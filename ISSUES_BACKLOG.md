@@ -1,51 +1,283 @@
-# ISSUES BACKLOG
+# Issue Templates
 
-## Issue Templates
+## Story 2.3
+### Requirements:
+- Requirement 1
+- Requirement 2
 
-### Story 2.3
-- [ ] Implement feature X in Story 2.3
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
 
-### Envelope Stories
-- [ ] Implement feature for Envelope story 3.1
-- [ ] Implement feature for Envelope story 3.2
-- [ ] Implement feature for Envelope story 3.3
-- [ ] Implement feature for Envelope story 3.4
-- [ ] Implement feature for Envelope story 3.5
+## Story 3.1
+### Requirements:
+- Requirement 1
+- Requirement 2
 
-### Transaction Stories
-- [ ] Implement feature for Transaction story 4.3
-- [ ] Implement feature for Transaction story 4.4
-- [ ] Implement feature for Transaction story 4.5
-- [ ] Implement feature for Transaction story 4.6
-- [ ] Implement feature for Transaction story 4.7
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
 
-### Frontend UI Stories
-- [ ] Implement feature for Frontend UI story 5.1
-- [ ] Implement feature for Frontend UI story 5.2
-- [ ] Implement feature for Frontend UI story 5.3
-- [ ] Implement feature for Frontend UI story 5.4
-- [ ] Implement feature for Frontend UI story 5.5
-- [ ] Implement feature for Frontend UI story 5.6
-- [ ] Implement feature for Frontend UI story 5.7
+## Story 3.2
+### Requirements:
+- Requirement 1
+- Requirement 2
 
-### Reporting Stories
-- [ ] Implement feature for Reporting story 6.1
-- [ ] Implement feature for Reporting story 6.2
-- [ ] Implement feature for Reporting story 6.3
-- [ ] Implement feature for Reporting story 6.4
-- [ ] Implement feature for Reporting story 6.5
-- [ ] Implement feature for Reporting story 6.6
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
 
-### Family Sharing Stories
-- [ ] Implement feature for Family Sharing story 7.1
-- [ ] Implement feature for Family Sharing story 7.2
-- [ ] Implement feature for Family Sharing story 7.3
-- [ ] Implement feature for Family Sharing story 7.5
+## Story 3.3
+### Requirements:
+- Requirement 1
+- Requirement 2
 
-### Remaining Epics
-- [ ] Implement Epic: Envelope System
-- [ ] Implement Epic: Frontend UI & UX
-- [ ] Implement Epic: Family Sharing & Multi-User Support
-- [ ] Implement Epic: DevOps & Monitoring
-- [ ] Implement Epic: Testing & Quality Assurance
-- [ ] Implement Epic: Documentation
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 3.4
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 3.5
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 4.3
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 4.4
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 4.5
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 4.6
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 4.7
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 5.1
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 5.2
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 5.3
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 5.4
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 5.5
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 5.6
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 5.7
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 6.1
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 6.2
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 6.3
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 6.4
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 6.5
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 6.6
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 7.1
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 7.2
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 7.3
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Story 7.5
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Epics
+### Epic 1
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Epic 2
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+## Epic 3
+### Requirements:
+- Requirement 1
+- Requirement 2
+
+### Acceptance Criteria:
+- Criteria 1
+- Criteria 2
+
+... more epics can be added as needed.
