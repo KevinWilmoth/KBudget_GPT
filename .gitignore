@@ -2,6 +2,10 @@
 *.log
 logs/
 
+# Deployment outputs (keep structure, exclude actual output files)
+infrastructure/arm-templates/main-deployment/outputs/*.json
+!infrastructure/arm-templates/main-deployment/outputs/README.md
+
 # PowerShell temporary files
 *.ps1xml
 

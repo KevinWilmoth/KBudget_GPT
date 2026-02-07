@@ -386,6 +386,110 @@ function Deploy-AzureFunctions {
 }
 
 ################################################################################
+# Post-Deployment Validation Functions
+################################################################################
+
+function Invoke-PostDeploymentValidation {
+    param(
+        [hashtable]$Deployments,
+        [string]$Environment,
+        [string[]]$ResourceTypes
+    )
+    
+    Write-Log "=== Post-Deployment Validation ===" "INFO"
+    
+    # Import validation module
+    $validationModule = Join-Path $ScriptDir "Deployment-Validation.psm1"
+    if (Test-Path $validationModule) {
+        Import-Module $validationModule -Force
+        
+        # Validate deployed resources
+        $validationResults = Test-DeploymentResources -Environment $Environment -ResourceTypes $ResourceTypes
+        
+        # Write validation summary
+        Write-DeploymentSummary -ValidationResults $validationResults -LogFile $LogFile
+        
+        # Send alerts if validation failed
+        if ($validationResults.OverallStatus -eq "Failed") {
+            Send-DeploymentAlert -ValidationResults $validationResults -AlertLevel "Critical"
+            Write-Log "Deployment validation FAILED - Some resources are missing or misconfigured" "ERROR"
+            return $false
+        }
+        
+        Write-Log "All deployed resources validated successfully" "SUCCESS"
+        return $true
+    }
+    else {
+        Write-Log "Validation module not found - skipping post-deployment validation" "WARNING"
+        return $true
+    }
+}
+
+function Export-DeploymentResults {
+    param(
+        [hashtable]$Deployments,
+        [string]$Environment
+    )
+    
+    Write-Log "=== Exporting Deployment Results ===" "INFO"
+    
+    $outputDir = Join-Path $ScriptDir "outputs"
+    if (-not (Test-Path $outputDir)) {
+        New-Item -ItemType Directory -Path $outputDir -Force | Out-Null
+    }
+    
+    $outputFile = Join-Path $outputDir "deployment-results_$($Environment)_$Timestamp.json"
+    
+    $results = @{
+        Environment = $Environment
+        Timestamp = $Timestamp
+        DeploymentTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        ResourceGroupName = $ResourceGroupName
+        Location = $Location
+        ResourcesDeployed = @($Deployments.Keys)
+        DeploymentDetails = @{}
+    }
+    
+    foreach ($key in $Deployments.Keys) {
+        $deployment = $Deployments[$key]
+        if ($deployment) {
+            $details = @{
+                DeploymentName = $deployment.DeploymentName
+                ProvisioningState = $deployment.ProvisioningState
+                Timestamp = if ($deployment.Timestamp) { $deployment.Timestamp.ToString('yyyy-MM-dd HH:mm:ss') } else { $null }
+            }
+            
+            # Extract outputs
+            if ($deployment.Outputs) {
+                $outputs = @{}
+                foreach ($outputKey in $deployment.Outputs.Keys) {
+                    $outputs[$outputKey] = $deployment.Outputs[$outputKey].Value
+                }
+                $details['Outputs'] = $outputs
+            }
+            
+            $results.DeploymentDetails[$key] = $details
+        }
+    }
+    
+    try {
+        $results | ConvertTo-Json -Depth 10 | Set-Content -Path $outputFile
+        Write-Log "Deployment results exported to: $outputFile" "SUCCESS"
+        
+        # Also create a latest.json symlink/copy for easy access
+        $latestFile = Join-Path $outputDir "deployment-results_$($Environment)_latest.json"
+        $results | ConvertTo-Json -Depth 10 | Set-Content -Path $latestFile
+        Write-Log "Latest results available at: $latestFile" "INFO"
+        
+        return $outputFile
+    }
+    catch {
+        Write-Log "Failed to export deployment results: $_" "WARNING"
+        return $null
+    }
+}
+
+################################################################################
 # Main Execution
 ################################################################################
 
@@ -404,6 +508,7 @@ try {
     Test-Prerequisites
     
     $deployments = @{}
+    $deploymentStartTime = Get-Date
     
     # Determine what to deploy
     $deployAll = $ResourceTypes -contains "all"
@@ -438,12 +543,30 @@ try {
         $deployments["Functions"] = Deploy-AzureFunctions
     }
     
+    $deploymentDuration = ((Get-Date) - $deploymentStartTime).TotalMinutes
+    
     Write-Log "=== Deployment Summary ===" "SUCCESS"
     Write-Log "Environment: $EnvName" "INFO"
     Write-Log "Resource Group: $ResourceGroupName" "INFO"
     Write-Log "Location: $Location" "INFO"
     Write-Log "Resources Deployed: $($deployments.Keys -join ', ')" "INFO"
+    Write-Log "Deployment Duration: $([math]::Round($deploymentDuration, 2)) minutes" "INFO"
     Write-Log "Log File: $LogFile" "INFO"
+    
+    # Export deployment results
+    if (-not $WhatIf) {
+        $outputFile = Export-DeploymentResults -Deployments $deployments -Environment $Environment
+        
+        # Perform post-deployment validation
+        $validationPassed = Invoke-PostDeploymentValidation -Deployments $deployments -Environment $Environment -ResourceTypes $ResourceTypes
+        
+        if (-not $validationPassed) {
+            Write-Log "=== Deployment Completed with VALIDATION ERRORS ===" "ERROR"
+            Write-Log "Review the validation summary above for details" "ERROR"
+            exit 1
+        }
+    }
+    
     Write-Log "=== Deployment Completed Successfully ===" "SUCCESS"
 }
 catch {
@@ -451,5 +574,24 @@ catch {
     Write-Log "Error: $_" "ERROR"
     Write-Log "Stack Trace: $($_.ScriptStackTrace)" "ERROR"
     Write-Log "Log File: $LogFile" "ERROR"
+    
+    # Send critical alert on deployment failure
+    try {
+        $alertData = @{
+            Environment = $Environment
+            OverallStatus = "Failed"
+            Resources = @{
+                Error = @{
+                    Exists = $false
+                    Error = $_.Exception.Message
+                }
+            }
+        }
+        Send-DeploymentAlert -ValidationResults $alertData -AlertLevel "Critical"
+    }
+    catch {
+        Write-Log "Failed to send deployment alert: $_" "WARNING"
+    }
+    
     exit 1
 }
