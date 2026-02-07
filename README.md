@@ -18,6 +18,15 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 ├── docs/                      # Project documentation
 │   ├── azure-resource-group-naming-conventions.md
 │   └── azure-resource-group-best-practices.md
+├── infrastructure/            # Infrastructure as Code
+│   └── arm-templates/        # ARM templates
+│       └── resource-groups/  # Resource group templates
+│           ├── resource-group.json
+│           ├── parameters.dev.json
+│           ├── parameters.staging.json
+│           ├── parameters.prod.json
+│           ├── deploy-resource-groups.sh
+│           └── README.md
 ├── issues/                    # Issue tracking
 │   └── 12.md                 # Password security requirements
 ├── ISSUES_BACKLOG.md         # Issue templates and backlog
@@ -25,6 +34,27 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 ```
 
 ## Getting Started
+
+### Infrastructure Deployment
+
+Deploy Azure Resource Groups for dev, staging, and prod environments:
+
+```bash
+# Navigate to the resource groups directory
+cd infrastructure/arm-templates/resource-groups
+
+# Deploy all environments
+./deploy-resource-groups.sh all
+
+# Or deploy individual environments
+./deploy-resource-groups.sh dev
+./deploy-resource-groups.sh staging
+./deploy-resource-groups.sh prod
+```
+
+For detailed deployment instructions, see [Resource Groups README](infrastructure/arm-templates/resource-groups/README.md).
+
+### Documentation
 
 For DevOps and infrastructure management, please refer to our documentation:
 - **[Azure Resource Group Naming Conventions](docs/azure-resource-group-naming-conventions.md)** - Start here for standard naming patterns for all environments
