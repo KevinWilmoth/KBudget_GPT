@@ -513,7 +513,7 @@ RESOURCE STATUS:
     
     foreach ($resourceType in $ValidationResults.Resources.Keys) {
         $resource = $ValidationResults.Resources[$resourceType]
-        $status = if ($resource.Exists) { "✓ DEPLOYED" } else { "✗ MISSING" }
+        $status = if ($resource.Exists) { "DEPLOYED" } else { "MISSING" }
         $summary += "`n$resourceType`: $status"
         
         if ($resource.ResourceId) {
