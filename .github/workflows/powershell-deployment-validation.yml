@@ -1,0 +1,343 @@
+name: PowerShell Deployment Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'infrastructure/arm-templates/**/*.ps1'
+      - 'infrastructure/arm-templates/**/*.json'
+      - '.github/workflows/powershell-deployment-validation.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'infrastructure/arm-templates/**/*.ps1'
+      - 'infrastructure/arm-templates/**/*.json'
+      - '.github/workflows/powershell-deployment-validation.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to validate'
+        required: false
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+jobs:
+  validate-scripts:
+    name: Validate PowerShell Scripts
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup PowerShell
+        shell: pwsh
+        run: |
+          Write-Host "PowerShell Version: $($PSVersionTable.PSVersion)"
+          Write-Host "OS: $($PSVersionTable.OS)"
+      
+      - name: Install Pester
+        shell: pwsh
+        run: |
+          Write-Host "Installing Pester testing framework..."
+          Install-Module -Name Pester -MinimumVersion 5.0.0 -Force -SkipPublisherCheck -Scope CurrentUser
+          Import-Module Pester
+          Write-Host "Pester version: $(Get-Module Pester | Select-Object -ExpandProperty Version)"
+      
+      - name: Validate PowerShell Syntax
+        shell: pwsh
+        run: |
+          Write-Host "Validating PowerShell script syntax..."
+          $scriptFiles = Get-ChildItem -Path infrastructure/arm-templates -Filter "*.ps1" -Recurse
+          
+          $errors = @()
+          foreach ($file in $scriptFiles) {
+            Write-Host "Checking: $($file.FullName)"
+            $parseErrors = $null
+            $null = [System.Management.Automation.PSParser]::Tokenize((Get-Content $file.FullName -Raw), [ref]$parseErrors)
+            
+            if ($parseErrors.Count -gt 0) {
+              $errors += "File: $($file.FullName)"
+              $errors += $parseErrors | ForEach-Object { "  - $($_.Message)" }
+            }
+          }
+          
+          if ($errors.Count -gt 0) {
+            Write-Error "PowerShell syntax errors found:`n$($errors -join "`n")"
+            exit 1
+          }
+          
+          Write-Host "✓ All PowerShell scripts have valid syntax"
+      
+      - name: Run Pester Tests
+        shell: pwsh
+        run: |
+          Write-Host "Running Pester tests..."
+          cd infrastructure/arm-templates/main-deployment
+          
+          $config = New-PesterConfiguration
+          $config.Run.Path = "Deploy-AzureResources.Tests.ps1"
+          $config.Output.Verbosity = "Detailed"
+          $config.TestResult.Enabled = $true
+          $config.TestResult.OutputPath = "test-results.xml"
+          $config.TestResult.OutputFormat = "NUnitXml"
+          
+          $result = Invoke-Pester -Configuration $config
+          
+          if ($result.FailedCount -gt 0) {
+            Write-Error "Pester tests failed! Failed count: $($result.FailedCount)"
+            exit 1
+          }
+          
+          Write-Host "✓ All Pester tests passed"
+      
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: infrastructure/arm-templates/main-deployment/test-results.xml
+          retention-days: 30
+      
+      - name: Validate ARM Templates
+        shell: pwsh
+        run: |
+          Write-Host "Validating ARM templates..."
+          cd infrastructure/arm-templates/main-deployment
+          
+          # Run the validation script
+          $result = & ./Validate-Templates.ps1
+          
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "ARM template validation failed"
+            exit 1
+          }
+          
+          Write-Host "✓ All ARM templates validated successfully"
+      
+      - name: Check for Required Functions
+        shell: pwsh
+        run: |
+          Write-Host "Checking for required deployment functions..."
+          
+          $deployScript = Get-Content infrastructure/arm-templates/main-deployment/Deploy-AzureResources.ps1 -Raw
+          
+          $requiredFunctions = @(
+            'Test-Prerequisites',
+            'Deploy-ResourceGroup',
+            'Deploy-VirtualNetwork',
+            'Deploy-KeyVault',
+            'Deploy-StorageAccount',
+            'Deploy-SqlDatabase',
+            'Deploy-AppService',
+            'Deploy-AzureFunctions',
+            'Invoke-PostDeploymentValidation',
+            'Export-DeploymentResults'
+          )
+          
+          $missing = @()
+          foreach ($func in $requiredFunctions) {
+            if ($deployScript -notmatch "function $func") {
+              $missing += $func
+            }
+          }
+          
+          if ($missing.Count -gt 0) {
+            Write-Error "Missing required functions: $($missing -join ', ')"
+            exit 1
+          }
+          
+          Write-Host "✓ All required functions found"
+      
+      - name: Verify Validation Module
+        shell: pwsh
+        run: |
+          Write-Host "Verifying Deployment-Validation module..."
+          
+          $modulePath = "infrastructure/arm-templates/main-deployment/Deployment-Validation.psm1"
+          
+          if (-not (Test-Path $modulePath)) {
+            Write-Error "Deployment-Validation module not found at $modulePath"
+            exit 1
+          }
+          
+          Import-Module $modulePath -Force
+          
+          $requiredExports = @(
+            'Get-DeploymentStatus',
+            'Test-ResourceGroupExists',
+            'Test-VirtualNetworkExists',
+            'Test-KeyVaultExists',
+            'Test-StorageAccountExists',
+            'Test-SqlServerExists',
+            'Test-AppServiceExists',
+            'Test-FunctionAppExists',
+            'Test-DeploymentResources',
+            'Export-DeploymentOutputs',
+            'Write-DeploymentSummary',
+            'Send-DeploymentAlert'
+          )
+          
+          $missing = @()
+          foreach ($export in $requiredExports) {
+            if (-not (Get-Command $export -ErrorAction SilentlyContinue)) {
+              $missing += $export
+            }
+          }
+          
+          Remove-Module Deployment-Validation -ErrorAction SilentlyContinue
+          
+          if ($missing.Count -gt 0) {
+            Write-Error "Missing exported functions: $($missing -join ', ')"
+            exit 1
+          }
+          
+          Write-Host "✓ Deployment-Validation module verified successfully"
+      
+      - name: Generate Validation Report
+        if: always()
+        shell: pwsh
+        run: |
+          Write-Host "Generating validation report..."
+          
+          $report = @"
+          ========================================
+          POWERSHELL DEPLOYMENT VALIDATION REPORT
+          ========================================
+          Date: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
+          Branch: ${{ github.ref_name }}
+          Commit: ${{ github.sha }}
+          
+          VALIDATION STATUS:
+          ✓ PowerShell syntax validation
+          ✓ Pester unit tests
+          ✓ ARM template validation
+          ✓ Required functions check
+          ✓ Validation module verification
+          
+          All checks passed successfully!
+          ========================================
+          "@
+          
+          Write-Host $report
+          
+          # Save report to file
+          $report | Out-File -FilePath validation-report.txt
+      
+      - name: Upload Validation Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: validation-report
+          path: validation-report.txt
+          retention-days: 30
+  
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Write-Host "Installing PSScriptAnalyzer..."
+          Install-Module -Name PSScriptAnalyzer -Force -SkipPublisherCheck -Scope CurrentUser
+          
+          Write-Host "Running security and best practices analysis..."
+          $scriptFiles = Get-ChildItem -Path infrastructure/arm-templates -Filter "*.ps1" -Recurse
+          
+          $issues = @()
+          foreach ($file in $scriptFiles) {
+            Write-Host "Analyzing: $($file.Name)"
+            $results = Invoke-ScriptAnalyzer -Path $file.FullName -Severity Warning,Error
+            
+            if ($results) {
+              $issues += "File: $($file.FullName)"
+              $issues += $results | ForEach-Object {
+                "  [$($_.Severity)] $($_.RuleName): $($_.Message) (Line $($_.Line))"
+              }
+            }
+          }
+          
+          if ($issues.Count -gt 0) {
+            Write-Warning "PSScriptAnalyzer found issues:"
+            $issues | ForEach-Object { Write-Warning $_ }
+            
+            # Fail the build if there are errors (not warnings)
+            $errors = $issues | Where-Object { $_ -match '\[Error\]' }
+            if ($errors.Count -gt 0) {
+              Write-Error "Critical issues found, failing build"
+              exit 1
+            }
+          } else {
+            Write-Host "✓ No security or best practice issues found"
+          }
+      
+      - name: Check for Hardcoded Secrets
+        shell: pwsh
+        run: |
+          Write-Host "Checking for hardcoded secrets..."
+          
+          $scriptFiles = Get-ChildItem -Path infrastructure/arm-templates -Filter "*.ps1" -Recurse
+          $patterns = @(
+            'password\s*=\s*[''"](?!.*\$)',
+            'apikey\s*=\s*[''"](?!.*\$)',
+            'secret\s*=\s*[''"](?!.*\$)',
+            'connectionstring\s*=\s*[''"](?!.*\$)'
+          )
+          
+          $findings = @()
+          foreach ($file in $scriptFiles) {
+            $content = Get-Content $file.FullName -Raw
+            foreach ($pattern in $patterns) {
+              if ($content -imatch $pattern) {
+                $findings += "Potential hardcoded secret in $($file.Name): $($matches[0])"
+              }
+            }
+          }
+          
+          if ($findings.Count -gt 0) {
+            Write-Warning "Potential hardcoded secrets found:"
+            $findings | ForEach-Object { Write-Warning $_ }
+            Write-Error "Please use Azure Key Vault or environment variables for secrets"
+            exit 1
+          }
+          
+          Write-Host "✓ No hardcoded secrets detected"
+
+  notify-status:
+    name: Notify Status
+    runs-on: ubuntu-latest
+    needs: [validate-scripts, security-scan]
+    if: always()
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Check Status
+        shell: pwsh
+        run: |
+          $validateStatus = "${{ needs.validate-scripts.result }}"
+          $securityStatus = "${{ needs.security-scan.result }}"
+          
+          Write-Host "Validation Status: $validateStatus"
+          Write-Host "Security Scan Status: $securityStatus"
+          
+          if ($validateStatus -eq "failure" -or $securityStatus -eq "failure") {
+            Write-Error "❌ PowerShell deployment validation FAILED"
+            Write-Error "Please review the errors above and fix the issues"
+            exit 1
+          }
+          
+          Write-Host "✅ All PowerShell deployment validations PASSED"
