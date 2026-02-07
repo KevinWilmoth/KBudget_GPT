@@ -124,7 +124,7 @@ jobs:
       
       - name: Check for Required Functions
         shell: pwsh
-        run: |
+        run: |          
           Write-Host "Checking for required deployment functions..."
           
           $deployScript = Get-Content infrastructure/arm-templates/main-deployment/Deploy-AzureResources.ps1 -Raw
@@ -159,6 +159,8 @@ jobs:
       - name: Verify Validation Module
         shell: pwsh
         run: |
+          echo "infrastructure/arm-templates/main-deployment/Deployment-Validation.psm1" >> $PSModulePath
+
           Write-Host "Verifying Deployment-Validation module..."
           
           $modulePath = "infrastructure/arm-templates/main-deployment/Deployment-Validation.psm1"
