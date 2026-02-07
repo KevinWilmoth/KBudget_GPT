@@ -20,6 +20,9 @@ All resource groups follow the naming convention documented in [Azure Resource G
 | `parameters.staging.json` | Parameters for staging environment |
 | `parameters.prod.json` | Parameters for production environment |
 | `deploy-resource-groups.sh` | Deployment script with logging and validation |
+| `delete-resource-group.json` | ARM template for resource group deletion operations |
+| `Cleanup-ResourceGroups.ps1` | PowerShell script for automated cleanup based on tags/age |
+| `CLEANUP-README.md` | Documentation for cleanup and deletion scripts |
 | `README.md` | This file |
 
 ## Prerequisites
@@ -237,9 +240,30 @@ This template can be integrated into Azure DevOps, GitHub Actions, or other CI/C
     arguments: 'all'
 ```
 
-## Cleanup
+## Cleanup and Resource Group Deletion
 
-To delete the resource groups (⚠️ WARNING: This will delete ALL resources within the groups):
+### Automated Cleanup
+
+For automated cleanup of old or non-production resource groups, see **[CLEANUP-README.md](CLEANUP-README.md)** which provides:
+
+- **PowerShell script** for automated cleanup based on tags, age, or environment
+- **Dry-run mode** for safe review before deletion
+- **Production protection** to prevent accidental deletion of production resources
+- **Detailed logging** with timestamps for audit and troubleshooting
+
+Quick start for automated cleanup:
+
+```powershell
+# Dry run - see what would be deleted (safe, no actual deletion)
+./Cleanup-ResourceGroups.ps1 -Environment Development -OlderThanDays 30
+
+# Actual deletion (requires confirmation)
+./Cleanup-ResourceGroups.ps1 -Environment Development -OlderThanDays 30 -DryRun:$false
+```
+
+### Manual Deletion
+
+To manually delete specific resource groups (⚠️ WARNING: This will delete ALL resources within the groups):
 
 ```bash
 # Delete development resource group
@@ -252,8 +276,11 @@ az group delete --name kbudget-staging-rg --yes --no-wait
 az group delete --name kbudget-prod-rg --yes --no-wait
 ```
 
+For more information on cleanup automation, see **[CLEANUP-README.md](CLEANUP-README.md)**.
+
 ## Related Documentation
 
+- [Resource Group Cleanup Automation](CLEANUP-README.md)
 - [Azure Resource Group Naming Conventions](../../../docs/azure-resource-group-naming-conventions.md)
 - [Azure Resource Group Best Practices](../../../docs/azure-resource-group-best-practices.md)
 - [Azure ARM Template Reference](https://docs.microsoft.com/azure/azure-resource-manager/templates/)

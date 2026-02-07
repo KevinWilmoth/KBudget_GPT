@@ -26,6 +26,9 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 │           ├── parameters.staging.json
 │           ├── parameters.prod.json
 │           ├── deploy-resource-groups.sh
+│           ├── delete-resource-group.json
+│           ├── Cleanup-ResourceGroups.ps1
+│           ├── CLEANUP-README.md
 │           └── README.md
 ├── issues/                    # Issue tracking
 │   └── 12.md                 # Password security requirements
@@ -53,6 +56,23 @@ cd infrastructure/arm-templates/resource-groups
 ```
 
 For detailed deployment instructions, see [Resource Groups README](infrastructure/arm-templates/resource-groups/README.md).
+
+### Resource Group Cleanup
+
+Automate cleanup of old or non-production resource groups to manage costs:
+
+```powershell
+# Navigate to the resource groups directory
+cd infrastructure/arm-templates/resource-groups
+
+# Dry run - see what would be deleted (safe, no deletion)
+./Cleanup-ResourceGroups.ps1 -Environment Development -OlderThanDays 30
+
+# Actual deletion (requires confirmation)
+./Cleanup-ResourceGroups.ps1 -Environment Development -OlderThanDays 30 -DryRun:$false
+```
+
+For detailed cleanup documentation, see [Cleanup README](infrastructure/arm-templates/resource-groups/CLEANUP-README.md).
 
 ### Documentation
 
