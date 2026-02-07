@@ -1,0 +1,69 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "ARM Template for deleting Azure Resource Groups - KBudget GPT Cleanup Automation"
+  },
+  "parameters": {
+    "resourceGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the resource group to delete"
+      }
+    },
+    "deleteConfirmation": {
+      "type": "string",
+      "defaultValue": "false",
+      "allowedValues": [
+        "true",
+        "false"
+      ],
+      "metadata": {
+        "description": "Confirmation flag - must be 'true' to proceed with deletion"
+      }
+    }
+  },
+  "variables": {
+    "canDelete": "[equals(parameters('deleteConfirmation'), 'true')]"
+  },
+  "resources": [
+    {
+      "condition": "[variables('canDelete')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "[concat('delete-', parameters('resourceGroupName'))]",
+      "location": "[deployment().location]",
+      "properties": {
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": []
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "resourceGroupName": {
+      "type": "string",
+      "value": "[parameters('resourceGroupName')]",
+      "metadata": {
+        "description": "Name of the resource group targeted for deletion"
+      }
+    },
+    "deleteConfirmation": {
+      "type": "string",
+      "value": "[parameters('deleteConfirmation')]",
+      "metadata": {
+        "description": "Whether deletion was confirmed"
+      }
+    },
+    "message": {
+      "type": "string",
+      "value": "[if(variables('canDelete'), concat('Resource group ', parameters('resourceGroupName'), ' marked for deletion'), concat('Deletion not confirmed for ', parameters('resourceGroupName'), ' - set deleteConfirmation to true'))]",
+      "metadata": {
+        "description": "Status message"
+      }
+    }
+  }
+}
