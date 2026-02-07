@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "functionAppName": {
+      "value": "kbudget-staging-func"
+    },
+    "storageAccountName": {
+      "value": "kbudgetstagingst"
+    },
+    "environment": {
+      "value": "Staging"
+    },
+    "runtime": {
+      "value": "dotnet"
+    },
+    "runtimeVersion": {
+      "value": "8"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Staging",
+        "Project": "KBudget-GPT",
+        "Owner": "DevOps-Team",
+        "CostCenter": "CC-12345",
+        "Application": "KBudget"
+      }
+    }
+  }
+}

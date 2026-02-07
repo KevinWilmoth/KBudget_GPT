@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appServicePlanName": {
+      "value": "kbudget-prod-asp"
+    },
+    "appServiceName": {
+      "value": "kbudget-prod-app"
+    },
+    "environment": {
+      "value": "Production"
+    },
+    "skuName": {
+      "value": "P1v2"
+    },
+    "skuCapacity": {
+      "value": 2
+    },
+    "alwaysOn": {
+      "value": true
+    },
+    "tags": {
+      "value": {
+        "Environment": "Production",
+        "Project": "KBudget-GPT",
+        "Owner": "DevOps-Team",
+        "CostCenter": "CC-12345",
+        "Application": "KBudget"
+      }
+    }
+  }
+}

@@ -8,6 +8,7 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 
 ### Project Documentation
 
+- [Azure Infrastructure Overview](docs/azure-infrastructure-overview.md) - Complete guide to the Azure architecture, resources, security, and deployment
 - [Azure Resource Group Naming Conventions](docs/azure-resource-group-naming-conventions.md) - Standard naming conventions for Azure Resource Groups across all environments
 - [Azure Resource Group Best Practices](docs/azure-resource-group-best-practices.md) - Comprehensive guide for managing Azure Resource Groups, including resource organization, tagging strategies, and lifecycle management
 
@@ -15,30 +16,69 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 
 ```
 .
-├── docs/                      # Project documentation
+├── docs/                           # Project documentation
 │   ├── azure-resource-group-naming-conventions.md
 │   └── azure-resource-group-best-practices.md
-├── infrastructure/            # Infrastructure as Code
-│   └── arm-templates/        # ARM templates
-│       └── resource-groups/  # Resource group templates
-│           ├── resource-group.json
-│           ├── parameters.dev.json
-│           ├── parameters.staging.json
-│           ├── parameters.prod.json
-│           ├── deploy-resource-groups.sh
-│           ├── delete-resource-group.json
-│           ├── Cleanup-ResourceGroups.ps1
-│           ├── CLEANUP-README.md
+├── infrastructure/                 # Infrastructure as Code
+│   └── arm-templates/             # ARM templates
+│       ├── resource-groups/       # Resource group templates
+│       ├── app-service/           # App Service templates
+│       ├── sql-database/          # SQL Database templates
+│       ├── storage-account/       # Storage Account templates
+│       ├── azure-functions/       # Azure Functions templates
+│       ├── key-vault/             # Key Vault templates
+│       ├── virtual-network/       # Virtual Network templates
+│       └── main-deployment/       # Main orchestration scripts
+│           ├── Deploy-AzureResources.ps1
 │           └── README.md
-├── issues/                    # Issue tracking
-│   └── 12.md                 # Password security requirements
-├── ISSUES_BACKLOG.md         # Issue templates and backlog
-└── README.md                 # This file
+├── issues/                        # Issue tracking
+├── ISSUES_BACKLOG.md             # Issue templates and backlog
+└── README.md                     # This file
 ```
 
 ## Getting Started
 
-### Infrastructure Deployment
+### Complete Infrastructure Deployment
+
+Deploy all Azure resources for the KBudget GPT application using PowerShell:
+
+```powershell
+# Navigate to the main deployment directory
+cd infrastructure/arm-templates/main-deployment
+
+# Deploy all resources to development
+.\Deploy-AzureResources.ps1 -Environment dev
+
+# Deploy all resources to staging
+.\Deploy-AzureResources.ps1 -Environment staging
+
+# Deploy all resources to production
+.\Deploy-AzureResources.ps1 -Environment prod
+```
+
+The deployment includes:
+- **Virtual Network**: Network isolation with subnets
+- **Key Vault**: Secure storage for secrets and keys
+- **Storage Account**: Blob storage for application data
+- **SQL Database**: Azure SQL Server and Database
+- **App Service**: Web application hosting
+- **Azure Functions**: Serverless compute
+
+For detailed instructions, see [Main Deployment README](infrastructure/arm-templates/main-deployment/README.md).
+
+### Individual Resource Deployment
+
+You can also deploy individual resources:
+
+```powershell
+# Deploy only Virtual Network and Storage
+.\Deploy-AzureResources.ps1 -Environment dev -ResourceTypes @("vnet", "storage")
+
+# Deploy only SQL Database
+.\Deploy-AzureResources.ps1 -Environment dev -ResourceTypes @("sql")
+```
+
+### Resource Groups Only
 
 Deploy Azure Resource Groups for dev, staging, and prod environments:
 
@@ -77,11 +117,71 @@ For detailed cleanup documentation, see [Cleanup README](infrastructure/arm-temp
 ### Documentation
 
 For DevOps and infrastructure management, please refer to our documentation:
-- **[Azure Resource Group Naming Conventions](docs/azure-resource-group-naming-conventions.md)** - Start here for standard naming patterns for all environments
+- **[Main Deployment README](infrastructure/arm-templates/main-deployment/README.md)** - Complete guide for deploying all Azure resources
+- **[Azure Resource Group Naming Conventions](docs/azure-resource-group-naming-conventions.md)** - Standard naming patterns for all environments
 - **[Azure Resource Group Best Practices](docs/azure-resource-group-best-practices.md)** - Comprehensive guide covering:
   - How to organize and structure Azure resources
   - Recommended tagging strategies for cost management and governance
   - Best practices for resource group lifecycle management
+
+#### Resource-Specific Documentation
+
+- [App Service](infrastructure/arm-templates/app-service/README.md) - Web application hosting
+- [SQL Database](infrastructure/arm-templates/sql-database/README.md) - Database server and configuration
+- [Storage Account](infrastructure/arm-templates/storage-account/README.md) - Blob storage and file services
+- [Azure Functions](infrastructure/arm-templates/azure-functions/README.md) - Serverless compute
+- [Key Vault](infrastructure/arm-templates/key-vault/README.md) - Secrets and key management
+- [Virtual Network](infrastructure/arm-templates/virtual-network/README.md) - Network isolation and security
+- [Resource Groups](infrastructure/arm-templates/resource-groups/README.md) - Resource group deployment
+
+## Azure Infrastructure
+
+### Architecture Overview
+
+The KBudget GPT application uses the following Azure resources:
+
+| Resource | Purpose | Environments |
+|----------|---------|--------------|
+| **Resource Group** | Logical container for resources | dev, staging, prod |
+| **Virtual Network** | Network isolation with subnets | All environments |
+| **Key Vault** | Secure storage for secrets, keys, certificates | All environments |
+| **Storage Account** | Blob storage for application data | All environments |
+| **SQL Database** | Application database (Azure SQL) | All environments |
+| **App Service** | Web application hosting (.NET 8.0) | All environments |
+| **Azure Functions** | Serverless background processing | All environments |
+
+### Security Features
+
+✅ **Secrets Management**: All passwords and keys stored in Key Vault  
+✅ **Managed Identities**: App Service and Functions use system-assigned identities  
+✅ **Network Security**: VNet isolation with NSGs and service endpoints  
+✅ **Encryption**: TLS 1.2 minimum, encrypted storage and database  
+✅ **HTTPS Only**: All web endpoints require HTTPS  
+✅ **Access Control**: RBAC and Key Vault access policies
+
+### Deployment Features
+
+✅ **Multi-Environment**: Support for dev, staging, and production  
+✅ **Idempotent**: Safe to run deployments multiple times  
+✅ **Automated**: PowerShell script orchestrates all resources  
+✅ **Flexible**: Deploy all resources or select specific ones  
+✅ **Logged**: Detailed logging for troubleshooting  
+✅ **Validated**: Pre-deployment prerequisite checks
+
+### Prerequisites
+
+To deploy the infrastructure, you need:
+
+1. **Azure Subscription** with Contributor or Owner permissions
+2. **PowerShell 7.0+** or Windows PowerShell 5.1+
+3. **Azure PowerShell Module (Az)**:
+   ```powershell
+   Install-Module -Name Az -AllowClobber -Scope CurrentUser
+   ```
+4. **Azure Authentication**:
+   ```powershell
+   Connect-AzAccount
+   ```
 
 ## Contributing
 

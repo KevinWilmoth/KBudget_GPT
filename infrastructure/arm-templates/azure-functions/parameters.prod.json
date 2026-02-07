@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "functionAppName": {
+      "value": "kbudget-prod-func"
+    },
+    "storageAccountName": {
+      "value": "kbudgetprodst"
+    },
+    "environment": {
+      "value": "Production"
+    },
+    "runtime": {
+      "value": "dotnet"
+    },
+    "runtimeVersion": {
+      "value": "8"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Production",
+        "Project": "KBudget-GPT",
+        "Owner": "DevOps-Team",
+        "CostCenter": "CC-12345",
+        "Application": "KBudget"
+      }
+    }
+  }
+}
