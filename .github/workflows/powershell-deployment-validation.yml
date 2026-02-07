@@ -11,6 +11,7 @@ on:
     branches: [ main, develop ]
     paths:
       - 'infrastructure/arm-templates/**/*.ps1'
+      - 'infrastructure/arm-templates/**/*.psm1'
       - 'infrastructure/arm-templates/**/*.json'
       - '.github/workflows/powershell-deployment-validation.yml'
   workflow_dispatch:
