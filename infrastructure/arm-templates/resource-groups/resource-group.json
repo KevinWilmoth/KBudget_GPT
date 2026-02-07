@@ -1,0 +1,125 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "ARM Template for creating Azure Resource Groups following KBudget GPT naming conventions"
+  },
+  "parameters": {
+    "resourceGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the resource group to create (must follow naming convention: <app>-<env>-rg)"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "eastus",
+      "metadata": {
+        "description": "Azure region for the resource group"
+      }
+    },
+    "environment": {
+      "type": "string",
+      "allowedValues": [
+        "Development",
+        "Staging",
+        "Production",
+        "QA",
+        "Demo",
+        "Sandbox"
+      ],
+      "metadata": {
+        "description": "Environment identifier for tagging"
+      }
+    },
+    "project": {
+      "type": "string",
+      "defaultValue": "KBudget-GPT",
+      "metadata": {
+        "description": "Project identifier for tagging"
+      }
+    },
+    "owner": {
+      "type": "string",
+      "defaultValue": "DevOps-Team",
+      "metadata": {
+        "description": "Team or person responsible for the resource group"
+      }
+    },
+    "costCenter": {
+      "type": "string",
+      "defaultValue": "CC-12345",
+      "metadata": {
+        "description": "Cost center for billing"
+      }
+    },
+    "createdDate": {
+      "type": "string",
+      "defaultValue": "[utcNow('yyyy-MM-dd')]",
+      "metadata": {
+        "description": "Resource group creation date"
+      }
+    },
+    "application": {
+      "type": "string",
+      "defaultValue": "KBudget",
+      "metadata": {
+        "description": "Application name"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2021-04-01",
+      "name": "[parameters('resourceGroupName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "Environment": "[parameters('environment')]",
+        "Project": "[parameters('project')]",
+        "Owner": "[parameters('owner')]",
+        "CostCenter": "[parameters('costCenter')]",
+        "CreatedDate": "[parameters('createdDate')]",
+        "Application": "[parameters('application')]"
+      },
+      "properties": {}
+    }
+  ],
+  "outputs": {
+    "resourceGroupName": {
+      "type": "string",
+      "value": "[parameters('resourceGroupName')]",
+      "metadata": {
+        "description": "The name of the created resource group"
+      }
+    },
+    "resourceGroupId": {
+      "type": "string",
+      "value": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('resourceGroupName'))]",
+      "metadata": {
+        "description": "The resource ID of the created resource group"
+      }
+    },
+    "resourceGroupLocation": {
+      "type": "string",
+      "value": "[parameters('location')]",
+      "metadata": {
+        "description": "The location of the created resource group"
+      }
+    },
+    "tags": {
+      "type": "object",
+      "value": {
+        "Environment": "[parameters('environment')]",
+        "Project": "[parameters('project')]",
+        "Owner": "[parameters('owner')]",
+        "CostCenter": "[parameters('costCenter')]",
+        "CreatedDate": "[parameters('createdDate')]",
+        "Application": "[parameters('application')]"
+      },
+      "metadata": {
+        "description": "Tags applied to the resource group"
+      }
+    }
+  }
+}

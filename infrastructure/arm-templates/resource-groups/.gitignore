@@ -1,0 +1,7 @@
+# Deployment logs
+logs/
+*.log
+
+# Azure deployment temporary files
+*.zip
+*.tmp
