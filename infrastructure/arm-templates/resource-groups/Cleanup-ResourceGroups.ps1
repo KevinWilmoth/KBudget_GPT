@@ -120,6 +120,7 @@ function Initialize-Logging {
 function Write-Log {
     param(
         [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
         [string]$Message,
         
         [Parameter(Mandatory = $false)]
@@ -129,6 +130,13 @@ function Write-Log {
         [Parameter(Mandatory = $true)]
         [string]$LogFile
     )
+    
+    # Handle empty messages (for blank lines)
+    if ([string]::IsNullOrEmpty($Message)) {
+        Add-Content -Path $LogFile -Value ""
+        Write-Host ""
+        return
+    }
     
     $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
     $logEntry = "[$Level] $timestamp - $Message"
