@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appServicePlanName": {
+      "value": "kbudget-staging-asp"
+    },
+    "appServiceName": {
+      "value": "kbudget-staging-app"
+    },
+    "environment": {
+      "value": "Staging"
+    },
+    "skuName": {
+      "value": "S1"
+    },
+    "skuCapacity": {
+      "value": 1
+    },
+    "alwaysOn": {
+      "value": true
+    },
+    "tags": {
+      "value": {
+        "Environment": "Staging",
+        "Project": "KBudget-GPT",
+        "Owner": "DevOps-Team",
+        "CostCenter": "CC-12345",
+        "Application": "KBudget"
+      }
+    }
+  }
+}

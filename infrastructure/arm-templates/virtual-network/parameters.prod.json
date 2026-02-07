@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vnetName": {
+      "value": "kbudget-prod-vnet"
+    },
+    "vnetAddressPrefix": {
+      "value": "10.2.0.0/16"
+    },
+    "appSubnetPrefix": {
+      "value": "10.2.1.0/24"
+    },
+    "dbSubnetPrefix": {
+      "value": "10.2.2.0/24"
+    },
+    "funcSubnetPrefix": {
+      "value": "10.2.3.0/24"
+    },
+    "enableDdosProtection": {
+      "value": true
+    },
+    "tags": {
+      "value": {
+        "Environment": "Production",
+        "Project": "KBudget-GPT",
+        "Owner": "DevOps-Team",
+        "CostCenter": "CC-12345",
+        "Application": "KBudget"
+      }
+    }
+  }
+}

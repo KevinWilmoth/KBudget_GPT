@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageAccountName": {
+      "value": "kbudgetstagingst"
+    },
+    "skuName": {
+      "value": "Standard_GRS"
+    },
+    "accessTier": {
+      "value": "Hot"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Staging",
+        "Project": "KBudget-GPT",
+        "Owner": "DevOps-Team",
+        "CostCenter": "CC-12345",
+        "Application": "KBudget"
+      }
+    }
+  }
+}

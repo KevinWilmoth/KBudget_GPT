@@ -1,0 +1,41 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sqlServerName": {
+      "value": "kbudget-dev-sql"
+    },
+    "sqlDatabaseName": {
+      "value": "kbudget-dev-db"
+    },
+    "administratorLogin": {
+      "value": "sqladmin"
+    },
+    "administratorLoginPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/{subscription-id}/resourceGroups/kbudget-dev-rg/providers/Microsoft.KeyVault/vaults/kbudget-dev-kv"
+        },
+        "secretName": "SqlAdminPassword"
+      }
+    },
+    "skuName": {
+      "value": "Basic"
+    },
+    "skuTier": {
+      "value": "Basic"
+    },
+    "enableAdvancedThreatProtection": {
+      "value": false
+    },
+    "tags": {
+      "value": {
+        "Environment": "Development",
+        "Project": "KBudget-GPT",
+        "Owner": "DevOps-Team",
+        "CostCenter": "CC-12345",
+        "Application": "KBudget"
+      }
+    }
+  }
+}
