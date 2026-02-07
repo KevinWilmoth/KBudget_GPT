@@ -4,6 +4,8 @@
 
 This document provides best practices for managing Azure Resource Groups in the KBudget GPT project. Following these guidelines ensures consistent resource organization, proper tagging, and effective lifecycle management.
 
+**For standardized naming conventions, please refer to our [Azure Resource Group Naming Conventions](azure-resource-group-naming-conventions.md) document.**
+
 ## Resource Group Purpose
 
 ### What is a Resource Group?
@@ -116,7 +118,7 @@ resource "azurerm_resource_group" "kbudget_prod" {
 
 #### Planning Phase
 Before creating a resource group, consider:
-1. **Naming Convention**: Follow a consistent naming pattern (e.g., `<app>-<env>-rg`)
+1. **Naming Convention**: Follow the standard naming pattern defined in [Azure Resource Group Naming Conventions](azure-resource-group-naming-conventions.md) (e.g., `<app>-<env>-rg`)
 2. **Location**: Choose the Azure region closest to your users or data
 3. **Subscription**: Determine the appropriate subscription based on billing and governance
 4. **Tags**: Prepare all required tags before creation
