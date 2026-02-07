@@ -8,6 +8,7 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 
 ### Project Documentation
 
+- **[PowerShell Deployment Guide](docs/POWERSHELL-DEPLOYMENT-GUIDE.md)** - Comprehensive guide for all PowerShell deployment scripts including prerequisites, usage examples, parameters, troubleshooting, and CI/CD integration
 - [Azure Infrastructure Overview](docs/azure-infrastructure-overview.md) - Complete guide to the Azure architecture, resources, security, and deployment
 - [Azure Resource Group Naming Conventions](docs/azure-resource-group-naming-conventions.md) - Standard naming conventions for Azure Resource Groups across all environments
 - [Azure Resource Group Best Practices](docs/azure-resource-group-best-practices.md) - Comprehensive guide for managing Azure Resource Groups, including resource organization, tagging strategies, and lifecycle management
@@ -38,14 +39,29 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 
 ## Getting Started
 
-### Complete Infrastructure Deployment
+### PowerShell Deployment Scripts
 
-Deploy all Azure resources for the KBudget GPT application using PowerShell:
+The KBudget GPT project uses PowerShell scripts for infrastructure deployment and management. For comprehensive documentation on all scripts, prerequisites, parameters, troubleshooting, and best practices, see the **[PowerShell Deployment Guide](docs/POWERSHELL-DEPLOYMENT-GUIDE.md)**.
 
+#### Quick Start
+
+**1. Prerequisites**:
 ```powershell
-# Navigate to the main deployment directory
-cd infrastructure/arm-templates/main-deployment
+# Install Azure PowerShell module
+Install-Module -Name Az -AllowClobber -Scope CurrentUser
 
+# Login to Azure
+Connect-AzAccount
+```
+
+**2. Validate Templates** (recommended before deployment):
+```powershell
+cd infrastructure/arm-templates/main-deployment
+.\Validate-Templates.ps1
+```
+
+**3. Deploy Infrastructure**:
+```powershell
 # Deploy all resources to development
 .\Deploy-AzureResources.ps1 -Environment dev
 
@@ -64,7 +80,7 @@ The deployment includes:
 - **App Service**: Web application hosting
 - **Azure Functions**: Serverless compute
 
-For detailed instructions, see [Main Deployment README](infrastructure/arm-templates/main-deployment/README.md).
+For detailed instructions, see [Main Deployment README](infrastructure/arm-templates/main-deployment/README.md) or the [PowerShell Deployment Guide](docs/POWERSHELL-DEPLOYMENT-GUIDE.md).
 
 ### Individual Resource Deployment
 
@@ -117,6 +133,7 @@ For detailed cleanup documentation, see [Cleanup README](infrastructure/arm-temp
 ### Documentation
 
 For DevOps and infrastructure management, please refer to our documentation:
+- **[PowerShell Deployment Guide](docs/POWERSHELL-DEPLOYMENT-GUIDE.md)** - Complete guide for all PowerShell deployment scripts with examples, parameters, and troubleshooting
 - **[Main Deployment README](infrastructure/arm-templates/main-deployment/README.md)** - Complete guide for deploying all Azure resources
 - **[Azure Resource Group Naming Conventions](docs/azure-resource-group-naming-conventions.md)** - Standard naming patterns for all environments
 - **[Azure Resource Group Best Practices](docs/azure-resource-group-best-practices.md)** - Comprehensive guide covering:
