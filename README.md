@@ -9,6 +9,7 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 ### Project Documentation
 
 - **[PowerShell Deployment Guide](docs/POWERSHELL-DEPLOYMENT-GUIDE.md)** - Comprehensive guide for all PowerShell deployment scripts including prerequisites, usage examples, parameters, troubleshooting, and CI/CD integration
+- **[Deployment Validation and Testing Guide](docs/DEPLOYMENT-VALIDATION-GUIDE.md)** - Complete guide for deployment validation, automated testing, CI/CD pipeline integration, and error handling
 - [Azure Infrastructure Overview](docs/azure-infrastructure-overview.md) - Complete guide to the Azure architecture, resources, security, and deployment
 - [Azure Resource Group Naming Conventions](docs/azure-resource-group-naming-conventions.md) - Standard naming conventions for Azure Resource Groups across all environments
 - [Azure Resource Group Best Practices](docs/azure-resource-group-best-practices.md) - Comprehensive guide for managing Azure Resource Groups, including resource organization, tagging strategies, and lifecycle management
@@ -130,10 +131,40 @@ cd infrastructure/arm-templates/resource-groups
 
 For detailed cleanup documentation, see [Cleanup README](infrastructure/arm-templates/resource-groups/CLEANUP-README.md).
 
+### Deployment Validation and Testing
+
+All deployment scripts include built-in validation and automated testing:
+
+**Validation Features**:
+- ✅ Post-deployment resource verification
+- ✅ Status checking and health monitoring  
+- ✅ Deployment output collection and storage
+- ✅ Automated alerts for critical failures
+- ✅ Comprehensive validation summaries
+
+**Testing**:
+```powershell
+# Run Pester tests locally
+cd infrastructure/arm-templates/main-deployment
+Install-Module -Name Pester -Force -SkipPublisherCheck
+Invoke-Pester -Path Deploy-AzureResources.Tests.ps1
+```
+
+**CI/CD Integration**:
+- GitHub Actions workflow automatically validates scripts on every commit
+- PowerShell syntax validation
+- Pester unit tests
+- ARM template validation
+- Security scanning with PSScriptAnalyzer
+- Hardcoded secrets detection
+
+For complete details, see the **[Deployment Validation and Testing Guide](docs/DEPLOYMENT-VALIDATION-GUIDE.md)**.
+
 ### Documentation
 
 For DevOps and infrastructure management, please refer to our documentation:
 - **[PowerShell Deployment Guide](docs/POWERSHELL-DEPLOYMENT-GUIDE.md)** - Complete guide for all PowerShell deployment scripts with examples, parameters, and troubleshooting
+- **[Deployment Validation and Testing Guide](docs/DEPLOYMENT-VALIDATION-GUIDE.md)** - Comprehensive guide for validation, testing, CI/CD integration, and error handling
 - **[Main Deployment README](infrastructure/arm-templates/main-deployment/README.md)** - Complete guide for deploying all Azure resources
 - **[Azure Resource Group Naming Conventions](docs/azure-resource-group-naming-conventions.md)** - Standard naming patterns for all environments
 - **[Azure Resource Group Best Practices](docs/azure-resource-group-best-practices.md)** - Comprehensive guide covering:
@@ -183,7 +214,12 @@ The KBudget GPT application uses the following Azure resources:
 ✅ **Automated**: PowerShell script orchestrates all resources  
 ✅ **Flexible**: Deploy all resources or select specific ones  
 ✅ **Logged**: Detailed logging for troubleshooting  
-✅ **Validated**: Pre-deployment prerequisite checks
+✅ **Validated**: Pre-deployment prerequisite checks  
+✅ **Post-Deployment Validation**: Automatic resource verification after deployment  
+✅ **Output Collection**: Deployment results exported to JSON for auditing  
+✅ **Automated Testing**: Pester tests for deployment script validation  
+✅ **CI/CD Integration**: GitHub Actions workflow for continuous validation  
+✅ **Alert System**: Automated notifications for critical failures
 
 ### Prerequisites
 
