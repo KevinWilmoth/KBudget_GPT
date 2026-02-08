@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workspaceId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-dev-rg/providers/Microsoft.OperationalInsights/workspaces/kbudget-dev-law"
+    },
+    "appServiceId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-dev-rg/providers/Microsoft.Web/sites/kbudget-dev-app"
+    },
+    "appServiceName": {
+      "value": "kbudget-dev-app"
+    },
+    "sqlServerId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-dev-rg/providers/Microsoft.Sql/servers/kbudget-dev-sql"
+    },
+    "sqlServerName": {
+      "value": "kbudget-dev-sql"
+    },
+    "sqlDatabaseName": {
+      "value": "kbudget-dev-db"
+    },
+    "storageAccountId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-dev-rg/providers/Microsoft.Storage/storageAccounts/kbudgetdevst"
+    },
+    "storageAccountName": {
+      "value": "kbudgetdevst"
+    },
+    "functionAppId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-dev-rg/providers/Microsoft.Web/sites/kbudget-dev-func"
+    },
+    "functionAppName": {
+      "value": "kbudget-dev-func"
+    },
+    "keyVaultId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-dev-rg/providers/Microsoft.KeyVault/vaults/kbudget-dev-kv"
+    },
+    "keyVaultName": {
+      "value": "kbudget-dev-kv"
+    }
+  }
+}

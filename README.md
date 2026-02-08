@@ -20,7 +20,8 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 .
 ├── docs/                           # Project documentation
 │   ├── azure-resource-group-naming-conventions.md
-│   └── azure-resource-group-best-practices.md
+│   ├── azure-resource-group-best-practices.md
+│   └── MONITORING-OBSERVABILITY.md # Monitoring and observability guide
 ├── infrastructure/                 # Infrastructure as Code
 │   └── arm-templates/             # ARM templates
 │       ├── resource-groups/       # Resource group templates
@@ -30,6 +31,9 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 │       ├── azure-functions/       # Azure Functions templates
 │       ├── key-vault/             # Key Vault templates
 │       ├── virtual-network/       # Virtual Network templates
+│       ├── log-analytics/         # Log Analytics Workspace templates
+│       ├── monitoring-alerts/     # Azure Monitor alerts templates
+│       ├── diagnostic-settings/   # Diagnostic settings templates
 │       └── main-deployment/       # Main orchestration scripts
 │           ├── Deploy-AzureResources.ps1
 │           └── README.md
@@ -80,6 +84,7 @@ The deployment includes:
 - **SQL Database**: Azure SQL Server and Database
 - **App Service**: Web application hosting
 - **Azure Functions**: Serverless compute
+- **Monitoring & Observability**: Log Analytics, diagnostic settings, and alerts
 
 For detailed instructions, see [Main Deployment README](infrastructure/arm-templates/main-deployment/README.md) or the [PowerShell Deployment Guide](docs/POWERSHELL-DEPLOYMENT-GUIDE.md).
 
@@ -93,6 +98,9 @@ You can also deploy individual resources:
 
 # Deploy only SQL Database
 .\Deploy-AzureResources.ps1 -Environment dev -ResourceTypes @("sql")
+
+# Deploy only monitoring resources
+.\Deploy-AzureResources.ps1 -Environment dev -ResourceTypes @("monitoring")
 ```
 
 ### Resource Groups Only
@@ -165,6 +173,7 @@ For complete details, see the **[Deployment Validation and Testing Guide](docs/D
 For DevOps and infrastructure management, please refer to our documentation:
 - **[PowerShell Deployment Guide](docs/POWERSHELL-DEPLOYMENT-GUIDE.md)** - Complete guide for all PowerShell deployment scripts with examples, parameters, and troubleshooting
 - **[Deployment Validation and Testing Guide](docs/DEPLOYMENT-VALIDATION-GUIDE.md)** - Comprehensive guide for validation, testing, CI/CD integration, and error handling
+- **[Monitoring and Observability Guide](docs/MONITORING-OBSERVABILITY.md)** - Complete guide for monitoring, logging, and alerting setup
 - **[Main Deployment README](infrastructure/arm-templates/main-deployment/README.md)** - Complete guide for deploying all Azure resources
 - **[Azure Resource Group Naming Conventions](docs/azure-resource-group-naming-conventions.md)** - Standard naming patterns for all environments
 - **[Azure Resource Group Best Practices](docs/azure-resource-group-best-practices.md)** - Comprehensive guide covering:
@@ -181,6 +190,12 @@ For DevOps and infrastructure management, please refer to our documentation:
 - [Key Vault](infrastructure/arm-templates/key-vault/README.md) - Secrets and key management
 - [Virtual Network](infrastructure/arm-templates/virtual-network/README.md) - Network isolation and security
 - [Resource Groups](infrastructure/arm-templates/resource-groups/README.md) - Resource group deployment
+
+#### Monitoring and Observability
+
+- [Log Analytics](infrastructure/arm-templates/log-analytics/README.md) - Centralized logging workspace
+- [Monitoring Alerts](infrastructure/arm-templates/monitoring-alerts/README.md) - Metric alerts and action groups
+- [Diagnostic Settings](infrastructure/arm-templates/diagnostic-settings/README.md) - Log collection configuration
 
 ## Azure Infrastructure
 

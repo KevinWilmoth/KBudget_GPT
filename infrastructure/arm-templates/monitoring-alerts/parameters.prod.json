@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "actionGroupName": {
+      "value": "kbudget-prod-alerts"
+    },
+    "actionGroupShortName": {
+      "value": "kbprd-alert"
+    },
+    "emailAddress": {
+      "value": "devops@example.com"
+    },
+    "appServiceId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-prod-rg/providers/Microsoft.Web/sites/kbudget-prod-app"
+    },
+    "appServiceName": {
+      "value": "kbudget-prod-app"
+    },
+    "sqlServerId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-prod-rg/providers/Microsoft.Sql/servers/kbudget-prod-sql"
+    },
+    "sqlServerName": {
+      "value": "kbudget-prod-sql"
+    },
+    "sqlDatabaseName": {
+      "value": "kbudget-prod-db"
+    },
+    "storageAccountId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-prod-rg/providers/Microsoft.Storage/storageAccounts/kbudgetprodst"
+    },
+    "storageAccountName": {
+      "value": "kbudgetprodst"
+    },
+    "functionAppId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-prod-rg/providers/Microsoft.Web/sites/kbudget-prod-func"
+    },
+    "functionAppName": {
+      "value": "kbudget-prod-func"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Production",
+        "Project": "KBudget-GPT",
+        "Owner": "DevOps-Team",
+        "CostCenter": "CC-12345",
+        "Application": "KBudget"
+      }
+    }
+  }
+}

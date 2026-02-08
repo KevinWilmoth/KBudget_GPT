@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "actionGroupName": {
+      "value": "kbudget-staging-alerts"
+    },
+    "actionGroupShortName": {
+      "value": "kbstg-alert"
+    },
+    "emailAddress": {
+      "value": "devops@example.com"
+    },
+    "appServiceId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-staging-rg/providers/Microsoft.Web/sites/kbudget-staging-app"
+    },
+    "appServiceName": {
+      "value": "kbudget-staging-app"
+    },
+    "sqlServerId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-staging-rg/providers/Microsoft.Sql/servers/kbudget-staging-sql"
+    },
+    "sqlServerName": {
+      "value": "kbudget-staging-sql"
+    },
+    "sqlDatabaseName": {
+      "value": "kbudget-staging-db"
+    },
+    "storageAccountId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-staging-rg/providers/Microsoft.Storage/storageAccounts/kbudgetstagingst"
+    },
+    "storageAccountName": {
+      "value": "kbudgetstagingst"
+    },
+    "functionAppId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-staging-rg/providers/Microsoft.Web/sites/kbudget-staging-func"
+    },
+    "functionAppName": {
+      "value": "kbudget-staging-func"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Staging",
+        "Project": "KBudget-GPT",
+        "Owner": "DevOps-Team",
+        "CostCenter": "CC-12345",
+        "Application": "KBudget"
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workspaceName": {
+      "value": "kbudget-dev-law"
+    },
+    "sku": {
+      "value": "PerGB2018"
+    },
+    "retentionInDays": {
+      "value": 30
+    },
+    "dailyQuotaGb": {
+      "value": 1
+    },
+    "tags": {
+      "value": {
+        "Environment": "Development",
+        "Project": "KBudget-GPT",
+        "Owner": "DevOps-Team",
+        "CostCenter": "CC-12345",
+        "Application": "KBudget"
+      }
+    }
+  }
+}
