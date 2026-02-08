@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workspaceId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-staging-rg/providers/Microsoft.OperationalInsights/workspaces/kbudget-staging-law"
+    },
+    "appServiceId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-staging-rg/providers/Microsoft.Web/sites/kbudget-staging-app"
+    },
+    "appServiceName": {
+      "value": "kbudget-staging-app"
+    },
+    "sqlServerId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-staging-rg/providers/Microsoft.Sql/servers/kbudget-staging-sql"
+    },
+    "sqlServerName": {
+      "value": "kbudget-staging-sql"
+    },
+    "sqlDatabaseName": {
+      "value": "kbudget-staging-db"
+    },
+    "storageAccountId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-staging-rg/providers/Microsoft.Storage/storageAccounts/kbudgetstagingst"
+    },
+    "storageAccountName": {
+      "value": "kbudgetstagingst"
+    },
+    "functionAppId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-staging-rg/providers/Microsoft.Web/sites/kbudget-staging-func"
+    },
+    "functionAppName": {
+      "value": "kbudget-staging-func"
+    },
+    "keyVaultId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-staging-rg/providers/Microsoft.KeyVault/vaults/kbudget-staging-kv"
+    },
+    "keyVaultName": {
+      "value": "kbudget-staging-kv"
+    }
+  }
+}

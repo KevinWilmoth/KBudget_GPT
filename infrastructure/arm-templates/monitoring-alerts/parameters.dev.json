@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "actionGroupName": {
+      "value": "kbudget-dev-alerts"
+    },
+    "actionGroupShortName": {
+      "value": "kbdev-alert"
+    },
+    "emailAddress": {
+      "value": "devops@example.com"
+    },
+    "appServiceId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-dev-rg/providers/Microsoft.Web/sites/kbudget-dev-app"
+    },
+    "appServiceName": {
+      "value": "kbudget-dev-app"
+    },
+    "sqlServerId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-dev-rg/providers/Microsoft.Sql/servers/kbudget-dev-sql"
+    },
+    "sqlServerName": {
+      "value": "kbudget-dev-sql"
+    },
+    "sqlDatabaseName": {
+      "value": "kbudget-dev-db"
+    },
+    "storageAccountId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-dev-rg/providers/Microsoft.Storage/storageAccounts/kbudgetdevst"
+    },
+    "storageAccountName": {
+      "value": "kbudgetdevst"
+    },
+    "functionAppId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-dev-rg/providers/Microsoft.Web/sites/kbudget-dev-func"
+    },
+    "functionAppName": {
+      "value": "kbudget-dev-func"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Development",
+        "Project": "KBudget-GPT",
+        "Owner": "DevOps-Team",
+        "CostCenter": "CC-12345",
+        "Application": "KBudget"
+      }
+    }
+  }
+}

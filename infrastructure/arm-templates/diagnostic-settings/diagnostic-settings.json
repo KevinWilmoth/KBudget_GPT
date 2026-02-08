@@ -1,0 +1,397 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "ARM Template for Diagnostic Settings to send logs to Log Analytics Workspace"
+  },
+  "parameters": {
+    "workspaceId": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource ID of the Log Analytics Workspace"
+      }
+    },
+    "appServiceId": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource ID of the App Service"
+      }
+    },
+    "appServiceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the App Service"
+      }
+    },
+    "sqlServerId": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource ID of the SQL Server"
+      }
+    },
+    "sqlServerName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the SQL Server"
+      }
+    },
+    "sqlDatabaseName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the SQL Database"
+      }
+    },
+    "storageAccountId": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource ID of the Storage Account"
+      }
+    },
+    "storageAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Storage Account"
+      }
+    },
+    "functionAppId": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource ID of the Function App"
+      }
+    },
+    "functionAppName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Function App"
+      }
+    },
+    "keyVaultId": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource ID of the Key Vault"
+      }
+    },
+    "keyVaultName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Key Vault"
+      }
+    }
+  },
+  "variables": {
+    "sqlDatabaseId": "[concat(parameters('sqlServerId'), '/databases/', parameters('sqlDatabaseName'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/sites/providers/diagnosticSettings",
+      "apiVersion": "2021-05-01-preview",
+      "name": "[concat(parameters('appServiceName'), '/Microsoft.Insights/default')]",
+      "properties": {
+        "workspaceId": "[parameters('workspaceId')]",
+        "logs": [
+          {
+            "category": "AppServiceHTTPLogs",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          },
+          {
+            "category": "AppServiceConsoleLogs",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          },
+          {
+            "category": "AppServiceAppLogs",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          },
+          {
+            "category": "AppServiceAuditLogs",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 180
+            }
+          },
+          {
+            "category": "AppServiceIPSecAuditLogs",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 180
+            }
+          },
+          {
+            "category": "AppServicePlatformLogs",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          }
+        ],
+        "metrics": [
+          {
+            "category": "AllMetrics",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases/providers/diagnosticSettings",
+      "apiVersion": "2021-05-01-preview",
+      "name": "[concat(parameters('sqlServerName'), '/', parameters('sqlDatabaseName'), '/Microsoft.Insights/default')]",
+      "properties": {
+        "workspaceId": "[parameters('workspaceId')]",
+        "logs": [
+          {
+            "category": "SQLInsights",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          },
+          {
+            "category": "AutomaticTuning",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          },
+          {
+            "category": "QueryStoreRuntimeStatistics",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          },
+          {
+            "category": "QueryStoreWaitStatistics",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          },
+          {
+            "category": "Errors",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          },
+          {
+            "category": "DatabaseWaitStatistics",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          },
+          {
+            "category": "Timeouts",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          },
+          {
+            "category": "Blocks",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          },
+          {
+            "category": "Deadlocks",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          }
+        ],
+        "metrics": [
+          {
+            "category": "Basic",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          },
+          {
+            "category": "InstanceAndAppAdvanced",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          },
+          {
+            "category": "WorkloadManagement",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/providers/diagnosticSettings",
+      "apiVersion": "2021-05-01-preview",
+      "name": "[concat(parameters('storageAccountName'), '/Microsoft.Insights/default')]",
+      "properties": {
+        "workspaceId": "[parameters('workspaceId')]",
+        "metrics": [
+          {
+            "category": "Transaction",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices/providers/diagnosticSettings",
+      "apiVersion": "2021-05-01-preview",
+      "name": "[concat(parameters('storageAccountName'), '/default/Microsoft.Insights/default')]",
+      "properties": {
+        "workspaceId": "[parameters('workspaceId')]",
+        "logs": [
+          {
+            "category": "StorageRead",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          },
+          {
+            "category": "StorageWrite",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          },
+          {
+            "category": "StorageDelete",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 180
+            }
+          }
+        ],
+        "metrics": [
+          {
+            "category": "Transaction",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/providers/diagnosticSettings",
+      "apiVersion": "2021-05-01-preview",
+      "name": "[concat(parameters('functionAppName'), '/Microsoft.Insights/default')]",
+      "properties": {
+        "workspaceId": "[parameters('workspaceId')]",
+        "logs": [
+          {
+            "category": "FunctionAppLogs",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          }
+        ],
+        "metrics": [
+          {
+            "category": "AllMetrics",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/providers/diagnosticSettings",
+      "apiVersion": "2021-05-01-preview",
+      "name": "[concat(parameters('keyVaultName'), '/Microsoft.Insights/default')]",
+      "properties": {
+        "workspaceId": "[parameters('workspaceId')]",
+        "logs": [
+          {
+            "category": "AuditEvent",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 365
+            }
+          },
+          {
+            "category": "AzurePolicyEvaluationDetails",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 180
+            }
+          }
+        ],
+        "metrics": [
+          {
+            "category": "AllMetrics",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+    "diagnosticSettingsConfigured": {
+      "type": "bool",
+      "value": true,
+      "metadata": {
+        "description": "Indicates that diagnostic settings have been configured"
+      }
+    }
+  }
+}
