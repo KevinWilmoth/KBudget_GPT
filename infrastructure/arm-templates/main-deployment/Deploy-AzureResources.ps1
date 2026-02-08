@@ -4,6 +4,7 @@
 # Purpose: Deploy all Azure resources for KBudget GPT application
 # Features:
 #   - Deploys resource groups, VNet, Key Vault, Storage, SQL DB, App Service, Functions
+#   - Deploys monitoring: Log Analytics, Diagnostic Settings, Alerts
 #   - Supports dev, staging, and production environments
 #   - Idempotent deployments (safe to run multiple times)
 #   - Detailed logging and error handling
@@ -385,6 +386,141 @@ function Deploy-AzureFunctions {
     }
 }
 
+function Deploy-LogAnalytics {
+    Write-Log "Deploying Log Analytics Workspace..." "INFO"
+    
+    $templatePath = Join-Path $ScriptDir "..\log-analytics\log-analytics.json"
+    $parametersPath = Join-Path $ScriptDir "..\log-analytics\parameters.$Environment.json"
+    
+    try {
+        if ($WhatIf) {
+            Write-Log "WhatIf: Would deploy Log Analytics Workspace" "INFO"
+            return
+        }
+        
+        $deployment = New-AzResourceGroupDeployment `
+            -Name "law-deployment-$Timestamp" `
+            -ResourceGroupName $ResourceGroupName `
+            -TemplateFile $templatePath `
+            -TemplateParameterFile $parametersPath `
+            -Verbose
+        
+        Write-Log "Log Analytics Workspace deployed successfully" "SUCCESS"
+        Write-Log "Workspace ID: $($deployment.Outputs.workspaceId.Value)" "INFO"
+        
+        return $deployment
+    }
+    catch {
+        Write-Log "Failed to deploy Log Analytics Workspace: $_" "ERROR"
+        throw
+    }
+}
+
+function Deploy-DiagnosticSettings {
+    param(
+        [hashtable]$Deployments
+    )
+    
+    Write-Log "Deploying Diagnostic Settings..." "INFO"
+    
+    $templatePath = Join-Path $ScriptDir "..\diagnostic-settings\diagnostic-settings.json"
+    $parametersPath = Join-Path $ScriptDir "..\diagnostic-settings\parameters.$Environment.json"
+    
+    try {
+        if ($WhatIf) {
+            Write-Log "WhatIf: Would deploy Diagnostic Settings" "INFO"
+            return
+        }
+        
+        # Read parameter file and update with actual resource IDs
+        $subscriptionId = (Get-AzContext).Subscription.Id
+        $paramContent = Get-Content $parametersPath -Raw | ConvertFrom-Json
+        
+        # Update workspace ID if Log Analytics was deployed
+        if ($Deployments.ContainsKey("LogAnalytics")) {
+            $workspaceId = $Deployments["LogAnalytics"].Outputs.workspaceId.Value
+            $paramContent.parameters.workspaceId.value = $workspaceId
+        }
+        
+        # Update resource IDs with actual subscription ID
+        foreach ($param in $paramContent.parameters.PSObject.Properties) {
+            if ($param.Value -is [PSCustomObject] -and $param.Value.value -match '\{subscription-id\}') {
+                $param.Value.value = $param.Value.value -replace '\{subscription-id\}', $subscriptionId
+            }
+        }
+        
+        $tempParamFile = Join-Path $env:TEMP "diag-params-$Timestamp.json"
+        $paramContent | ConvertTo-Json -Depth 10 | Set-Content $tempParamFile
+        
+        $deployment = New-AzResourceGroupDeployment `
+            -Name "diag-deployment-$Timestamp" `
+            -ResourceGroupName $ResourceGroupName `
+            -TemplateFile $templatePath `
+            -TemplateParameterFile $tempParamFile `
+            -Verbose
+        
+        Remove-Item $tempParamFile -Force
+        
+        Write-Log "Diagnostic Settings deployed successfully" "SUCCESS"
+        
+        return $deployment
+    }
+    catch {
+        Write-Log "Failed to deploy Diagnostic Settings: $_" "ERROR"
+        throw
+    }
+}
+
+function Deploy-MonitoringAlerts {
+    param(
+        [hashtable]$Deployments
+    )
+    
+    Write-Log "Deploying Monitoring Alerts..." "INFO"
+    
+    $templatePath = Join-Path $ScriptDir "..\monitoring-alerts\monitoring-alerts.json"
+    $parametersPath = Join-Path $ScriptDir "..\monitoring-alerts\parameters.$Environment.json"
+    
+    try {
+        if ($WhatIf) {
+            Write-Log "WhatIf: Would deploy Monitoring Alerts" "INFO"
+            return
+        }
+        
+        # Read parameter file and update with actual resource IDs
+        $subscriptionId = (Get-AzContext).Subscription.Id
+        $paramContent = Get-Content $parametersPath -Raw | ConvertFrom-Json
+        
+        # Update resource IDs with actual subscription ID
+        foreach ($param in $paramContent.parameters.PSObject.Properties) {
+            if ($param.Value -is [PSCustomObject] -and $param.Value.value -match '\{subscription-id\}') {
+                $param.Value.value = $param.Value.value -replace '\{subscription-id\}', $subscriptionId
+            }
+        }
+        
+        $tempParamFile = Join-Path $env:TEMP "alerts-params-$Timestamp.json"
+        $paramContent | ConvertTo-Json -Depth 10 | Set-Content $tempParamFile
+        
+        $deployment = New-AzResourceGroupDeployment `
+            -Name "alerts-deployment-$Timestamp" `
+            -ResourceGroupName $ResourceGroupName `
+            -TemplateFile $templatePath `
+            -TemplateParameterFile $tempParamFile `
+            -Verbose
+        
+        Remove-Item $tempParamFile -Force
+        
+        Write-Log "Monitoring Alerts deployed successfully" "SUCCESS"
+        Write-Log "Action Group: $($deployment.Outputs.actionGroupName.Value)" "INFO"
+        
+        return $deployment
+    }
+    catch {
+        Write-Log "Failed to deploy Monitoring Alerts: $_" "ERROR"
+        throw
+    }
+}
+
 ################################################################################
 # Post-Deployment Validation Functions
 ################################################################################
@@ -541,6 +677,25 @@ try {
     
     if ($deployAll -or $ResourceTypes -contains "functions") {
         $deployments["Functions"] = Deploy-AzureFunctions
+    }
+    
+    # Deploy monitoring resources (Log Analytics, Diagnostic Settings, Alerts)
+    if ($deployAll -or $ResourceTypes -contains "monitoring") {
+        # Deploy Log Analytics Workspace first
+        $deployments["LogAnalytics"] = Deploy-LogAnalytics
+        
+        # Deploy Diagnostic Settings (requires Log Analytics and other resources)
+        if ($deployments.ContainsKey("AppService") -or $deployments.ContainsKey("SqlDatabase") -or 
+            $deployments.ContainsKey("Storage") -or $deployments.ContainsKey("Functions") -or 
+            $deployments.ContainsKey("KeyVault")) {
+            $deployments["DiagnosticSettings"] = Deploy-DiagnosticSettings -Deployments $deployments
+        }
+        
+        # Deploy Monitoring Alerts (requires other resources)
+        if ($deployments.ContainsKey("AppService") -or $deployments.ContainsKey("SqlDatabase") -or 
+            $deployments.ContainsKey("Storage") -or $deployments.ContainsKey("Functions")) {
+            $deployments["MonitoringAlerts"] = Deploy-MonitoringAlerts -Deployments $deployments
+        }
     }
     
     $deploymentDuration = ((Get-Date) - $deploymentStartTime).TotalMinutes
