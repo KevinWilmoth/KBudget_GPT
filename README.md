@@ -196,8 +196,6 @@ For DevOps and infrastructure management, please refer to our documentation:
 - [Log Analytics](infrastructure/arm-templates/log-analytics/README.md) - Centralized logging workspace
 - [Monitoring Alerts](infrastructure/arm-templates/monitoring-alerts/README.md) - Metric alerts and action groups
 - [Diagnostic Settings](infrastructure/arm-templates/diagnostic-settings/README.md) - Log collection configuration
-- [Virtual Network](infrastructure/arm-templates/virtual-network/README.md) - Network isolation and security
-- [Resource Groups](infrastructure/arm-templates/resource-groups/README.md) - Resource group deployment
 
 ## Azure Infrastructure
 

@@ -40,7 +40,7 @@ The Log Analytics Workspace provides a centralized repository for collecting, an
 
 ### Production
 - **Retention**: 180 days (regulatory compliance)
-- **Daily Quota**: Unlimited (no restrictions on critical logs)
+- **Daily Quota**: Unlimited (`-1` value = no quota limit, unrestricted ingestion for critical production logs)
 - **Purpose**: Production monitoring and compliance
 
 ## Deployment
