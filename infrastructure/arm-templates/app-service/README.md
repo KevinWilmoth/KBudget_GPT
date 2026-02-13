@@ -22,6 +22,10 @@ This directory contains ARM templates for deploying Azure App Service (Web App) 
 | alwaysOn | bool | false | Enable Always On |
 | httpsOnly | bool | true | Require HTTPS |
 | tags | object | {} | Resource tags |
+| enableAadAuthentication | bool | false | Enable Azure Active Directory authentication |
+| aadClientId | string | "" | Azure AD Application (Client) ID |
+| aadTenantId | string | "" | Azure AD Tenant ID |
+| aadClientSecret | securestring | "" | Azure AD Client Secret |
 
 ## Environment-Specific Configurations
 
@@ -78,6 +82,82 @@ az deployment group create \
 - TLS 1.2 minimum
 - FTPS disabled
 - HTTP 2.0 enabled
+- Azure Active Directory authentication (optional)
+  - OAuth 2.0 and OpenID Connect
+  - Role-based access control
+  - Token store for session management
+
+## Azure AD Authentication
+
+To enable Azure AD authentication:
+
+### 1. Register AAD Application
+
+First, register an AAD application using the provided script:
+
+```powershell
+cd infrastructure/arm-templates/aad-app-registration
+.\Register-AADApp.ps1 -Environment dev
+```
+
+This creates an AAD app registration and outputs the configuration values.
+
+### 2. Store Client Secret in Key Vault
+
+```powershell
+# Get the AAD configuration
+$aadConfig = Get-Content "infrastructure/arm-templates/aad-app-registration/aad-config-dev.json" | ConvertFrom-Json
+
+# Store secret in Key Vault
+Set-AzKeyVaultSecret `
+    -VaultName "kbudget-dev-kv" `
+    -Name "AAD-ClientSecret" `
+    -SecretValue (ConvertTo-SecureString $aadConfig.ClientSecret -AsPlainText -Force)
+```
+
+### 3. Deploy with AAD Authentication Enabled
+
+Update the parameter file (`parameters.dev.json`):
+
+```json
+{
+  "enableAadAuthentication": {
+    "value": true
+  },
+  "aadClientId": {
+    "value": "your-client-id-here"
+  },
+  "aadTenantId": {
+    "value": "your-tenant-id-here"
+  }
+}
+```
+
+Then deploy with the client secret from Key Vault:
+
+```powershell
+# Get client secret from Key Vault
+$secret = Get-AzKeyVaultSecret -VaultName "kbudget-dev-kv" -Name "AAD-ClientSecret" -AsPlainText
+
+# Deploy with AAD authentication
+New-AzResourceGroupDeployment `
+    -Name "app-service-deployment-aad" `
+    -ResourceGroupName "kbudget-dev-rg" `
+    -TemplateFile "app-service.json" `
+    -TemplateParameterFile "parameters.dev.json" `
+    -aadClientSecret $secret
+```
+
+### 4. Assign Users to Roles
+
+After deployment, assign users to the AAD app roles:
+
+1. Navigate to Azure Portal > Enterprise Applications
+2. Find your app: "KBudget GPT - Development"
+3. Go to Users and groups
+4. Add users and assign them to either **Administrator** or **User** role
+
+For detailed AAD setup instructions, see [AAD App Registration README](../aad-app-registration/README.md).
 
 ## Post-Deployment
 

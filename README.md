@@ -10,6 +10,7 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 
 - **[PowerShell Deployment Guide](docs/POWERSHELL-DEPLOYMENT-GUIDE.md)** - Comprehensive guide for all PowerShell deployment scripts including prerequisites, usage examples, parameters, troubleshooting, and CI/CD integration
 - **[Deployment Validation and Testing Guide](docs/DEPLOYMENT-VALIDATION-GUIDE.md)** - Complete guide for deployment validation, automated testing, CI/CD pipeline integration, and error handling
+- **[Azure AD Authentication Setup Guide](docs/AAD-AUTHENTICATION-SETUP-GUIDE.md)** - Complete guide for configuring Azure Active Directory authentication including app registration, user management, testing, and troubleshooting
 - **[Compliance Documentation](docs/COMPLIANCE-DOCUMENTATION.md)** - Comprehensive audit log retention and regulatory compliance documentation with all log categories, retention timelines, and security policies
 - [Azure Infrastructure Overview](docs/azure-infrastructure-overview.md) - Complete guide to the Azure architecture, resources, security, and deployment
 - [Azure Resource Group Naming Conventions](docs/azure-resource-group-naming-conventions.md) - Standard naming conventions for Azure Resource Groups across all environments
@@ -21,12 +22,14 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 ```
 .
 ├── docs/                           # Project documentation
+│   ├── AAD-AUTHENTICATION-SETUP-GUIDE.md # Azure AD authentication guide
 │   ├── azure-resource-group-naming-conventions.md
 │   ├── azure-resource-group-best-practices.md
 │   └── MONITORING-OBSERVABILITY.md # Monitoring and observability guide
 ├── infrastructure/                 # Infrastructure as Code
 │   └── arm-templates/             # ARM templates
 │       ├── resource-groups/       # Resource group templates
+│       ├── aad-app-registration/  # Azure AD app registration scripts
 │       ├── app-service/           # App Service templates
 │       ├── sql-database/          # SQL Database templates
 │       ├── storage-account/       # Storage Account templates
@@ -222,7 +225,35 @@ The KBudget GPT application uses the following Azure resources:
 ✅ **Network Security**: VNet isolation with NSGs and service endpoints  
 ✅ **Encryption**: TLS 1.2 minimum, encrypted storage and database  
 ✅ **HTTPS Only**: All web endpoints require HTTPS  
-✅ **Access Control**: RBAC and Key Vault access policies
+✅ **Access Control**: RBAC and Key Vault access policies  
+✅ **Azure AD Authentication**: Enterprise-grade OAuth 2.0 and OpenID Connect authentication (optional)
+
+### Authentication
+
+The application supports **Azure Active Directory (AAD) authentication** for enterprise-grade security:
+
+- **Single Sign-On**: Users authenticate with their organizational credentials
+- **Role-Based Access**: Separate Administrator and User roles
+- **Multi-Factor Authentication**: Support for MFA through Azure AD
+- **Audit Logging**: Complete authentication audit trail
+
+**Quick Start with AAD:**
+
+```powershell
+# 1. Register AAD application
+cd infrastructure/arm-templates/aad-app-registration
+.\Register-AADApp.ps1 -Environment dev
+
+# 2. Deploy App Service with authentication enabled
+cd ../app-service
+# Update parameters.dev.json with AAD values
+New-AzResourceGroupDeployment -ResourceGroupName "kbudget-dev-rg" `
+    -TemplateFile "app-service.json" -TemplateParameterFile "parameters.dev.json"
+```
+
+For complete setup instructions, see:
+- **[Quick Start Guide](infrastructure/arm-templates/aad-app-registration/QUICKSTART.md)** - Get started in 5 minutes
+- **[Azure AD Authentication Setup Guide](docs/AAD-AUTHENTICATION-SETUP-GUIDE.md)** - Complete configuration guide
 
 ### Deployment Features
 

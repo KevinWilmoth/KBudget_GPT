@@ -91,10 +91,51 @@
       "metadata": {
         "description": "Tags for the resources"
       }
+    },
+    "enableAadAuthentication": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Enable Azure Active Directory authentication"
+      }
+    },
+    "aadClientId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Azure AD Application (Client) ID"
+      }
+    },
+    "aadTenantId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Azure AD Tenant ID"
+      }
+    },
+    "aadClientSecret": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Azure AD Client Secret (if using client secret authentication)"
+      }
     }
   },
   "variables": {
-    "appServicePlanResourceId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
+    "appServicePlanResourceId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+    "baseAppSettings": [
+      {
+        "name": "ENVIRONMENT",
+        "value": "[parameters('environment')]"
+      }
+    ],
+    "aadAppSettings": [
+      {
+        "name": "MICROSOFT_PROVIDER_AUTHENTICATION_SECRET",
+        "value": "[parameters('aadClientSecret')]"
+      }
+    ],
+    "appSettings": "[if(parameters('enableAadAuthentication'), union(variables('baseAppSettings'), variables('aadAppSettings')), variables('baseAppSettings'))]"
   },
   "resources": [
     {
@@ -132,15 +173,52 @@
           "ftpsState": "Disabled",
           "minTlsVersion": "1.2",
           "http20Enabled": true,
-          "appSettings": [
-            {
-              "name": "ENVIRONMENT",
-              "value": "[parameters('environment')]"
-            }
-          ]
+          "appSettings": "[variables('appSettings')]"
         }
       },
       "tags": "[parameters('tags')]"
+    },
+    {
+      "condition": "[parameters('enableAadAuthentication')]",
+      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(parameters('appServiceName'), '/authsettingsV2')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('appServiceName'))]"
+      ],
+      "properties": {
+        "platform": {
+          "enabled": true
+        },
+        "globalValidation": {
+          "requireAuthentication": true,
+          "unauthenticatedClientAction": "RedirectToLoginPage",
+          "redirectToProvider": "azureActiveDirectory"
+        },
+        "identityProviders": {
+          "azureActiveDirectory": {
+            "enabled": true,
+            "registration": {
+              "openIdIssuer": "[concat('https://login.microsoftonline.com/', parameters('aadTenantId'), '/v2.0')]",
+              "clientId": "[parameters('aadClientId')]",
+              "clientSecretSettingName": "MICROSOFT_PROVIDER_AUTHENTICATION_SECRET"
+            },
+            "login": {
+              "loginParameters": []
+            },
+            "validation": {
+              "allowedAudiences": [
+                "[parameters('aadClientId')]"
+              ]
+            }
+          }
+        },
+        "login": {
+          "tokenStore": {
+            "enabled": true
+          }
+        }
+      }
     }
   ],
   "outputs": {
