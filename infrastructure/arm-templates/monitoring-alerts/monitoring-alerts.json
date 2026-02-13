@@ -24,6 +24,20 @@
         "description": "Email address for alert notifications"
       }
     },
+    "webhookUri": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional webhook URI for alert notifications (e.g., Teams, Slack, custom endpoint)"
+      }
+    },
+    "enableWebhook": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Enable webhook notifications"
+      }
+    },
     "appServiceId": {
       "type": "string",
       "metadata": {
@@ -111,7 +125,8 @@
             "emailAddress": "[parameters('emailAddress')]",
             "useCommonAlertSchema": true
           }
-        ]
+        ],
+        "webhookReceivers": "[if(parameters('enableWebhook'), createArray(createObject('name', 'WebhookReceiver', 'serviceUri', parameters('webhookUri'), 'useCommonAlertSchema', true())), createArray())]"
       },
       "tags": "[parameters('tags')]"
     },
