@@ -6,6 +6,9 @@ logs/
 infrastructure/arm-templates/main-deployment/outputs/*.json
 !infrastructure/arm-templates/main-deployment/outputs/README.md
 
+# AAD configuration files (contain secrets)
+infrastructure/arm-templates/aad-app-registration/aad-config-*.json
+
 # PowerShell temporary files
 *.ps1xml
 

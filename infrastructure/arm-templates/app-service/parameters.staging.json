@@ -28,6 +28,15 @@
         "CostCenter": "CC-12345",
         "Application": "KBudget"
       }
+    },
+    "enableAadAuthentication": {
+      "value": false
+    },
+    "aadClientId": {
+      "value": ""
+    },
+    "aadTenantId": {
+      "value": ""
     }
   }
 }
