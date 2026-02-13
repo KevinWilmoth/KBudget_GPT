@@ -216,13 +216,18 @@ function Set-AADAppPermissions {
         }
         
         # Update the application with required permissions
-        # Note: This sets the permissions but admin consent is still required
+        # Note: This sets the permissions but admin consent is still required.
+        # Admin consent can be granted via:
+        # 1. Azure Portal: App registrations > Your app > API permissions > Grant admin consent
+        # 2. PowerShell (if available): Grant-AzADAppPermission cmdlet
+        # 3. URL: https://login.microsoftonline.com/{tenantId}/adminconsent?client_id={clientId}
         Update-AzADApplication `
             -ObjectId $Application.Id `
             -RequiredResourceAccess @($requiredResourceAccess)
         
         Write-Log "API permissions configured successfully" -Level "SUCCESS"
         Write-Log "Note: Admin consent may be required for the permissions" -Level "WARNING"
+        Write-Log "Grant consent via Azure Portal or use the admin consent URL" -Level "INFO"
     }
     catch {
         Write-Log "Error configuring API permissions: $_" -Level "ERROR"
