@@ -411,8 +411,8 @@ Policy file not found: audit-retention-policy.json
 # Verify you're in the correct directory
 Get-Location
 
-# Should be in diagnostic-settings folder
-cd /home/runner/work/KBudget_GPT/KBudget_GPT/infrastructure/arm-templates/diagnostic-settings
+# Navigate to diagnostic-settings folder from repository root
+cd infrastructure/arm-templates/diagnostic-settings
 
 # Verify file exists
 Test-Path .\audit-retention-policy.json
