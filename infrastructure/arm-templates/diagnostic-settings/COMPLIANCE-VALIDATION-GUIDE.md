@@ -56,7 +56,8 @@ Get-AzResourceGroup -Name "kbudget-*-rg"
 This validates current state without making any changes:
 
 ```powershell
-cd /home/runner/work/KBudget_GPT/KBudget_GPT/infrastructure/arm-templates/diagnostic-settings
+# Navigate to the diagnostic-settings directory
+cd infrastructure/arm-templates/diagnostic-settings
 
 # Validate development environment
 .\Set-AuditLogRetention.ps1 -Environment dev -ValidateOnly

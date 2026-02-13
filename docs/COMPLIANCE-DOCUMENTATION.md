@@ -549,10 +549,10 @@ CISO                                        Date
 
 ### C. Internal Documentation
 
-- [Audit Retention Policy (JSON)](./audit-retention-policy.json)
-- [Compliance Validation Guide](./COMPLIANCE-VALIDATION-GUIDE.md)
-- [Set-AuditLogRetention Script](./Set-AuditLogRetention.ps1)
-- [Diagnostic Settings Template](./diagnostic-settings.json)
+- [Audit Retention Policy (JSON)](../infrastructure/arm-templates/diagnostic-settings/audit-retention-policy.json)
+- [Compliance Validation Guide](../infrastructure/arm-templates/diagnostic-settings/COMPLIANCE-VALIDATION-GUIDE.md)
+- [Set-AuditLogRetention Script](../infrastructure/arm-templates/diagnostic-settings/Set-AuditLogRetention.ps1)
+- [Diagnostic Settings Template](../infrastructure/arm-templates/diagnostic-settings/diagnostic-settings.json)
 
 ---
 
