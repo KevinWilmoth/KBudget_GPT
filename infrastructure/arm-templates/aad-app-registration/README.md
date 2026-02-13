@@ -259,9 +259,67 @@ $aadConfig = .\infrastructure\arm-templates\aad-app-registration\Register-AADApp
     -AADTenantId $aadConfig.TenantId
 ```
 
+## Testing the Configuration
+
+After setting up AAD authentication, use the test script to verify everything is configured correctly:
+
+```powershell
+# Run the test script
+.\Test-AADAuthentication.ps1 -Environment dev
+```
+
+The test script validates:
+- ✓ Azure authentication
+- ✓ AAD app registration exists
+- ✓ Redirect URIs are configured correctly
+- ✓ App roles are configured
+- ✓ Client secret is stored in Key Vault
+- ✓ App Service exists and is accessible
+- ✓ Authentication is enabled on App Service
+- ✓ Azure AD provider is configured
+- ✓ App Service redirects to Azure AD login
+
+**Sample Output:**
+```
+========================================
+AAD Authentication Test Suite
+Environment: Development
+========================================
+
+Testing Prerequisites...
+✓ Azure Authentication
+
+Testing AAD App Registration...
+✓ AAD Application exists
+✓ Redirect URIs configured
+✓ App Roles configured
+
+Testing Key Vault Secret...
+✓ Key Vault exists
+✓ Client Secret exists in Key Vault
+
+Testing App Service Authentication...
+✓ App Service exists
+✓ Authentication enabled
+✓ Azure AD provider configured
+
+Testing App Service URL...
+✓ Redirects to Azure AD login
+
+========================================
+Test Summary
+========================================
+Total Tests:  10
+Passed:       10
+Failed:       0
+
+✓ All tests passed!
+```
+
 ## Files in This Directory
 
 - **Register-AADApp.ps1**: Main script for AAD app registration
+- **Test-AADAuthentication.ps1**: Test script to validate AAD configuration
 - **README.md**: This documentation file
 - **logs/**: Directory for log files (created automatically)
 - **aad-config-{env}.json**: Generated configuration files (excluded from git)
