@@ -4,8 +4,6 @@ logs/
 
 # Reports
 reports/
-*.csv
-*.json
 
 # Temporary files
 *.tmp

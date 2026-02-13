@@ -1,0 +1,106 @@
+{
+  "description": "RBAC configuration for Production environment",
+  "environment": "prod",
+  "roleAssignments": [
+    {
+      "principalType": "Group",
+      "principalIdentifier": "KBudget-Production-Admins",
+      "role": "Owner",
+      "scope": {
+        "type": "ResourceGroup",
+        "name": "kbudget-prod-rg"
+      },
+      "justification": "Production administrators have full control over production resources"
+    },
+    {
+      "principalType": "Group",
+      "principalIdentifier": "KBudget-DevOps",
+      "role": "Contributor",
+      "scope": {
+        "type": "ResourceGroup",
+        "name": "kbudget-prod-rg"
+      },
+      "justification": "DevOps team manages production deployments (no RBAC changes)"
+    },
+    {
+      "principalType": "Group",
+      "principalIdentifier": "KBudget-Support",
+      "role": "Reader",
+      "scope": {
+        "type": "ResourceGroup",
+        "name": "kbudget-prod-rg"
+      },
+      "justification": "Support team needs read access for troubleshooting"
+    },
+    {
+      "principalType": "ServicePrincipal",
+      "principalIdentifier": "kbudget-prod-automation",
+      "role": "Contributor",
+      "scope": {
+        "type": "ResourceGroup",
+        "name": "kbudget-prod-rg"
+      },
+      "justification": "CI/CD pipeline service principal for production deployments (least privilege, no Owner)"
+    },
+    {
+      "principalType": "ServicePrincipal",
+      "principalIdentifier": "kbudget-prod-app",
+      "role": "Storage Blob Data Contributor",
+      "scope": {
+        "type": "StorageAccount",
+        "name": "kbudgetprodstorage"
+      },
+      "justification": "App Service managed identity - least privilege for blob operations only"
+    },
+    {
+      "principalType": "ServicePrincipal",
+      "principalIdentifier": "kbudget-prod-app",
+      "role": "Key Vault Secrets User",
+      "scope": {
+        "type": "KeyVault",
+        "name": "kbudget-prod-kv"
+      },
+      "justification": "App Service managed identity - read-only secrets access (not Certificate User or Keys User)"
+    },
+    {
+      "principalType": "ServicePrincipal",
+      "principalIdentifier": "kbudget-prod-func",
+      "role": "Storage Blob Data Contributor",
+      "scope": {
+        "type": "StorageAccount",
+        "name": "kbudgetprodstorage"
+      },
+      "justification": "Azure Functions managed identity - least privilege for blob processing"
+    },
+    {
+      "principalType": "ServicePrincipal",
+      "principalIdentifier": "kbudget-prod-func",
+      "role": "Key Vault Secrets User",
+      "scope": {
+        "type": "KeyVault",
+        "name": "kbudget-prod-kv"
+      },
+      "justification": "Azure Functions managed identity - read-only secrets access"
+    },
+    {
+      "principalType": "Group",
+      "principalIdentifier": "KBudget-Security-Team",
+      "role": "Security Reader",
+      "scope": {
+        "type": "ResourceGroup",
+        "name": "kbudget-prod-rg"
+      },
+      "justification": "Security team audits production security configurations"
+    },
+    {
+      "principalType": "Group",
+      "principalIdentifier": "KBudget-Monitoring-Team",
+      "role": "Monitoring Reader",
+      "scope": {
+        "type": "ResourceGroup",
+        "name": "kbudget-prod-rg"
+      },
+      "justification": "Monitoring team needs read access to metrics and logs"
+    }
+  ]
+}
