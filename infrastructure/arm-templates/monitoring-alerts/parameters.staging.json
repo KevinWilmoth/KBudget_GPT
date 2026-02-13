@@ -11,6 +11,12 @@
     "emailAddress": {
       "value": "devops@example.com"
     },
+    "webhookUri": {
+      "value": ""
+    },
+    "enableWebhook": {
+      "value": false
+    },
     "appServiceId": {
       "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-staging-rg/providers/Microsoft.Web/sites/kbudget-staging-app"
     },

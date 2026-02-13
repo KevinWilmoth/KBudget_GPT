@@ -77,7 +77,41 @@ This template creates comprehensive monitoring alerts for:
 
 **Important**: This template requires resource IDs from already deployed resources. Deploy this after all application resources are created.
 
-### Using Azure CLI
+### Recommended: Using the Deployment Script
+
+The easiest way to deploy alerts is using the provided PowerShell script:
+
+```powershell
+# Deploy to development
+.\Deploy-MonitoringAlerts.ps1 -Environment dev
+
+# Deploy with test notification
+.\Deploy-MonitoringAlerts.ps1 -Environment dev -SendTestNotification
+
+# Deploy to production with custom email
+.\Deploy-MonitoringAlerts.ps1 -Environment prod `
+  -EmailAddress "oncall@company.com" `
+  -SendTestNotification
+
+# Deploy with webhook integration (e.g., Teams or Slack)
+.\Deploy-MonitoringAlerts.ps1 -Environment prod `
+  -EmailAddress "oncall@company.com" `
+  -WebhookUri "https://hooks.slack.com/services/YOUR/WEBHOOK/URL" `
+  -SendTestNotification
+
+# WhatIf mode (preview changes)
+.\Deploy-MonitoringAlerts.ps1 -Environment staging -WhatIf
+```
+
+**Script Features:**
+- Automatic resource ID resolution
+- Email and webhook configuration
+- Test notification capability
+- Validation and summary of deployed alerts
+- Automatic documentation generation
+- Detailed logging
+
+### Alternative: Using Azure CLI
 
 ```bash
 # Deploy to development
@@ -99,7 +133,7 @@ az deployment group create \
   --parameters parameters.prod.json
 ```
 
-### Using PowerShell
+### Alternative: Using PowerShell Directly
 
 ```powershell
 # Deploy to development
@@ -135,6 +169,54 @@ Edit the parameter files to change notification recipients:
 }
 ```
 
+### Configuring Webhook Notifications
+
+To add webhook notifications (e.g., Microsoft Teams, Slack, PagerDuty):
+
+**1. Using the Deployment Script (Recommended):**
+
+```powershell
+.\Deploy-MonitoringAlerts.ps1 -Environment prod `
+  -EmailAddress "ops@company.com" `
+  -WebhookUri "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+```
+
+**2. Using Parameter Files:**
+
+Edit the parameter file (`parameters.{env}.json`):
+
+```json
+{
+  "emailAddress": {
+    "value": "ops@company.com"
+  },
+  "webhookUri": {
+    "value": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+  },
+  "enableWebhook": {
+    "value": true
+  }
+}
+```
+
+**Microsoft Teams Setup:**
+1. In Teams, go to the channel where you want alerts
+2. Click the "..." menu → Connectors
+3. Add "Incoming Webhook" connector
+4. Configure and copy the webhook URL
+5. Use this URL in the `webhookUri` parameter
+
+**Slack Setup:**
+1. Create an Incoming Webhook app in your Slack workspace
+2. Select the channel for notifications
+3. Copy the webhook URL
+4. Use this URL in the `webhookUri` parameter
+
+**Custom Webhooks:**
+- Any HTTPS endpoint can be used
+- Receives alerts in Common Alert Schema format
+- Must respond with 200 OK within 10 seconds
+
 ### Adjusting Alert Thresholds
 
 Modify the template to change thresholds:
@@ -166,12 +248,41 @@ The template creates an Action Group that:
 
 ## Testing Alerts
 
-To test that alerts are working:
+### Using the Deployment Script
 
-1. **App Service CPU**: Generate load on the application
-2. **SQL Database DTU**: Run intensive queries
-3. **Storage Availability**: Temporarily restrict storage access
-4. **Function Errors**: Deploy a function that throws exceptions
+The deployment script can send test notifications to verify your configuration:
+
+```powershell
+# Deploy and send test notification
+.\Deploy-MonitoringAlerts.ps1 -Environment dev -SendTestNotification
+
+# Send test to existing deployment
+.\Deploy-MonitoringAlerts.ps1 -Environment prod -SendTestNotification
+```
+
+The test notification will:
+- Send a test alert to configured email addresses
+- Send a test alert to configured webhooks (if enabled)
+- Verify action group is working correctly
+
+### Manual Testing
+
+To manually test that alerts are working:
+
+1. **App Service CPU**: Generate load on the application using a load testing tool
+2. **SQL Database DTU**: Run intensive queries against the database
+3. **Storage Availability**: Temporarily restrict storage access (testing only!)
+4. **Function Errors**: Deploy a function that intentionally throws exceptions
+
+### Verifying Alerts
+
+After deployment, check:
+1. Azure Portal → Monitor → Alerts to see configured rules
+2. Email inbox for test notification (check spam folder)
+3. Webhook endpoint for test payload
+4. Alert history in Azure Portal
+
+**Note:** It may take 5-15 minutes for test notifications to arrive.
 
 ## Outputs
 
@@ -182,17 +293,31 @@ To test that alerts are working:
 
 1. **Test in Non-Production First**: Verify alerts work in dev/staging before production
 2. **Avoid Alert Fatigue**: Set appropriate thresholds to reduce false positives
-3. **Regular Review**: Periodically review and adjust alert rules
-4. **Multiple Channels**: Consider adding SMS or webhook actions for critical alerts
-5. **Documentation**: Document your alert response procedures
+3. **Regular Review**: Periodically review and adjust alert rules based on actual usage
+4. **Multiple Channels**: Use both email and webhooks for critical production alerts
+5. **Documentation**: Document your alert response procedures (see ALERT-CONFIGURATION-GUIDE.md)
+6. **Test Regularly**: Send test notifications monthly to verify configuration
+7. **Monitor the Monitors**: Ensure alerts themselves are working correctly
+
+## Documentation
+
+- **[ALERT-CONFIGURATION-GUIDE.md](./ALERT-CONFIGURATION-GUIDE.md)** - Comprehensive guide with:
+  - Detailed alert configuration for each resource
+  - Alert thresholds and severities explained
+  - Response procedures for each alert type
+  - Webhook integration examples
+  - Testing procedures
+  - Troubleshooting guide
 
 ## Related Resources
 
 - [Log Analytics](../log-analytics/README.md) - Centralized logging workspace
 - [Diagnostic Settings](../diagnostic-settings/README.md) - Configure diagnostic data collection
+- [Deployment Script](./Deploy-MonitoringAlerts.ps1) - PowerShell deployment script
 
 ## References
 
 - [Azure Monitor Alerts Documentation](https://docs.microsoft.com/azure/azure-monitor/alerts/alerts-overview)
 - [Metric Alert Rules](https://docs.microsoft.com/azure/azure-monitor/alerts/alerts-metric)
 - [Action Groups](https://docs.microsoft.com/azure/azure-monitor/alerts/action-groups)
+- [Common Alert Schema](https://docs.microsoft.com/azure/azure-monitor/alerts/alerts-common-schema)
