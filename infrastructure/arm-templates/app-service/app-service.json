@@ -208,7 +208,7 @@
             },
             "validation": {
               "allowedAudiences": [
-                "[concat('api://', parameters('aadClientId'))]"
+                "[parameters('aadClientId')]"
               ]
             }
           }

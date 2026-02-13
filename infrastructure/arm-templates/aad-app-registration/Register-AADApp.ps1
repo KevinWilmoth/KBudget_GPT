@@ -161,12 +161,15 @@ function New-AADAppRegistration {
             "$AppServiceUrl/signin-oidc"
         )
         
-        # Create the application
+        # Create the application with web platform
+        $webApp = @{
+            RedirectUri = $redirectUris
+        }
+        
         $app = New-AzADApplication `
             -DisplayName $DisplayName `
-            -Web `
-            -ReplyUrl $redirectUris `
-            -SignInAudience "AzureADMyOrg"
+            -SignInAudience "AzureADMyOrg" `
+            -Web $webApp
         
         Write-Log "AAD App Registration created successfully" -Level "SUCCESS"
         Write-Log "Application ID: $($app.AppId)" -Level "INFO"
@@ -197,25 +200,26 @@ function Set-AADAppPermissions {
         $graphApiId = "00000003-0000-0000-c000-000000000000"
         
         # Define required permissions
-        # User.Read: Sign in and read user profile
-        $userReadPermission = @{
-            Id = "e1fe6dd8-ba31-4d61-89e7-88639da4683d"
-            Type = "Scope"
+        # User.Read: Sign in and read user profile (delegated permission)
+        $userReadPermissionId = "e1fe6dd8-ba31-4d61-89e7-88639da4683d"
+        
+        # Create the resource access object
+        $resourceAccess = @{
+            Id = $userReadPermissionId
+            Type = "Scope"  # Scope = Delegated permission
         }
         
-        # Get the Microsoft Graph service principal
-        $graphSp = Get-AzADServicePrincipal -ApplicationId $graphApiId
-        
-        # Add required resource access
+        # Create the required resource access object for Microsoft Graph
         $requiredResourceAccess = @{
             ResourceAppId = $graphApiId
-            ResourceAccess = @($userReadPermission)
+            ResourceAccess = @($resourceAccess)
         }
         
         # Update the application with required permissions
+        # Note: This sets the permissions but admin consent is still required
         Update-AzADApplication `
-            -ApplicationId $Application.AppId `
-            -RequiredResourceAccess $requiredResourceAccess
+            -ObjectId $Application.Id `
+            -RequiredResourceAccess @($requiredResourceAccess)
         
         Write-Log "API permissions configured successfully" -Level "SUCCESS"
         Write-Log "Note: Admin consent may be required for the permissions" -Level "WARNING"
@@ -274,7 +278,28 @@ function New-AADAppRoles {
     }
     
     try {
-        # Define app roles
+        # Check if app roles already exist
+        $existingRoles = $Application.AppRole
+        
+        if ($existingRoles -and $existingRoles.Count -gt 0) {
+            Write-Log "App roles already exist on the application. Checking for required roles..." -Level "INFO"
+            
+            # Check if Admin and User roles already exist
+            $hasAdminRole = $existingRoles | Where-Object { $_.Value -eq "Admin" }
+            $hasUserRole = $existingRoles | Where-Object { $_.Value -eq "User" }
+            
+            if ($hasAdminRole -and $hasUserRole) {
+                Write-Log "Required app roles (Admin, User) already exist. Skipping role creation." -Level "SUCCESS"
+                return
+            }
+            else {
+                Write-Log "Some required roles are missing. Please manage app roles manually in Azure Portal." -Level "WARNING"
+                Write-Log "Skipping app role configuration to preserve existing roles." -Level "WARNING"
+                return
+            }
+        }
+        
+        # Define app roles (only if no existing roles)
         $adminRole = @{
             AllowedMemberTypes = @("User")
             Description = "Administrators have full access to all features"
@@ -295,7 +320,7 @@ function New-AADAppRoles {
         
         # Update the application with app roles
         Update-AzADApplication `
-            -ApplicationId $Application.AppId `
+            -ObjectId $Application.Id `
             -AppRole @($adminRole, $userRole)
         
         Write-Log "App roles configured successfully" -Level "SUCCESS"
