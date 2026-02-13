@@ -417,12 +417,12 @@ Describe "Documentation Files" {
     Context "Compliance Documentation" {
         
         It "Should exist in docs folder" {
-            $docsPath = Join-Path $PSScriptRoot "..\..\docs\COMPLIANCE-DOCUMENTATION.md"
+            $docsPath = Join-Path $PSScriptRoot "..\..\..\docs\COMPLIANCE-DOCUMENTATION.md"
             Test-Path $docsPath | Should -Be $true
         }
         
         It "Should document all compliance frameworks" {
-            $docsPath = Join-Path $PSScriptRoot "..\..\docs\COMPLIANCE-DOCUMENTATION.md"
+            $docsPath = Join-Path $PSScriptRoot "..\..\..\docs\COMPLIANCE-DOCUMENTATION.md"
             $content = Get-Content $docsPath -Raw
             
             $content | Should -Match 'SOC 2'
@@ -433,7 +433,7 @@ Describe "Documentation Files" {
         }
         
         It "Should document all resource log categories" {
-            $docsPath = Join-Path $PSScriptRoot "..\..\docs\COMPLIANCE-DOCUMENTATION.md"
+            $docsPath = Join-Path $PSScriptRoot "..\..\..\docs\COMPLIANCE-DOCUMENTATION.md"
             $content = Get-Content $docsPath -Raw
             
             $content | Should -Match 'App Service'
@@ -444,7 +444,7 @@ Describe "Documentation Files" {
         }
         
         It "Should include retention policy summary" {
-            $docsPath = Join-Path $PSScriptRoot "..\..\docs\COMPLIANCE-DOCUMENTATION.md"
+            $docsPath = Join-Path $PSScriptRoot "..\..\..\docs\COMPLIANCE-DOCUMENTATION.md"
             $content = Get-Content $docsPath -Raw
             
             $content | Should -Match '## Retention Policy Summary'
@@ -454,7 +454,7 @@ Describe "Documentation Files" {
         }
         
         It "Should include security policies" {
-            $docsPath = Join-Path $PSScriptRoot "..\..\docs\COMPLIANCE-DOCUMENTATION.md"
+            $docsPath = Join-Path $PSScriptRoot "..\..\..\docs\COMPLIANCE-DOCUMENTATION.md"
             $content = Get-Content $docsPath -Raw
             
             $content | Should -Match '## Security Policies'
