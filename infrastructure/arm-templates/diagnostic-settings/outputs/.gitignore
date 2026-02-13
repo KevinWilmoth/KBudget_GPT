@@ -1,0 +1,6 @@
+# Ignore all compliance reports
+*.json
+*.html
+
+# Keep the README
+!README.md

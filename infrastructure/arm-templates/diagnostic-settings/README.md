@@ -216,10 +216,46 @@ To optimize costs:
 3. Adjust retention periods for less critical logs
 4. Implement log filtering at the source
 
+## Compliance and Audit Log Retention
+
+### Organizational Policy
+
+The audit log retention policy is defined in [audit-retention-policy.json](./audit-retention-policy.json) and ensures compliance with:
+- SOC 2 Type II
+- ISO 27001
+- GDPR
+- HIPAA
+- PCI DSS
+
+### Compliance Validation
+
+Use the [Set-AuditLogRetention.ps1](./Set-AuditLogRetention.ps1) script to:
+- Validate all resources have diagnostic settings configured
+- Ensure log retention meets organizational policy requirements
+- Generate compliance reports for security team review
+
+**Quick Start:**
+```powershell
+# Validate compliance (read-only)
+.\Set-AuditLogRetention.ps1 -Environment dev -ValidateOnly
+
+# Apply retention policies
+.\Set-AuditLogRetention.ps1 -Environment dev
+
+# Generate compliance report
+.\Set-AuditLogRetention.ps1 -Environment prod -ValidateOnly -GenerateReport
+```
+
+For detailed procedures, see:
+- [Compliance Validation Guide](./COMPLIANCE-VALIDATION-GUIDE.md) - Step-by-step validation procedures
+- [Compliance Documentation](../../docs/COMPLIANCE-DOCUMENTATION.md) - Complete log categories and retention policies
+
 ## Related Resources
 
 - [Log Analytics](../log-analytics/README.md) - Centralized workspace for logs
 - [Monitoring Alerts](../monitoring-alerts/README.md) - Alerts based on log data
+- [Compliance Documentation](../../docs/COMPLIANCE-DOCUMENTATION.md) - Comprehensive compliance guide
+- [Compliance Validation Guide](./COMPLIANCE-VALIDATION-GUIDE.md) - Validation procedures
 
 ## References
 
