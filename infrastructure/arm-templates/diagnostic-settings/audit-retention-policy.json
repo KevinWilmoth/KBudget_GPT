@@ -1,0 +1,351 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "KBudget GPT Audit Log Retention Policy",
+  "description": "Organizational policy for audit log retention and compliance requirements",
+  "version": "1.0.0",
+  "lastUpdated": "2026-02-13",
+  "complianceFrameworks": [
+    "SOC 2 Type II",
+    "ISO 27001",
+    "GDPR",
+    "HIPAA",
+    "PCI DSS"
+  ],
+  "retentionPolicies": {
+    "default": {
+      "standardLogs": {
+        "retentionDays": 90,
+        "description": "Default retention for operational and diagnostic logs"
+      },
+      "auditLogs": {
+        "retentionDays": 180,
+        "description": "Default retention for security and audit logs"
+      },
+      "criticalAuditLogs": {
+        "retentionDays": 365,
+        "description": "Extended retention for critical security audit events"
+      },
+      "complianceLogs": {
+        "retentionDays": 730,
+        "description": "Maximum retention for regulatory compliance (2 years)"
+      }
+    }
+  },
+  "resourcePolicies": {
+    "appService": {
+      "logs": [
+        {
+          "category": "AppServiceHTTPLogs",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "operational",
+          "purpose": "HTTP request logging and troubleshooting"
+        },
+        {
+          "category": "AppServiceConsoleLogs",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "operational",
+          "purpose": "Application console output for debugging"
+        },
+        {
+          "category": "AppServiceAppLogs",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "operational",
+          "purpose": "Application-level logging and diagnostics"
+        },
+        {
+          "category": "AppServiceAuditLogs",
+          "enabled": true,
+          "retentionDays": 180,
+          "classification": "security-audit",
+          "purpose": "Security audit events and access tracking"
+        },
+        {
+          "category": "AppServiceIPSecAuditLogs",
+          "enabled": true,
+          "retentionDays": 180,
+          "classification": "security-audit",
+          "purpose": "IP security and firewall audit events"
+        },
+        {
+          "category": "AppServicePlatformLogs",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "operational",
+          "purpose": "Azure platform-level logs for the service"
+        }
+      ],
+      "metrics": [
+        {
+          "category": "AllMetrics",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "performance",
+          "purpose": "Performance monitoring and capacity planning"
+        }
+      ]
+    },
+    "sqlDatabase": {
+      "logs": [
+        {
+          "category": "SQLInsights",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "operational",
+          "purpose": "Query performance insights and optimization"
+        },
+        {
+          "category": "AutomaticTuning",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "operational",
+          "purpose": "Automated tuning recommendations"
+        },
+        {
+          "category": "QueryStoreRuntimeStatistics",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "performance",
+          "purpose": "Query execution statistics and performance"
+        },
+        {
+          "category": "QueryStoreWaitStatistics",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "performance",
+          "purpose": "Query wait time analysis"
+        },
+        {
+          "category": "Errors",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "operational",
+          "purpose": "Database error tracking and resolution"
+        },
+        {
+          "category": "DatabaseWaitStatistics",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "performance",
+          "purpose": "Database-level wait event analysis"
+        },
+        {
+          "category": "Timeouts",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "operational",
+          "purpose": "Query timeout tracking and resolution"
+        },
+        {
+          "category": "Blocks",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "operational",
+          "purpose": "Blocking event detection and analysis"
+        },
+        {
+          "category": "Deadlocks",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "operational",
+          "purpose": "Deadlock detection and resolution"
+        }
+      ],
+      "metrics": [
+        {
+          "category": "Basic",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "performance",
+          "purpose": "Basic database performance metrics"
+        },
+        {
+          "category": "InstanceAndAppAdvanced",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "performance",
+          "purpose": "Advanced performance and resource metrics"
+        },
+        {
+          "category": "WorkloadManagement",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "performance",
+          "purpose": "Workload management and resource governance"
+        }
+      ]
+    },
+    "storageAccount": {
+      "logs": [
+        {
+          "category": "StorageRead",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "operational",
+          "purpose": "Storage read operation tracking"
+        },
+        {
+          "category": "StorageWrite",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "operational",
+          "purpose": "Storage write operation tracking"
+        },
+        {
+          "category": "StorageDelete",
+          "enabled": true,
+          "retentionDays": 180,
+          "classification": "security-audit",
+          "purpose": "Data deletion audit trail for compliance"
+        }
+      ],
+      "metrics": [
+        {
+          "category": "Transaction",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "performance",
+          "purpose": "Storage transaction metrics and billing"
+        }
+      ]
+    },
+    "functionApp": {
+      "logs": [
+        {
+          "category": "FunctionAppLogs",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "operational",
+          "purpose": "Serverless function execution logs"
+        }
+      ],
+      "metrics": [
+        {
+          "category": "AllMetrics",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "performance",
+          "purpose": "Function app performance and execution metrics"
+        }
+      ]
+    },
+    "keyVault": {
+      "logs": [
+        {
+          "category": "AuditEvent",
+          "enabled": true,
+          "retentionDays": 365,
+          "classification": "critical-security-audit",
+          "purpose": "Critical security audit for secret/key access"
+        },
+        {
+          "category": "AzurePolicyEvaluationDetails",
+          "enabled": true,
+          "retentionDays": 180,
+          "classification": "compliance-audit",
+          "purpose": "Azure Policy compliance evaluation tracking"
+        }
+      ],
+      "metrics": [
+        {
+          "category": "AllMetrics",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "performance",
+          "purpose": "Key Vault service health and performance"
+        }
+      ]
+    },
+    "logAnalyticsWorkspace": {
+      "retentionInDays": 90,
+      "dailyQuotaGb": -1,
+      "immediatePurgeDataOn30Days": false,
+      "description": "Centralized workspace for all Azure resource logs"
+    }
+  },
+  "complianceRequirements": {
+    "soc2": {
+      "minimumRetention": 365,
+      "requiredLogCategories": [
+        "AppServiceAuditLogs",
+        "AppServiceIPSecAuditLogs",
+        "AuditEvent",
+        "StorageDelete"
+      ],
+      "description": "SOC 2 requires 1+ year retention for audit logs"
+    },
+    "iso27001": {
+      "minimumRetention": 180,
+      "requiredLogCategories": [
+        "AppServiceAuditLogs",
+        "AuditEvent",
+        "StorageDelete"
+      ],
+      "description": "ISO 27001 requires security event logging and monitoring"
+    },
+    "gdpr": {
+      "minimumRetention": 90,
+      "requiredLogCategories": [
+        "StorageRead",
+        "StorageWrite",
+        "StorageDelete",
+        "AuditEvent"
+      ],
+      "description": "GDPR requires data access and modification tracking"
+    },
+    "hipaa": {
+      "minimumRetention": 730,
+      "requiredLogCategories": [
+        "AuditEvent",
+        "AppServiceAuditLogs",
+        "StorageDelete"
+      ],
+      "description": "HIPAA requires 2-year audit trail for PHI access"
+    },
+    "pciDss": {
+      "minimumRetention": 365,
+      "requiredLogCategories": [
+        "AppServiceAuditLogs",
+        "AuditEvent",
+        "StorageDelete"
+      ],
+      "description": "PCI DSS requires 1-year retention for security events"
+    }
+  },
+  "securityPolicies": {
+    "encryption": {
+      "enabled": true,
+      "description": "All logs must be encrypted at rest and in transit"
+    },
+    "accessControl": {
+      "minimumRole": "Log Analytics Reader",
+      "approvalRequired": true,
+      "description": "Access to logs requires explicit approval and proper RBAC"
+    },
+    "monitoring": {
+      "alertOnRetentionChange": true,
+      "alertOnDeletionAttempt": true,
+      "description": "Alert security team on retention policy changes"
+    },
+    "backup": {
+      "archiveToStorage": true,
+      "archiveAfterDays": 90,
+      "description": "Archive logs older than 90 days to cold storage"
+    }
+  },
+  "validationRules": {
+    "allResourcesMustHaveDiagnostics": true,
+    "minimumRetentionDays": 90,
+    "maximumRetentionDays": 730,
+    "auditLogsMinimumRetention": 180,
+    "criticalAuditLogsMinimumRetention": 365
+  },
+  "reviewSchedule": {
+    "frequency": "quarterly",
+    "nextReview": "2026-05-13",
+    "reviewer": "Security and Governance Team",
+    "approver": "CISO"
+  }
+}
