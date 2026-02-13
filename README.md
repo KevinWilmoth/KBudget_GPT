@@ -251,7 +251,9 @@ New-AzResourceGroupDeployment -ResourceGroupName "kbudget-dev-rg" `
     -TemplateFile "app-service.json" -TemplateParameterFile "parameters.dev.json"
 ```
 
-For complete setup instructions, see the **[Azure AD Authentication Setup Guide](docs/AAD-AUTHENTICATION-SETUP-GUIDE.md)**.
+For complete setup instructions, see:
+- **[Quick Start Guide](infrastructure/arm-templates/aad-app-registration/QUICKSTART.md)** - Get started in 5 minutes
+- **[Azure AD Authentication Setup Guide](docs/AAD-AUTHENTICATION-SETUP-GUIDE.md)** - Complete configuration guide
 
 ### Deployment Features
 

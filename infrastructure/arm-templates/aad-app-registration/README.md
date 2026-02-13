@@ -2,6 +2,10 @@
 
 This directory contains scripts for registering and configuring Azure Active Directory (AAD) applications for the KBudget GPT project.
 
+## Quick Start
+
+New to AAD authentication setup? See the **[Quick Start Guide](QUICKSTART.md)** for a 5-minute setup walkthrough.
+
 ## Overview
 
 The AAD app registration enables enterprise-grade authentication for the KBudget GPT application using Azure Active Directory. This provides:
