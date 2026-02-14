@@ -1,0 +1,18 @@
+# Ignore generated reports and logs
+reports/
+logs/
+templates/*.txt
+
+# But keep the directory structure
+!reports/.gitkeep
+!logs/.gitkeep
+!templates/.gitkeep
+
+# Ignore temporary files
+*.tmp
+*.temp
+~$*
+
+# Ignore Excel temporary files
+~$*.xlsx
+*.xlsm

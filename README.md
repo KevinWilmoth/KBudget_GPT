@@ -12,6 +12,7 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 - **[Deployment Validation and Testing Guide](docs/DEPLOYMENT-VALIDATION-GUIDE.md)** - Complete guide for deployment validation, automated testing, CI/CD pipeline integration, and error handling
 - **[Azure AD Authentication Setup Guide](docs/AAD-AUTHENTICATION-SETUP-GUIDE.md)** - Complete guide for configuring Azure Active Directory authentication including app registration, user management, testing, and troubleshooting
 - **[RBAC Documentation](docs/RBAC-DOCUMENTATION.md)** - Complete guide for Role-Based Access Control implementation, including role assignments, service principal configuration, audit process, and compliance
+- **[Access Review Process](docs/ACCESS-REVIEW-PROCESS.md)** - Comprehensive guide for conducting regular access reviews, ensuring compliance and least privilege access across all Azure resources
 - **[Compliance Documentation](docs/COMPLIANCE-DOCUMENTATION.md)** - Comprehensive audit log retention and regulatory compliance documentation with all log categories, retention timelines, and security policies
 - [Azure Infrastructure Overview](docs/azure-infrastructure-overview.md) - Complete guide to the Azure architecture, resources, security, and deployment
 - [Azure Resource Group Naming Conventions](docs/azure-resource-group-naming-conventions.md) - Standard naming conventions for Azure Resource Groups across all environments
@@ -24,6 +25,7 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 .
 ├── docs/                           # Project documentation
 │   ├── AAD-AUTHENTICATION-SETUP-GUIDE.md # Azure AD authentication guide
+│   ├── ACCESS-REVIEW-PROCESS.md   # Access review process guide
 │   ├── azure-resource-group-naming-conventions.md
 │   ├── azure-resource-group-best-practices.md
 │   └── MONITORING-OBSERVABILITY.md # Monitoring and observability guide
@@ -41,6 +43,7 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 │       ├── monitoring-alerts/     # Azure Monitor alerts templates
 │       ├── diagnostic-settings/   # Diagnostic settings templates
 │       ├── rbac/                  # Role-Based Access Control (RBAC) scripts
+│       ├── access-reviews/        # Access review scripts and templates
 │       └── main-deployment/       # Main orchestration scripts
 │           ├── Deploy-AzureResources.ps1
 │           └── README.md
@@ -207,6 +210,7 @@ For DevOps and infrastructure management, please refer to our documentation:
 #### Security and Access Control
 
 - [RBAC](infrastructure/arm-templates/rbac/README.md) - Role-Based Access Control assignment and auditing
+- [Access Reviews](infrastructure/arm-templates/access-reviews/README.md) - Regular access review process for compliance and least privilege
 - [Azure AD App Registration](infrastructure/arm-templates/aad-app-registration/README.md) - Azure Active Directory authentication setup
 
 ## Azure Infrastructure
@@ -294,6 +298,45 @@ For complete setup instructions, see:
 - **[RBAC Scripts README](infrastructure/arm-templates/rbac/README.md)** - Complete guide to RBAC scripts and usage
 - **[RBAC Quick Reference](infrastructure/arm-templates/rbac/QUICK-REFERENCE.md)** - Quick reference for common commands
 - **[RBAC Documentation](docs/RBAC-DOCUMENTATION.md)** - Comprehensive RBAC implementation guide
+
+### Access Reviews
+
+Conduct regular access reviews to ensure compliance, maintain least privilege, and validate user and service access:
+
+- **Quarterly Reviews**: Comprehensive review of all access across environments
+- **Monthly High-Privilege Reviews**: Review Owner/Contributor role assignments
+- **Service Principal Reviews**: Validate service principal permissions and secret rotation
+- **Compliance**: Supports SOC 2, ISO 27001, PCI DSS, and GDPR requirements
+
+**Quick Start with Access Reviews:**
+
+```powershell
+# Navigate to access reviews directory
+cd infrastructure/arm-templates/access-reviews
+
+# Run quarterly access review (all environments)
+.\Conduct-AccessReview.ps1 -ReviewType Quarterly
+
+# Run production access review
+.\Conduct-AccessReview.ps1 -Environment prod -ReviewType Quarterly
+
+# Monthly high-privilege review
+.\Conduct-AccessReview.ps1 -ReviewType HighPrivilege
+
+# Service principal review
+.\Conduct-AccessReview.ps1 -ReviewType ServicePrincipal
+```
+
+**Review Schedule:**
+- **Quarterly**: January 15, April 15, July 15, October 15
+- **Monthly**: First Monday of each month (high-privilege accounts)
+- **Annual**: December 1-31 (comprehensive review)
+
+For complete setup instructions, see:
+- **[Access Review Process Guide](docs/ACCESS-REVIEW-PROCESS.md)** - Comprehensive process documentation
+- **[Access Reviews README](infrastructure/arm-templates/access-reviews/README.md)** - Scripts and usage guide
+- **[Access Review Quick Reference](infrastructure/arm-templates/access-reviews/QUICK-REFERENCE.md)** - Quick reference for common tasks
+
 
 ### Deployment Features
 
