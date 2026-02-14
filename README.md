@@ -10,6 +10,7 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 
 - **[PowerShell Deployment Guide](docs/POWERSHELL-DEPLOYMENT-GUIDE.md)** - Comprehensive guide for all PowerShell deployment scripts including prerequisites, usage examples, parameters, troubleshooting, and CI/CD integration
 - **[Deployment Validation and Testing Guide](docs/DEPLOYMENT-VALIDATION-GUIDE.md)** - Complete guide for deployment validation, automated testing, CI/CD pipeline integration, and error handling
+- **[Network Architecture Guide](docs/NETWORK-ARCHITECTURE.md)** - Detailed network architecture diagrams, subnet layout, traffic flows, and security boundaries for the VNet infrastructure
 - **[Azure AD Authentication Setup Guide](docs/AAD-AUTHENTICATION-SETUP-GUIDE.md)** - Complete guide for configuring Azure Active Directory authentication including app registration, user management, testing, and troubleshooting
 - **[RBAC Documentation](docs/RBAC-DOCUMENTATION.md)** - Complete guide for Role-Based Access Control implementation, including role assignments, service principal configuration, audit process, and compliance
 - **[Access Review Process](docs/ACCESS-REVIEW-PROCESS.md)** - Comprehensive guide for conducting regular access reviews, ensuring compliance and least privilege access across all Azure resources
