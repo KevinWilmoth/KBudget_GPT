@@ -94,6 +94,31 @@
         "description": "Enable RBAC authorization instead of access policies"
       }
     },
+    "networkAclsDefaultAction": {
+      "type": "string",
+      "defaultValue": "Deny",
+      "allowedValues": [
+        "Allow",
+        "Deny"
+      ],
+      "metadata": {
+        "description": "Default action for network ACLs (Deny recommended for production)"
+      }
+    },
+    "allowedSubnetIds": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Array of subnet resource IDs allowed to access Key Vault"
+      }
+    },
+    "allowedIpAddresses": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Array of IP addresses or CIDR ranges allowed to access Key Vault"
+      }
+    },
     "tags": {
       "type": "object",
       "defaultValue": {},
@@ -157,8 +182,11 @@
         ],
         "networkAcls": {
           "bypass": "AzureServices",
-          "defaultAction": "Allow"
-        }
+          "defaultAction": "[parameters('networkAclsDefaultAction')]",
+          "virtualNetworkRules": "[if(greater(length(parameters('allowedSubnetIds')), 0), map(parameters('allowedSubnetIds'), lambda('subnetId', createObject('id', lambdaVariables('subnetId')))), createArray())]",
+          "ipRules": "[if(greater(length(parameters('allowedIpAddresses')), 0), map(parameters('allowedIpAddresses'), lambda('ipAddress', createObject('value', lambdaVariables('ipAddress')))), createArray())]"
+        },
+        "publicNetworkAccess": "Enabled"
       },
       "tags": "[parameters('tags')]"
     }

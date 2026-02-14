@@ -67,6 +67,20 @@
         "description": "Address prefix for functions subnet"
       }
     },
+    "appGwSubnetName": {
+      "type": "string",
+      "defaultValue": "appgw-subnet",
+      "metadata": {
+        "description": "Name of the Application Gateway subnet"
+      }
+    },
+    "appGwSubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.4.0/24",
+      "metadata": {
+        "description": "Address prefix for Application Gateway subnet"
+      }
+    },
     "enableDdosProtection": {
       "type": "bool",
       "defaultValue": false,
@@ -123,6 +137,73 @@
     {
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2022-07-01",
+      "name": "[format('{0}-appgw-nsg', parameters('vnetName'))]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "AllowGatewayManager",
+            "properties": {
+              "priority": 100,
+              "direction": "Inbound",
+              "access": "Allow",
+              "protocol": "*",
+              "sourceAddressPrefix": "GatewayManager",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "65200-65535",
+              "description": "Allow inbound traffic from GatewayManager service tag"
+            }
+          },
+          {
+            "name": "AllowAzureLoadBalancer",
+            "properties": {
+              "priority": 110,
+              "direction": "Inbound",
+              "access": "Allow",
+              "protocol": "*",
+              "sourceAddressPrefix": "AzureLoadBalancer",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "*",
+              "description": "Allow Azure Load Balancer health probes"
+            }
+          },
+          {
+            "name": "AllowHTTPS",
+            "properties": {
+              "priority": 120,
+              "direction": "Inbound",
+              "access": "Allow",
+              "protocol": "Tcp",
+              "sourceAddressPrefix": "Internet",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "443",
+              "description": "Allow HTTPS from Internet"
+            }
+          },
+          {
+            "name": "AllowHTTP",
+            "properties": {
+              "priority": 130,
+              "direction": "Inbound",
+              "access": "Allow",
+              "protocol": "Tcp",
+              "sourceAddressPrefix": "Internet",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "80",
+              "description": "Allow HTTP from Internet (for redirect)"
+            }
+          }
+        ]
+      },
+      "tags": "[parameters('tags')]"
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2022-07-01",
       "name": "[format('{0}-db-nsg', parameters('vnetName'))]",
       "location": "[parameters('location')]",
       "properties": {
@@ -151,7 +232,8 @@
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkSecurityGroups', format('{0}-app-nsg', parameters('vnetName')))]",
-        "[resourceId('Microsoft.Network/networkSecurityGroups', format('{0}-db-nsg', parameters('vnetName')))]"
+        "[resourceId('Microsoft.Network/networkSecurityGroups', format('{0}-db-nsg', parameters('vnetName')))]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', format('{0}-appgw-nsg', parameters('vnetName')))]"
       ],
       "properties": {
         "addressSpace": {
@@ -233,6 +315,15 @@
                 }
               ]
             }
+          },
+          {
+            "name": "[parameters('appGwSubnetName')]",
+            "properties": {
+              "addressPrefix": "[parameters('appGwSubnetPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', format('{0}-appgw-nsg', parameters('vnetName')))]"
+              }
+            }
           }
         ]
       },
@@ -273,6 +364,13 @@
       "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('funcSubnetName'))]",
       "metadata": {
         "description": "Resource ID of the functions subnet"
+      }
+    },
+    "appGwSubnetId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('appGwSubnetName'))]",
+      "metadata": {
+        "description": "Resource ID of the Application Gateway subnet"
       }
     }
   }

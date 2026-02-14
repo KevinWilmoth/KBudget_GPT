@@ -1,0 +1,133 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "ARM Template for Azure DNS Zone"
+  },
+  "parameters": {
+    "dnsZoneName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the DNS zone (e.g., example.com)"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "global",
+      "metadata": {
+        "description": "Location for DNS zone (always global)"
+      }
+    },
+    "applicationGatewayPublicIp": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Public IP address of the Application Gateway (for A record)"
+      }
+    },
+    "applicationGatewayFqdn": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "FQDN of the Application Gateway (for CNAME record)"
+      }
+    },
+    "createAppGatewayRecord": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Create DNS record for Application Gateway"
+      }
+    },
+    "appGatewayRecordName": {
+      "type": "string",
+      "defaultValue": "www",
+      "metadata": {
+        "description": "Name for Application Gateway DNS record (e.g., www, @)"
+      }
+    },
+    "recordType": {
+      "type": "string",
+      "defaultValue": "A",
+      "allowedValues": [
+        "A",
+        "CNAME"
+      ],
+      "metadata": {
+        "description": "Type of DNS record to create for Application Gateway"
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Tags for the resources"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/dnsZones",
+      "apiVersion": "2018-05-01",
+      "name": "[parameters('dnsZoneName')]",
+      "location": "[parameters('location')]",
+      "properties": {},
+      "tags": "[parameters('tags')]"
+    },
+    {
+      "condition": "[and(parameters('createAppGatewayRecord'), equals(parameters('recordType'), 'A'))]",
+      "type": "Microsoft.Network/dnsZones/A",
+      "apiVersion": "2018-05-01",
+      "name": "[concat(parameters('dnsZoneName'), '/', parameters('appGatewayRecordName'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/dnsZones', parameters('dnsZoneName'))]"
+      ],
+      "properties": {
+        "TTL": 3600,
+        "ARecords": [
+          {
+            "ipv4Address": "[parameters('applicationGatewayPublicIp')]"
+          }
+        ]
+      }
+    },
+    {
+      "condition": "[and(parameters('createAppGatewayRecord'), equals(parameters('recordType'), 'CNAME'))]",
+      "type": "Microsoft.Network/dnsZones/CNAME",
+      "apiVersion": "2018-05-01",
+      "name": "[concat(parameters('dnsZoneName'), '/', parameters('appGatewayRecordName'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/dnsZones', parameters('dnsZoneName'))]"
+      ],
+      "properties": {
+        "TTL": 3600,
+        "CNAMERecord": {
+          "cname": "[parameters('applicationGatewayFqdn')]"
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "dnsZoneId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Network/dnsZones', parameters('dnsZoneName'))]",
+      "metadata": {
+        "description": "Resource ID of the DNS zone"
+      }
+    },
+    "dnsZoneName": {
+      "type": "string",
+      "value": "[parameters('dnsZoneName')]",
+      "metadata": {
+        "description": "Name of the DNS zone"
+      }
+    },
+    "nameServers": {
+      "type": "array",
+      "value": "[reference(resourceId('Microsoft.Network/dnsZones', parameters('dnsZoneName'))).nameServers]",
+      "metadata": {
+        "description": "Name servers for the DNS zone"
+      }
+    }
+  }
+}

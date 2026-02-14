@@ -1,0 +1,52 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "applicationGatewayName": {
+      "value": "kbudget-prod-appgw"
+    },
+    "tier": {
+      "value": "WAF_v2"
+    },
+    "skuSize": {
+      "value": "WAF_v2"
+    },
+    "autoScaleMinCapacity": {
+      "value": 2
+    },
+    "autoScaleMaxCapacity": {
+      "value": 10
+    },
+    "vnetName": {
+      "value": "kbudget-prod-vnet"
+    },
+    "subnetName": {
+      "value": "appgw-subnet"
+    },
+    "publicIpName": {
+      "value": "kbudget-prod-appgw-pip"
+    },
+    "backendAppServiceFqdn": {
+      "value": "kbudget-prod-app.azurewebsites.net"
+    },
+    "wafMode": {
+      "value": "Prevention"
+    },
+    "wafRuleSetVersion": {
+      "value": "3.2"
+    },
+    "minTlsVersion": {
+      "value": "TLS1_2"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Production",
+        "Project": "KBudget-GPT",
+        "Owner": "DevOps-Team",
+        "CostCenter": "CC-12345",
+        "Application": "KBudget",
+        "Component": "Application-Gateway"
+      }
+    }
+  }
+}
