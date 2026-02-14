@@ -67,6 +67,20 @@
         "description": "Address prefix for functions subnet"
       }
     },
+    "frontendSubnetName": {
+      "type": "string",
+      "defaultValue": "frontend-subnet",
+      "metadata": {
+        "description": "Name of the frontend subnet for public-facing workloads"
+      }
+    },
+    "frontendSubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.4.0/24",
+      "metadata": {
+        "description": "Address prefix for frontend subnet"
+      }
+    },
     "enableDdosProtection": {
       "type": "bool",
       "defaultValue": false,
@@ -123,6 +137,43 @@
     {
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2022-07-01",
+      "name": "[format('{0}-frontend-nsg', parameters('vnetName'))]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "AllowHTTPS",
+            "properties": {
+              "priority": 100,
+              "direction": "Inbound",
+              "access": "Allow",
+              "protocol": "Tcp",
+              "sourceAddressPrefix": "Internet",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "443"
+            }
+          },
+          {
+            "name": "AllowHTTP",
+            "properties": {
+              "priority": 110,
+              "direction": "Inbound",
+              "access": "Allow",
+              "protocol": "Tcp",
+              "sourceAddressPrefix": "Internet",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "80"
+            }
+          }
+        ]
+      },
+      "tags": "[parameters('tags')]"
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2022-07-01",
       "name": "[format('{0}-db-nsg', parameters('vnetName'))]",
       "location": "[parameters('location')]",
       "properties": {
@@ -151,6 +202,7 @@
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkSecurityGroups', format('{0}-app-nsg', parameters('vnetName')))]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', format('{0}-frontend-nsg', parameters('vnetName')))]",
         "[resourceId('Microsoft.Network/networkSecurityGroups', format('{0}-db-nsg', parameters('vnetName')))]"
       ],
       "properties": {
@@ -233,6 +285,26 @@
                 }
               ]
             }
+          },
+          {
+            "name": "[parameters('frontendSubnetName')]",
+            "properties": {
+              "addressPrefix": "[parameters('frontendSubnetPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', format('{0}-frontend-nsg', parameters('vnetName')))]"
+              },
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Web"
+                },
+                {
+                  "service": "Microsoft.Storage"
+                },
+                {
+                  "service": "Microsoft.KeyVault"
+                }
+              ]
+            }
           }
         ]
       },
@@ -273,6 +345,13 @@
       "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('funcSubnetName'))]",
       "metadata": {
         "description": "Resource ID of the functions subnet"
+      }
+    },
+    "frontendSubnetId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('frontendSubnetName'))]",
+      "metadata": {
+        "description": "Resource ID of the frontend subnet"
       }
     }
   }

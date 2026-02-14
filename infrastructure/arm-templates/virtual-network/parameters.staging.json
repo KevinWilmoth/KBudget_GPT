@@ -17,6 +17,9 @@
     "funcSubnetPrefix": {
       "value": "10.1.3.0/24"
     },
+    "frontendSubnetPrefix": {
+      "value": "10.1.4.0/24"
+    },
     "enableDdosProtection": {
       "value": false
     },

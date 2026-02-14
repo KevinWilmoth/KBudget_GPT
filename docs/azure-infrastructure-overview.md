@@ -188,22 +188,34 @@ az deployment group create \
 
 ### Network Architecture
 
+> **Detailed Network Documentation**: For comprehensive network architecture diagrams, subnet layout, traffic flows, and security boundaries, see the [Network Architecture Guide](NETWORK-ARCHITECTURE.md).
+
+The KBudget GPT application uses a multi-tier network architecture with four dedicated subnets for workload segregation:
+
 #### Virtual Network Layout
 
 | Subnet | CIDR | Purpose | Delegation |
 |--------|------|---------|------------|
-| app-subnet | 10.x.1.0/24 | App Service | Microsoft.Web/serverFarms |
+| frontend-subnet | 10.x.4.0/24 | Public-facing tier | None |
+| app-subnet | 10.x.1.0/24 | App Service, APIs | Microsoft.Web/serverFarms |
 | db-subnet | 10.x.2.0/24 | SQL Database | None |
 | func-subnet | 10.x.3.0/24 | Azure Functions | Microsoft.Web/serverFarms |
 
+Each subnet provides 256 IP addresses (251 usable, 5 reserved by Azure), allowing for significant horizontal scaling.
+
 #### NSG Rules
 
-**App Subnet NSG**:
+**Frontend Subnet NSG**:
 - Allow HTTPS (443) from Internet
 - Allow HTTP (80) from Internet
+- Deny all other inbound
+
+**App Subnet NSG**:
+- Allow HTTPS (443) from all
+- Allow HTTP (80) from all
 
 **DB Subnet NSG**:
-- Allow SQL (1433) from app-subnet only
+- Allow SQL (1433) from app-subnet only (10.x.1.0/24)
 - Deny all other inbound
 
 #### Service Endpoints
