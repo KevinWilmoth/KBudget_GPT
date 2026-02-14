@@ -133,7 +133,7 @@ The deployment script supports three environments, each with optimized settings:
 - **Purpose**: Pre-production testing
 
 #### Production (`prod`)
-- **Capacity**: 2 instances (can be scaled up to 10)
+- **Capacity**: 2 instances
 - **WAF Mode**: Prevention (actively blocks threats)
 - **Purpose**: Production workloads
 

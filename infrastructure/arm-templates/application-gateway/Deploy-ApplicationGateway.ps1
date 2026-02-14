@@ -262,11 +262,29 @@ function Deploy-ApplicationGateway {
     $params = Get-Content $ParameterFile | ConvertFrom-Json
     $vnetName = $params.parameters.virtualNetworkName.value
     $subnetName = $params.parameters.subnetName.value
-    $appServiceName = $params.parameters.backendAppServiceFqdn.value -replace '\.azurewebsites\.net$', ''
+    $backendFqdn = $params.parameters.backendAppServiceFqdn.value
+    
+    # Extract App Service name - handle both azurewebsites.net and custom domains
+    # For azurewebsites.net: extract the name before .azurewebsites.net
+    # For custom domains: try to find matching App Service in resource group
+    if ($backendFqdn -match '^([^.]+)\.azurewebsites\.net$') {
+        $appServiceName = $matches[1]
+    }
+    else {
+        # For custom domains, we'll skip the App Service validation
+        # since we can't reliably determine the App Service name
+        $appServiceName = $null
+        Write-Log "Backend uses custom domain: $backendFqdn" "INFO"
+        Write-Log "Skipping App Service validation (only applicable for *.azurewebsites.net)" "INFO"
+    }
     
     # Validate dependencies
     Test-VirtualNetwork -ResourceGroupName $ResourceGroupName -VNetName $vnetName -SubnetName $subnetName
-    Test-AppService -ResourceGroupName $ResourceGroupName -AppServiceName $appServiceName
+    
+    # Only validate App Service if we could determine the name
+    if ($appServiceName) {
+        Test-AppService -ResourceGroupName $ResourceGroupName -AppServiceName $appServiceName
+    }
     
     # Prepare deployment parameters
     $deploymentParams = @{

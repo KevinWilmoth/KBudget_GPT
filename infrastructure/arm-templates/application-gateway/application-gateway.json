@@ -303,7 +303,9 @@
                 "id": "[resourceId('Microsoft.Network/applicationGateways/frontendPorts', parameters('applicationGatewayName'), variables('frontendPortHttpsName'))]"
               },
               "protocol": "Https",
-              "sslCertificate": "[if(not(empty(parameters('sslCertificateData'))), json(concat('{\"id\": \"', resourceId('Microsoft.Network/applicationGateways/sslCertificates', parameters('applicationGatewayName'), variables('sslCertificateName')), '\"}')), json('null'))]",
+              "sslCertificate": {
+                "id": "[if(not(empty(parameters('sslCertificateData'))), resourceId('Microsoft.Network/applicationGateways/sslCertificates', parameters('applicationGatewayName'), variables('sslCertificateName')), json('null'))]"
+              },
               "requireServerNameIndication": false
             }
           }
@@ -362,7 +364,7 @@
             }
           }
         ],
-        "sslCertificates": "[if(not(empty(parameters('sslCertificateData'))), json(concat('[{\"name\": \"', variables('sslCertificateName'), '\", \"properties\": {\"data\": \"', parameters('sslCertificateData'), '\", \"password\": \"', parameters('sslCertificatePassword'), '\"}}]')), json('[]'))]"
+        "sslCertificates": "[if(not(empty(parameters('sslCertificateData'))), createArray(createObject('name', variables('sslCertificateName'), 'properties', createObject('data', parameters('sslCertificateData'), 'password', parameters('sslCertificatePassword')))), createArray())]"
       }
     }
   ],
