@@ -79,6 +79,10 @@ Describe "Deploy-AzureResources.ps1 Script Tests" {
             $content | Should -Match 'function Deploy-AzureFunctions'
         }
         
+        It "Should contain Deploy-ApplicationGateway function" {
+            $content | Should -Match 'function Deploy-ApplicationGateway'
+        }
+        
         It "Should contain Invoke-PostDeploymentValidation function" {
             $content | Should -Match 'function Invoke-PostDeploymentValidation'
         }
