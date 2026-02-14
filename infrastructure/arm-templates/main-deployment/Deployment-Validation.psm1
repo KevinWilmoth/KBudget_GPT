@@ -223,35 +223,35 @@ function Test-StorageAccountExists {
     }
 }
 
-function Test-SqlServerExists {
+function Test-CosmosAccountExists {
     <#
     .SYNOPSIS
-        Validates that a SQL Server exists and is accessible
+        Validates that a Cosmos DB Account exists and is accessible
     #>
     param(
         [Parameter(Mandatory = $true)]
         [string]$ResourceGroupName,
         
         [Parameter(Mandatory = $true)]
-        [string]$ServerName
+        [string]$AccountName
     )
     
     try {
-        $sqlServer = Get-AzSqlServer -ResourceGroupName $ResourceGroupName -ServerName $ServerName -ErrorAction SilentlyContinue
+        $cosmosAccount = Get-AzCosmosDBAccount -ResourceGroupName $ResourceGroupName -Name $AccountName -ErrorAction SilentlyContinue
         
         return [PSCustomObject]@{
-            Exists = $null -ne $sqlServer
-            ServerName = $ServerName
-            ResourceId = if ($sqlServer) { $sqlServer.ResourceId } else { $null }
-            Location = if ($sqlServer) { $sqlServer.Location } else { $null }
-            FullyQualifiedDomainName = if ($sqlServer) { $sqlServer.FullyQualifiedDomainName } else { $null }
-            Version = if ($sqlServer) { $sqlServer.ServerVersion } else { $null }
+            Exists = $null -ne $cosmosAccount
+            AccountName = $AccountName
+            ResourceId = if ($cosmosAccount) { $cosmosAccount.Id } else { $null }
+            Location = if ($cosmosAccount) { $cosmosAccount.Location } else { $null }
+            DocumentEndpoint = if ($cosmosAccount) { $cosmosAccount.DocumentEndpoint } else { $null }
+            ProvisioningState = if ($cosmosAccount) { $cosmosAccount.ProvisioningState } else { $null }
         }
     }
     catch {
         return [PSCustomObject]@{
             Exists = $false
-            ServerName = $ServerName
+            AccountName = $AccountName
             Error = $_.Exception.Message
         }
     }
@@ -395,12 +395,12 @@ function Test-DeploymentResources {
         if (-not $storageStatus.Exists) { $allPassed = $false }
     }
     
-    # Validate SQL Server
-    if ($deployAll -or $ResourceTypes -contains "sql") {
-        $sqlServerName = "kbudget-$Environment-sql"
-        $sqlStatus = Test-SqlServerExists -ResourceGroupName $ResourceGroupName -ServerName $sqlServerName
-        $results.Resources["SqlServer"] = $sqlStatus
-        if (-not $sqlStatus.Exists) { $allPassed = $false }
+    # Validate Cosmos DB Account
+    if ($deployAll -or $ResourceTypes -contains "cosmos") {
+        $cosmosAccountName = "kbudget-$Environment-cosmos"
+        $cosmosStatus = Test-CosmosAccountExists -ResourceGroupName $ResourceGroupName -AccountName $cosmosAccountName
+        $results.Resources["CosmosAccount"] = $cosmosStatus
+        if (-not $cosmosStatus.Exists) { $allPassed = $false }
     }
     
     # Validate App Service
@@ -599,7 +599,7 @@ Export-ModuleMember -Function @(
     'Test-VirtualNetworkExists',
     'Test-KeyVaultExists',
     'Test-StorageAccountExists',
-    'Test-SqlServerExists',
+    'Test-CosmosAccountExists',
     'Test-AppServiceExists',
     'Test-FunctionAppExists',
     'Test-DeploymentResources',
