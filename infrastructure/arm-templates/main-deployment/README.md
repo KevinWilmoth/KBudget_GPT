@@ -10,7 +10,7 @@ The `Deploy-AzureResources.ps1` script automates the deployment of the complete 
 - **Virtual Network (VNet)**: Network isolation with subnets for app, database, and functions
 - **Key Vault**: Secure storage for secrets, keys, and certificates
 - **Storage Account**: Blob storage for application data and Azure Functions
-- **SQL Database**: Azure SQL Server and Database for application data
+- **Cosmos DB**: NoSQL database with global distribution for application data
 - **App Service**: Web application hosting with App Service Plan
 - **Azure Functions**: Serverless compute for background tasks
 - **Application Gateway with WAF**: Load balancer with Web Application Firewall for security
@@ -94,8 +94,8 @@ Deploy only specific resource types:
 # Deploy only VNet and Storage
 .\Deploy-AzureResources.ps1 -Environment dev -ResourceTypes @("vnet", "storage")
 
-# Deploy only Key Vault and SQL Database
-.\Deploy-AzureResources.ps1 -Environment prod -ResourceTypes @("keyvault", "sql")
+# Deploy only Key Vault and Cosmos DB
+.\Deploy-AzureResources.ps1 -Environment prod -ResourceTypes @("keyvault", "cosmos")
 ```
 
 Available resource types:
@@ -103,7 +103,7 @@ Available resource types:
 - `vnet` - Virtual Network
 - `keyvault` - Key Vault
 - `storage` - Storage Account
-- `sql` - SQL Database
+- `cosmos` - Cosmos DB
 - `appservice` - App Service
 - `functions` - Azure Functions
 - `appgateway` - Application Gateway with WAF
@@ -151,8 +151,8 @@ All resources follow a consistent naming pattern:
 | Virtual Network | `kbudget-{env}-vnet` | `kbudget-dev-vnet` |
 | Key Vault | `kbudget-{env}-kv` | `kbudget-dev-kv` |
 | Storage Account | `kbudget{env}st` | `kbudgetdevst` |
-| SQL Server | `kbudget-{env}-sql` | `kbudget-dev-sql` |
-| SQL Database | `kbudget-{env}-db` | `kbudget-dev-db` |
+| Cosmos DB Account | `kbudget-{env}-cosmos` | `kbudget-dev-cosmos` |
+| Cosmos DB Database | `kbudget-{env}-db` | `kbudget-dev-db` |
 | App Service Plan | `kbudget-{env}-asp` | `kbudget-dev-asp` |
 | App Service | `kbudget-{env}-app` | `kbudget-dev-app` |
 | Function App | `kbudget-{env}-func` | `kbudget-dev-func` |
@@ -165,7 +165,7 @@ Resources are deployed in the following order to handle dependencies:
 2. **Virtual Network** (network foundation)
 3. **Key Vault** (secrets storage)
 4. **Storage Account** (required for Functions)
-5. **SQL Database** (data tier)
+5. **Cosmos DB** (data tier)
 6. **App Service** (web tier)
 7. **Azure Functions** (serverless tier)
 
@@ -173,9 +173,9 @@ Resources are deployed in the following order to handle dependencies:
 
 ### Secrets Management
 
-- SQL admin passwords are automatically generated (16 characters, complex)
-- Passwords stored securely in Key Vault
-- SQL Database parameter files reference Key Vault for passwords
+- Connection strings are automatically generated
+- Secrets stored securely in Key Vault
+- Cosmos DB parameter files reference Key Vault for connection strings
 - No secrets in code or parameter files
 
 ### Network Security
@@ -190,13 +190,13 @@ Resources are deployed in the following order to handle dependencies:
 
 - Managed identities for App Service and Functions
 - Key Vault access policies for services
-- SQL firewall rules for Azure services
+- Cosmos DB firewall rules for Azure services
 - Storage account with secure transfer required
 
 ### Encryption
 
 - Blob and file encryption enabled on Storage Account
-- SQL Transparent Data Encryption (TDE) enabled
+- Cosmos DB encryption at rest (automatic)
 - Key Vault soft delete and purge protection (prod)
 
 ## Logging
@@ -367,7 +367,7 @@ To customize deployments for your needs:
 
 1. **Edit environment-specific parameter files**:
    - `../app-service/parameters.{env}.json`
-   - `../sql-database/parameters.{env}.json`
+   - `../cosmos-database/parameters.{env}.json`
    - etc.
 
 2. **Common customizations**:

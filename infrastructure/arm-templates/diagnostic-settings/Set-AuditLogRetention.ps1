@@ -318,7 +318,7 @@ foreach ($resource in $resources) {
                 "appService"
             }
         }
-        "Microsoft.Sql/servers/databases" { "sqlDatabase" }
+        "Microsoft.DocumentDB/databaseAccounts" { "cosmosDatabase" }
         "Microsoft.Storage/storageAccounts" { "storageAccount" }
         "Microsoft.KeyVault/vaults" { "keyVault" }
         default { $null }

@@ -85,7 +85,7 @@ Describe "Set-AuditLogRetention Script" {
             $policy = Get-Content $policyPath -Raw | ConvertFrom-Json
             
             $policy.resourcePolicies.PSObject.Properties.Name | Should -Contain 'appService'
-            $policy.resourcePolicies.PSObject.Properties.Name | Should -Contain 'sqlDatabase'
+            $policy.resourcePolicies.PSObject.Properties.Name | Should -Contain 'cosmosDatabase'
             $policy.resourcePolicies.PSObject.Properties.Name | Should -Contain 'storageAccount'
             $policy.resourcePolicies.PSObject.Properties.Name | Should -Contain 'functionApp'
             $policy.resourcePolicies.PSObject.Properties.Name | Should -Contain 'keyVault'
@@ -160,9 +160,9 @@ Describe "Set-AuditLogRetention Script" {
         }
     }
     
-    Context "SQL Database Log Categories" {
+    Context "Cosmos Database Log Categories" {
         
-        It "Should enable all critical SQL log categories" {
+        It "Should enable all critical Cosmos DB log categories" {
             $policyPath = Join-Path $PSScriptRoot "audit-retention-policy.json"
             $policy = Get-Content $policyPath -Raw | ConvertFrom-Json
             
@@ -179,11 +179,11 @@ Describe "Set-AuditLogRetention Script" {
             }
         }
         
-        It "Should have 90+ day retention for all SQL logs" {
+        It "Should have 90+ day retention for all Cosmos DB logs" {
             $policyPath = Join-Path $PSScriptRoot "audit-retention-policy.json"
             $policy = Get-Content $policyPath -Raw | ConvertFrom-Json
             
-            $policy.resourcePolicies.sqlDatabase.logs | ForEach-Object {
+            $policy.resourcePolicies.cosmosDatabase.logs | ForEach-Object {
                 $_.retentionDays | Should -BeGreaterOrEqual 90
             }
         }
@@ -437,7 +437,7 @@ Describe "Documentation Files" {
             $content = Get-Content $docsPath -Raw
             
             $content | Should -Match 'App Service'
-            $content | Should -Match 'SQL Database'
+            $content | Should -Match 'Cosmos Database'
             $content | Should -Match 'Storage Account'
             $content | Should -Match 'Azure Functions'
             $content | Should -Match 'Key Vault'

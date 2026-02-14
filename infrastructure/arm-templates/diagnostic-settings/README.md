@@ -11,7 +11,7 @@ Diagnostic settings enable the collection of:
 
 This template configures diagnostic settings for:
 - App Service (web apps)
-- SQL Database
+- Cosmos DB Database
 - Storage Account (including blob service)
 - Function App
 - Key Vault
@@ -33,16 +33,12 @@ This template configures diagnostic settings for:
 - **AppServiceIPSecAuditLogs**: IP security audit (180 days)
 - **AppServicePlatformLogs**: Platform logs (90 days)
 
-### SQL Database
-- **SQLInsights**: Query insights (90 days)
-- **AutomaticTuning**: Tuning recommendations (90 days)
-- **QueryStoreRuntimeStatistics**: Query performance (90 days)
-- **QueryStoreWaitStatistics**: Wait statistics (90 days)
-- **Errors**: Database errors (90 days)
-- **DatabaseWaitStatistics**: Wait events (90 days)
-- **Timeouts**: Query timeouts (90 days)
-- **Blocks**: Blocking events (90 days)
-- **Deadlocks**: Deadlock information (90 days)
+### Cosmos DB Database
+- **DataPlaneRequests**: Data plane requests (90 days)
+- **MongoRequests**: MongoDB API requests (90 days)
+- **QueryRuntimeStatistics**: Query performance (90 days)
+- **PartitionKeyStatistics**: Partition distribution (90 days)
+- **ControlPlaneRequests**: Control plane operations (180 days)
 
 ### Storage Account
 - **StorageRead**: Read operations (90 days)
@@ -74,9 +70,8 @@ This template configures diagnostic settings for:
 | `workspaceId` | string | Resource ID of Log Analytics Workspace |
 | `appServiceId` | string | Resource ID of App Service |
 | `appServiceName` | string | Name of App Service |
-| `sqlServerId` | string | Resource ID of SQL Server |
-| `sqlServerName` | string | Name of SQL Server |
-| `sqlDatabaseName` | string | Name of SQL Database |
+| `cosmosAccountId` | string | Resource ID of Cosmos DB Account |
+| `cosmosAccountName` | string | Name of Cosmos DB Account |
 | `storageAccountId` | string | Resource ID of Storage Account |
 | `storageAccountName` | string | Name of Storage Account |
 | `functionAppId` | string | Resource ID of Function App |
@@ -147,13 +142,13 @@ AppServiceHTTPLogs
 | summarize count() by ScStatus, bin(TimeGenerated, 5m)
 ```
 
-### Query SQL Database Errors
+### Query Cosmos DB Metrics
 ```kusto
 AzureDiagnostics
-| where ResourceType == "SERVERS/DATABASES"
-| where Category == "Errors"
+| where ResourceType == "DATABASEACCOUNTS"
+| where Category == "DataPlaneRequests"
 | where TimeGenerated > ago(24h)
-| project TimeGenerated, error_message_s, severity_s
+| project TimeGenerated, activityId_g, statusCode_s, requestCharge_s
 ```
 
 ### Query Storage Operations

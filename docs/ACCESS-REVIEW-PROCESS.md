@@ -96,7 +96,7 @@ All access reviews must include the following resources:
 - Table access
 - Container-level permissions
 
-#### 4. SQL Database
+#### 4. Cosmos DB Database
 - Database roles and permissions
 - Server-level access
 - Firewall rules

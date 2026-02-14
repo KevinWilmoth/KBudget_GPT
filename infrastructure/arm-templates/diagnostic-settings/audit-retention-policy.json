@@ -87,93 +87,51 @@
         }
       ]
     },
-    "sqlDatabase": {
+    "cosmosDatabase": {
       "logs": [
         {
-          "category": "SQLInsights",
+          "category": "DataPlaneRequests",
           "enabled": true,
           "retentionDays": 90,
           "classification": "operational",
+          "purpose": "Data plane operations and request tracking"
+        },
+        {
+          "category": "QueryRuntimeStatistics",
+          "enabled": true,
+          "retentionDays": 90,
+          "classification": "performance",
           "purpose": "Query performance insights and optimization"
         },
         {
-          "category": "AutomaticTuning",
-          "enabled": true,
-          "retentionDays": 90,
-          "classification": "operational",
-          "purpose": "Automated tuning recommendations"
-        },
-        {
-          "category": "QueryStoreRuntimeStatistics",
+          "category": "PartitionKeyStatistics",
           "enabled": true,
           "retentionDays": 90,
           "classification": "performance",
-          "purpose": "Query execution statistics and performance"
+          "purpose": "Partition key usage statistics"
         },
         {
-          "category": "QueryStoreWaitStatistics",
-          "enabled": true,
-          "retentionDays": 90,
-          "classification": "performance",
-          "purpose": "Query wait time analysis"
-        },
-        {
-          "category": "Errors",
+          "category": "PartitionKeyRUConsumption",
           "enabled": true,
           "retentionDays": 90,
           "classification": "operational",
-          "purpose": "Database error tracking and resolution"
+          "purpose": "Request unit consumption by partition key"
         },
         {
-          "category": "DatabaseWaitStatistics",
+          "category": "ControlPlaneRequests",
           "enabled": true,
           "retentionDays": 90,
-          "classification": "performance",
-          "purpose": "Database-level wait event analysis"
-        },
-        {
-          "category": "Timeouts",
-          "enabled": true,
-          "retentionDays": 90,
-          "classification": "operational",
-          "purpose": "Query timeout tracking and resolution"
-        },
-        {
-          "category": "Blocks",
-          "enabled": true,
-          "retentionDays": 90,
-          "classification": "operational",
-          "purpose": "Blocking event detection and analysis"
-        },
-        {
-          "category": "Deadlocks",
-          "enabled": true,
-          "retentionDays": 90,
-          "classification": "operational",
-          "purpose": "Deadlock detection and resolution"
+          "classification": "audit",
+          "purpose": "Control plane operations and changes"
         }
       ],
       "metrics": [
         {
-          "category": "Basic",
+          "category": "Requests",
           "enabled": true,
           "retentionDays": 90,
           "classification": "performance",
-          "purpose": "Basic database performance metrics"
-        },
-        {
-          "category": "InstanceAndAppAdvanced",
-          "enabled": true,
-          "retentionDays": 90,
-          "classification": "performance",
-          "purpose": "Advanced performance and resource metrics"
-        },
-        {
-          "category": "WorkloadManagement",
-          "enabled": true,
-          "retentionDays": 90,
-          "classification": "performance",
-          "purpose": "Workload management and resource governance"
+          "purpose": "Request metrics and throughput monitoring"
         }
       ]
     },

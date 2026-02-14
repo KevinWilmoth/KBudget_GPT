@@ -1,0 +1,45 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "cosmosAccountName": {
+      "value": "kbudget-staging-cosmos"
+    },
+    "cosmosDatabaseName": {
+      "value": "kbudget-staging-db"
+    },
+    "cosmosContainerName": {
+      "value": "budgets"
+    },
+    "consistencyLevel": {
+      "value": "Session"
+    },
+    "enableServerless": {
+      "value": false
+    },
+    "throughput": {
+      "value": 400
+    },
+    "enableFreeTier": {
+      "value": false
+    },
+    "enableAutomaticFailover": {
+      "value": true
+    },
+    "enableMultipleWriteLocations": {
+      "value": false
+    },
+    "partitionKeyPath": {
+      "value": "/id"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Staging",
+        "Project": "KBudget-GPT",
+        "Owner": "DevOps-Team",
+        "CostCenter": "CC-12345",
+        "Application": "KBudget"
+      }
+    }
+  }
+}

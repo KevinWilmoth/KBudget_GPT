@@ -438,7 +438,7 @@ Unable to retrieve diagnostic settings for [ResourceId]
 
 2. Check if resource type is supported:
    - App Service: Supported
-   - SQL Database: Supported
+   - Cosmos DB Database: Supported
    - Storage Account: Supported
    - Function App: Supported
    - Key Vault: Supported

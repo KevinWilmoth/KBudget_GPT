@@ -3,12 +3,12 @@
 # 
 # Purpose: Deploy all Azure resources for KBudget GPT application
 # Features:
-#   - Deploys resource groups, VNet, Key Vault, Storage, SQL DB, App Service, Functions
+#   - Deploys resource groups, VNet, Key Vault, Storage, Cosmos DB, App Service, Functions
 #   - Deploys monitoring: Log Analytics, Diagnostic Settings, Alerts
 #   - Supports dev, staging, and production environments
 #   - Idempotent deployments (safe to run multiple times)
 #   - Detailed logging and error handling
-#   - Secure password handling via Key Vault
+#   - Secure key handling via Key Vault
 #   - Output resource IDs and connection strings
 #
 # Prerequisites:
@@ -234,14 +234,6 @@ function Deploy-KeyVault {
         Write-Log "Key Vault deployed successfully" "SUCCESS"
         Write-Log "Key Vault URI: $($deployment.Outputs.keyVaultUri.Value)" "INFO"
         
-        # Generate and store SQL admin password
-        $kvName = $deployment.Outputs.keyVaultName.Value
-        $sqlPassword = -join ((65..90) + (97..122) + (48..57) + (33..47) | Get-Random -Count 16 | ForEach-Object {[char]$_})
-        $securePassword = ConvertTo-SecureString -String $sqlPassword -AsPlainText -Force
-        
-        Set-AzKeyVaultSecret -VaultName $kvName -Name "SqlAdminPassword" -SecretValue $securePassword | Out-Null
-        Write-Log "SQL admin password stored in Key Vault" "SUCCESS"
-        
         return $deployment
     }
     catch {
@@ -280,48 +272,41 @@ function Deploy-StorageAccount {
     }
 }
 
-function Deploy-SqlDatabase {
-    Write-Log "Deploying SQL Database..." "INFO"
+function Deploy-CosmosDatabase {
+    Write-Log "Deploying Cosmos Database..." "INFO"
     
-    $templatePath = Join-Path $ScriptDir "..\sql-database\sql-database.json"
-    $parametersPath = Join-Path $ScriptDir "..\sql-database\parameters.$Environment.json"
+    $templatePath = Join-Path $ScriptDir "..\cosmos-database\cosmos-database.json"
+    $parametersPath = Join-Path $ScriptDir "..\cosmos-database\parameters.$Environment.json"
     
     try {
         if ($WhatIf) {
-            Write-Log "WhatIf: Would deploy SQL Database" "INFO"
+            Write-Log "WhatIf: Would deploy Cosmos Database" "INFO"
             return
         }
         
-        # Update parameter file to use actual subscription ID
-        $subscriptionId = (Get-AzContext).Subscription.Id
-        $paramContent = Get-Content $parametersPath -Raw | ConvertFrom-Json
-        
-        # Update Key Vault reference with actual subscription ID
-        if ($paramContent.parameters.administratorLoginPassword.reference) {
-            $kvId = $paramContent.parameters.administratorLoginPassword.reference.keyVault.id
-            $kvId = $kvId -replace '\{subscription-id\}', $subscriptionId
-            $paramContent.parameters.administratorLoginPassword.reference.keyVault.id = $kvId
-        }
-        
-        $tempParamFile = Join-Path $env:TEMP "sql-params-$Timestamp.json"
-        $paramContent | ConvertTo-Json -Depth 10 | Set-Content $tempParamFile
-        
         $deployment = New-AzResourceGroupDeployment `
-            -Name "sql-deployment-$Timestamp" `
+            -Name "cosmos-deployment-$Timestamp" `
             -ResourceGroupName $ResourceGroupName `
             -TemplateFile $templatePath `
-            -TemplateParameterFile $tempParamFile `
+            -TemplateParameterFile $parametersPath `
             -Verbose
         
-        Remove-Item $tempParamFile -Force
+        Write-Log "Cosmos Database deployed successfully" "SUCCESS"
+        Write-Log "Cosmos DB Endpoint: $($deployment.Outputs.cosmosAccountEndpoint.Value)" "INFO"
         
-        Write-Log "SQL Database deployed successfully" "SUCCESS"
-        Write-Log "SQL Server FQDN: $($deployment.Outputs.sqlServerFqdn.Value)" "INFO"
+        # Store Cosmos DB primary key in Key Vault
+        $primaryKey = $deployment.Outputs.primaryMasterKey.Value
+        $secureKey = ConvertTo-SecureString -String $primaryKey -AsPlainText -Force
+        
+        # Get Key Vault name from environment
+        $kvName = "kbudget-$Environment-kv"
+        Set-AzKeyVaultSecret -VaultName $kvName -Name "CosmosDbPrimaryKey" -SecretValue $secureKey | Out-Null
+        Write-Log "Cosmos DB primary key stored in Key Vault" "SUCCESS"
         
         return $deployment
     }
     catch {
-        Write-Log "Failed to deploy SQL Database: $_" "ERROR"
+        Write-Log "Failed to deploy Cosmos Database: $_" "ERROR"
         throw
     }
 }
@@ -698,8 +683,8 @@ try {
         $deployments["Storage"] = Deploy-StorageAccount
     }
     
-    if ($deployAll -or $ResourceTypes -contains "sql") {
-        $deployments["SqlDatabase"] = Deploy-SqlDatabase
+    if ($deployAll -or $ResourceTypes -contains "cosmos") {
+        $deployments["CosmosDatabase"] = Deploy-CosmosDatabase
     }
     
     if ($deployAll -or $ResourceTypes -contains "appservice") {
@@ -720,14 +705,14 @@ try {
         $deployments["LogAnalytics"] = Deploy-LogAnalytics
         
         # Deploy Diagnostic Settings (requires Log Analytics and other resources)
-        if ($deployments.ContainsKey("AppService") -or $deployments.ContainsKey("SqlDatabase") -or 
+        if ($deployments.ContainsKey("AppService") -or $deployments.ContainsKey("CosmosDatabase") -or 
             $deployments.ContainsKey("Storage") -or $deployments.ContainsKey("Functions") -or 
             $deployments.ContainsKey("KeyVault")) {
             $deployments["DiagnosticSettings"] = Deploy-DiagnosticSettings -Deployments $deployments
         }
         
         # Deploy Monitoring Alerts (requires other resources)
-        if ($deployments.ContainsKey("AppService") -or $deployments.ContainsKey("SqlDatabase") -or 
+        if ($deployments.ContainsKey("AppService") -or $deployments.ContainsKey("CosmosDatabase") -or 
             $deployments.ContainsKey("Storage") -or $deployments.ContainsKey("Functions")) {
             $deployments["MonitoringAlerts"] = Deploy-MonitoringAlerts -Deployments $deployments
         }

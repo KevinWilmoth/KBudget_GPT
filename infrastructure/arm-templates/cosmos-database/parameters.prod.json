@@ -1,0 +1,45 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "cosmosAccountName": {
+      "value": "kbudget-prod-cosmos"
+    },
+    "cosmosDatabaseName": {
+      "value": "kbudget-prod-db"
+    },
+    "cosmosContainerName": {
+      "value": "budgets"
+    },
+    "consistencyLevel": {
+      "value": "Session"
+    },
+    "enableServerless": {
+      "value": false
+    },
+    "throughput": {
+      "value": 1000
+    },
+    "enableFreeTier": {
+      "value": false
+    },
+    "enableAutomaticFailover": {
+      "value": true
+    },
+    "enableMultipleWriteLocations": {
+      "value": false
+    },
+    "partitionKeyPath": {
+      "value": "/id"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Production",
+        "Project": "KBudget-GPT",
+        "Owner": "DevOps-Team",
+        "CostCenter": "CC-12345",
+        "Application": "KBudget"
+      }
+    }
+  }
+}

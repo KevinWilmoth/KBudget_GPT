@@ -35,7 +35,7 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 │       ├── resource-groups/       # Resource group templates
 │       ├── aad-app-registration/  # Azure AD app registration scripts
 │       ├── app-service/           # App Service templates
-│       ├── sql-database/          # SQL Database templates
+│       ├── cosmos-database/       # Cosmos DB templates
 │       ├── storage-account/       # Storage Account templates
 │       ├── azure-functions/       # Azure Functions templates
 │       ├── key-vault/             # Key Vault templates
@@ -92,7 +92,7 @@ The deployment includes:
 - **Virtual Network**: Network isolation with subnets
 - **Key Vault**: Secure storage for secrets and keys
 - **Storage Account**: Blob storage for application data
-- **SQL Database**: Azure SQL Server and Database
+- **Cosmos DB**: NoSQL database with global distribution
 - **App Service**: Web application hosting
 - **Azure Functions**: Serverless compute
 - **Monitoring & Observability**: Log Analytics, diagnostic settings, and alerts
@@ -107,8 +107,8 @@ You can also deploy individual resources:
 # Deploy only Virtual Network and Storage
 .\Deploy-AzureResources.ps1 -Environment dev -ResourceTypes @("vnet", "storage")
 
-# Deploy only SQL Database
-.\Deploy-AzureResources.ps1 -Environment dev -ResourceTypes @("sql")
+# Deploy only Cosmos DB
+.\Deploy-AzureResources.ps1 -Environment dev -ResourceTypes @("cosmos")
 
 # Deploy only monitoring resources
 .\Deploy-AzureResources.ps1 -Environment dev -ResourceTypes @("monitoring")
@@ -195,7 +195,7 @@ For DevOps and infrastructure management, please refer to our documentation:
 #### Resource-Specific Documentation
 
 - [App Service](infrastructure/arm-templates/app-service/README.md) - Web application hosting
-- [SQL Database](infrastructure/arm-templates/sql-database/README.md) - Database server and configuration
+- [Cosmos DB](infrastructure/arm-templates/cosmos-database/README.md) - NoSQL database configuration
 - [Storage Account](infrastructure/arm-templates/storage-account/README.md) - Blob storage and file services
 - [Azure Functions](infrastructure/arm-templates/azure-functions/README.md) - Serverless compute
 - [Key Vault](infrastructure/arm-templates/key-vault/README.md) - Secrets and key management
@@ -226,7 +226,7 @@ The KBudget GPT application uses the following Azure resources:
 | **Virtual Network** | Network isolation with subnets | All environments |
 | **Key Vault** | Secure storage for secrets, keys, certificates | All environments |
 | **Storage Account** | Blob storage for application data | All environments |
-| **SQL Database** | Application database (Azure SQL) | All environments |
+| **Cosmos DB** | NoSQL database with global distribution | All environments |
 | **App Service** | Web application hosting (.NET 8.0) | All environments |
 | **Azure Functions** | Serverless background processing | All environments |
 

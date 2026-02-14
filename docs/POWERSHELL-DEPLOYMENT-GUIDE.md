@@ -27,7 +27,7 @@ The KBudget GPT project includes three major PowerShell scripts for infrastructu
 
 | Script | Location | Purpose |
 |--------|----------|---------|
-| **Deploy-AzureResources.ps1** | `infrastructure/arm-templates/main-deployment/` | Deploys all Azure resources (VNet, Key Vault, Storage, SQL, App Service, Functions) |
+| **Deploy-AzureResources.ps1** | `infrastructure/arm-templates/main-deployment/` | Deploys all Azure resources (VNet, Key Vault, Storage, Cosmos DB, App Service, Functions) |
 | **Validate-Templates.ps1** | `infrastructure/arm-templates/main-deployment/` | Validates ARM templates and parameter files for syntax and schema compliance |
 | **Cleanup-ResourceGroups.ps1** | `infrastructure/arm-templates/resource-groups/` | Automated cleanup of old or non-production resource groups |
 
@@ -78,7 +78,7 @@ Import-Module Az
 - `Az.Accounts` - For authentication
 - `Az.KeyVault` - For Key Vault operations
 - `Az.Storage` - For storage operations
-- `Az.Sql` - For SQL database operations
+- `Az.CosmosDB` - For Cosmos DB operations
 - `Az.Network` - For virtual network operations
 - `Az.Websites` - For App Service operations
 
@@ -105,7 +105,7 @@ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
    - Virtual Networks
    - Public IP addresses
    - Storage accounts
-   - SQL databases
+   - Cosmos DB accounts
    - App Service plans
 
 ### Connection Requirements
@@ -199,7 +199,7 @@ Get-AzRoleAssignment -SignInName (Get-AzContext).Account.Id |
 
 #### Synopsis
 
-Deploys the complete Azure infrastructure including Resource Groups, Virtual Network, Key Vault, Storage Account, SQL Database, App Service, and Azure Functions.
+Deploys the complete Azure infrastructure including Resource Groups, Virtual Network, Key Vault, Storage Account, Cosmos DB, App Service, and Azure Functions.
 
 #### Parameters
 
@@ -249,7 +249,7 @@ cd infrastructure/arm-templates/main-deployment
 - `vnet` - Virtual Network
 - `keyvault` - Key Vault
 - `storage` - Storage Account
-- `sql` - SQL Database
+- `cosmos` - Cosmos DB
 - `appservice` - App Service
 - `functions` - Azure Functions
 
@@ -292,7 +292,7 @@ Validates JSON syntax, ARM template schema, and parameter file compatibility for
 
 - `all` - Validate all templates (default)
 - `app-service` - App Service templates
-- `sql-database` - SQL Database templates
+- `cosmos-database` - Cosmos DB templates
 - `storage-account` - Storage Account templates
 - `azure-functions` - Azure Functions templates
 - `key-vault` - Key Vault templates
@@ -317,8 +317,8 @@ cd infrastructure/arm-templates/main-deployment
 # Validate only App Service templates
 .\Validate-Templates.ps1 -ResourceType app-service
 
-# Validate only SQL Database templates
-.\Validate-Templates.ps1 -ResourceType sql-database
+# Validate only Cosmos DB templates
+.\Validate-Templates.ps1 -ResourceType cosmos-database
 
 # Validate only Key Vault templates
 .\Validate-Templates.ps1 -ResourceType key-vault
@@ -553,13 +553,13 @@ Workflow for deploying or updating a specific resource:
 ```powershell
 # Step 1: Validate specific resource template
 cd infrastructure/arm-templates/main-deployment
-.\Validate-Templates.ps1 -ResourceType sql-database
+.\Validate-Templates.ps1 -ResourceType cosmos-database
 
 # Step 2: Deploy only that resource
-.\Deploy-AzureResources.ps1 -Environment dev -ResourceTypes @("sql") -SkipResourceGroup
+.\Deploy-AzureResources.ps1 -Environment dev -ResourceTypes @("cosmos") -SkipResourceGroup
 
 # Step 3: Verify resource
-Get-AzSqlServer -ResourceGroupName "kbudget-dev-rg"
+Get-AzCosmosDBAccount -ResourceGroupName "kbudget-dev-rg"
 ```
 
 ### 4. Environment Cleanup
@@ -624,7 +624,7 @@ cd infrastructure/arm-templates/main-deployment
 .\Deploy-AzureResources.ps1 -Environment prod
 
 # Step 4: Restore data from backups
-# ... restore SQL database ...
+# ... restore Cosmos DB data ...
 # ... restore storage blobs ...
 
 # Step 5: Verify all services
@@ -645,7 +645,7 @@ infrastructure/arm-templates/
 │   ├── parameters.dev.json
 │   ├── parameters.staging.json
 │   └── parameters.prod.json
-├── sql-database/
+├── cosmos-database/
 │   ├── parameters.dev.json
 │   ├── parameters.staging.json
 │   └── parameters.prod.json
@@ -672,7 +672,7 @@ infrastructure/arm-templates/
 | Virtual Network | `kbudget-dev-vnet` | `kbudget-staging-vnet` | `kbudget-prod-vnet` |
 | Key Vault | `kbudget-dev-kv` | `kbudget-staging-kv` | `kbudget-prod-kv` |
 | Storage | `kbudgetdevst` | `kbudgetstagingst` | `kbudgetprodst` |
-| SQL Server | `kbudget-dev-sql` | `kbudget-staging-sql` | `kbudget-prod-sql` |
+| Cosmos DB Account | `kbudget-dev-cosmos` | `kbudget-staging-cosmos` | `kbudget-prod-cosmos` |
 | App Service | `kbudget-dev-app` | `kbudget-staging-app` | `kbudget-prod-app` |
 | Functions | `kbudget-dev-func` | `kbudget-staging-func` | `kbudget-prod-func` |
 
@@ -748,7 +748,7 @@ $VerbosePreference = 'Continue'
 ```powershell
 # Deploy specific resources (array)
 -ResourceTypes @("vnet", "storage")
--ResourceTypes @("keyvault", "sql")
+-ResourceTypes @("keyvault", "cosmos")
 -ResourceTypes @("appservice", "functions")
 ```
 
@@ -982,31 +982,29 @@ Set-AzKeyVaultAccessPolicy `
     -PermissionsToSecrets get,list,set
 ```
 
-### SQL Database Connection Issues
+### Cosmos DB Connection Issues
 
-**Problem**: Cannot connect to SQL Database
+**Problem**: Cannot connect to Cosmos DB
 
 **Diagnosis**:
 ```powershell
-# Check SQL firewall rules
-Get-AzSqlServerFirewallRule `
+# Check Cosmos DB firewall rules
+Get-AzCosmosDBAccount `
     -ResourceGroupName "kbudget-dev-rg" `
-    -ServerName "kbudget-dev-sql"
+    -Name "kbudget-dev-cosmos"
 
-# Get SQL server FQDN
-Get-AzSqlServer -ResourceGroupName "kbudget-dev-rg" |
-    Select-Object FullyQualifiedDomainName
+# Get Cosmos DB endpoint
+Get-AzCosmosDBAccount -ResourceGroupName "kbudget-dev-rg" -Name "kbudget-dev-cosmos" |
+    Select-Object DocumentEndpoint
 ```
 
 **Solutions**:
 1. Add firewall rule for your IP:
 ```powershell
-New-AzSqlServerFirewallRule `
+Update-AzCosmosDBAccount `
     -ResourceGroupName "kbudget-dev-rg" `
-    -ServerName "kbudget-dev-sql" `
-    -FirewallRuleName "MyClientIP" `
-    -StartIpAddress "x.x.x.x" `
-    -EndIpAddress "x.x.x.x"
+    -Name "kbudget-dev-cosmos" `
+    -IpRule "x.x.x.x"
 ```
 2. Enable "Allow Azure services" option
 3. Use VPN if accessing from restricted network

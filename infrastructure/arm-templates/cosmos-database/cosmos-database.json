@@ -1,0 +1,262 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "ARM Template for Azure Cosmos DB Account"
+  },
+  "parameters": {
+    "cosmosAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Cosmos DB Account"
+      }
+    },
+    "cosmosDatabaseName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Cosmos DB Database"
+      }
+    },
+    "cosmosContainerName": {
+      "type": "string",
+      "defaultValue": "budgets",
+      "metadata": {
+        "description": "Name of the Cosmos DB Container"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources"
+      }
+    },
+    "consistencyLevel": {
+      "type": "string",
+      "defaultValue": "Session",
+      "allowedValues": [
+        "Eventual",
+        "ConsistentPrefix",
+        "Session",
+        "BoundedStaleness",
+        "Strong"
+      ],
+      "metadata": {
+        "description": "Cosmos DB consistency level"
+      }
+    },
+    "maxStalenessPrefix": {
+      "type": "int",
+      "defaultValue": 100000,
+      "minValue": 10,
+      "maxValue": 2147483647,
+      "metadata": {
+        "description": "Max stale requests for BoundedStaleness consistency"
+      }
+    },
+    "maxIntervalInSeconds": {
+      "type": "int",
+      "defaultValue": 300,
+      "minValue": 5,
+      "maxValue": 86400,
+      "metadata": {
+        "description": "Max lag time (seconds) for BoundedStaleness consistency"
+      }
+    },
+    "enableAutomaticFailover": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Enable automatic failover for multi-region deployments"
+      }
+    },
+    "enableMultipleWriteLocations": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Enable multi-region writes"
+      }
+    },
+    "throughput": {
+      "type": "int",
+      "defaultValue": 400,
+      "minValue": 400,
+      "maxValue": 1000000,
+      "metadata": {
+        "description": "Database throughput (RU/s)"
+      }
+    },
+    "partitionKeyPath": {
+      "type": "string",
+      "defaultValue": "/id",
+      "metadata": {
+        "description": "Partition key path for the container"
+      }
+    },
+    "enableServerless": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Enable serverless capacity mode (no throughput provisioning)"
+      }
+    },
+    "enableFreeTier": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Enable free tier (first 1000 RU/s and 25 GB free)"
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Tags for the resources"
+      }
+    }
+  },
+  "variables": {
+    "cosmosAccountResourceId": "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosAccountName'))]",
+    "locations": [
+      {
+        "locationName": "[parameters('location')]",
+        "failoverPriority": 0,
+        "isZoneRedundant": false
+      }
+    ],
+    "consistencyPolicy": {
+      "Eventual": {
+        "defaultConsistencyLevel": "Eventual"
+      },
+      "ConsistentPrefix": {
+        "defaultConsistencyLevel": "ConsistentPrefix"
+      },
+      "Session": {
+        "defaultConsistencyLevel": "Session"
+      },
+      "BoundedStaleness": {
+        "defaultConsistencyLevel": "BoundedStaleness",
+        "maxStalenessPrefix": "[parameters('maxStalenessPrefix')]",
+        "maxIntervalInSeconds": "[parameters('maxIntervalInSeconds')]"
+      },
+      "Strong": {
+        "defaultConsistencyLevel": "Strong"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts",
+      "apiVersion": "2023-04-15",
+      "name": "[parameters('cosmosAccountName')]",
+      "location": "[parameters('location')]",
+      "kind": "GlobalDocumentDB",
+      "properties": {
+        "consistencyPolicy": "[variables('consistencyPolicy')[parameters('consistencyLevel')]]",
+        "locations": "[variables('locations')]",
+        "databaseAccountOfferType": "Standard",
+        "enableAutomaticFailover": "[parameters('enableAutomaticFailover')]",
+        "enableMultipleWriteLocations": "[parameters('enableMultipleWriteLocations')]",
+        "capabilities": "[if(parameters('enableServerless'), createArray(createObject('name', 'EnableServerless')), createArray())]",
+        "enableFreeTier": "[parameters('enableFreeTier')]",
+        "publicNetworkAccess": "Enabled",
+        "enableAnalyticalStorage": false,
+        "networkAclBypass": "AzureServices",
+        "disableKeyBasedMetadataWriteAccess": false,
+        "enablePartitionKeyMonitor": false
+      },
+      "tags": "[parameters('tags')]"
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}', parameters('cosmosAccountName'), parameters('cosmosDatabaseName'))]",
+      "dependsOn": [
+        "[variables('cosmosAccountResourceId')]"
+      ],
+      "properties": {
+        "resource": {
+          "id": "[parameters('cosmosDatabaseName')]"
+        },
+        "options": "[if(parameters('enableServerless'), createObject(), createObject('throughput', parameters('throughput')))]"
+      }
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', parameters('cosmosAccountName'), parameters('cosmosDatabaseName'), parameters('cosmosContainerName'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosAccountName'), parameters('cosmosDatabaseName'))]"
+      ],
+      "properties": {
+        "resource": {
+          "id": "[parameters('cosmosContainerName')]",
+          "partitionKey": {
+            "paths": [
+              "[parameters('partitionKeyPath')]"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "automatic": true,
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ],
+            "excludedPaths": [
+              {
+                "path": "/\"_etag\"/?"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "cosmosAccountEndpoint": {
+      "type": "string",
+      "value": "[reference(variables('cosmosAccountResourceId')).documentEndpoint]",
+      "metadata": {
+        "description": "Cosmos DB Account endpoint URL"
+      }
+    },
+    "cosmosAccountId": {
+      "type": "string",
+      "value": "[variables('cosmosAccountResourceId')]",
+      "metadata": {
+        "description": "Resource ID of the Cosmos DB Account"
+      }
+    },
+    "cosmosDatabaseId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosAccountName'), parameters('cosmosDatabaseName'))]",
+      "metadata": {
+        "description": "Resource ID of the Cosmos DB Database"
+      }
+    },
+    "cosmosContainerId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', parameters('cosmosAccountName'), parameters('cosmosDatabaseName'), parameters('cosmosContainerName'))]",
+      "metadata": {
+        "description": "Resource ID of the Cosmos DB Container"
+      }
+    },
+    "primaryMasterKey": {
+      "type": "string",
+      "value": "[listKeys(variables('cosmosAccountResourceId'), '2023-04-15').primaryMasterKey]",
+      "metadata": {
+        "description": "Primary master key for Cosmos DB authentication"
+      }
+    },
+    "connectionString": {
+      "type": "string",
+      "value": "[format('AccountEndpoint={0};AccountKey={1};', reference(variables('cosmosAccountResourceId')).documentEndpoint, listKeys(variables('cosmosAccountResourceId'), '2023-04-15').primaryMasterKey)]",
+      "metadata": {
+        "description": "Connection string for the Cosmos DB Account"
+      }
+    }
+  }
+}

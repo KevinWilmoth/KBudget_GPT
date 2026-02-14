@@ -50,22 +50,22 @@
         "description": "Name of the App Service"
       }
     },
-    "sqlServerId": {
+    "cosmosAccountId": {
       "type": "string",
       "metadata": {
-        "description": "Resource ID of the SQL Server to monitor"
+        "description": "Resource ID of the Cosmos DB Account to monitor"
       }
     },
-    "sqlServerName": {
+    "cosmosAccountName": {
       "type": "string",
       "metadata": {
-        "description": "Name of the SQL Server"
+        "description": "Name of the Cosmos DB Account"
       }
     },
-    "sqlDatabaseName": {
+    "cosmosDatabaseName": {
       "type": "string",
       "metadata": {
-        "description": "Name of the SQL Database"
+        "description": "Name of the Cosmos DB Database"
       }
     },
     "storageAccountId": {
@@ -108,7 +108,7 @@
     }
   },
   "variables": {
-    "sqlDatabaseId": "[concat(parameters('sqlServerId'), '/databases/', parameters('sqlDatabaseName'))]"
+    "cosmosAccountResourceId": "[parameters('cosmosAccountId')]"
   },
   "resources": [
     {
@@ -250,17 +250,17 @@
     {
       "type": "Microsoft.Insights/metricAlerts",
       "apiVersion": "2018-03-01",
-      "name": "[concat(parameters('sqlDatabaseName'), '-high-dtu')]",
+      "name": "[concat(parameters('cosmosAccountName'), '-high-ru')]",
       "location": "Global",
       "dependsOn": [
         "[resourceId('Microsoft.Insights/actionGroups', parameters('actionGroupName'))]"
       ],
       "properties": {
-        "description": "Alert when SQL Database DTU percentage is high",
+        "description": "Alert when Cosmos DB Request Units consumption is high",
         "severity": 2,
         "enabled": true,
         "scopes": [
-          "[variables('sqlDatabaseId')]"
+          "[variables('cosmosAccountResourceId')]"
         ],
         "evaluationFrequency": "PT5M",
         "windowSize": "PT5M",
@@ -268,12 +268,12 @@
           "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
           "allOf": [
             {
-              "name": "DTU Percentage",
-              "metricName": "dtu_consumption_percent",
-              "metricNamespace": "Microsoft.Sql/servers/databases",
+              "name": "Total Request Units",
+              "metricName": "TotalRequestUnits",
+              "metricNamespace": "Microsoft.DocumentDB/databaseAccounts",
               "operator": "GreaterThan",
-              "threshold": 80,
-              "timeAggregation": "Average",
+              "threshold": 10000,
+              "timeAggregation": "Total",
               "criterionType": "StaticThresholdCriterion"
             }
           ]
@@ -289,17 +289,17 @@
     {
       "type": "Microsoft.Insights/metricAlerts",
       "apiVersion": "2018-03-01",
-      "name": "[concat(parameters('sqlDatabaseName'), '-deadlock')]",
+      "name": "[concat(parameters('cosmosAccountName'), '-throttled-requests')]",
       "location": "Global",
       "dependsOn": [
         "[resourceId('Microsoft.Insights/actionGroups', parameters('actionGroupName'))]"
       ],
       "properties": {
-        "description": "Alert when SQL Database has deadlocks",
+        "description": "Alert when Cosmos DB requests are throttled (429 errors)",
         "severity": 1,
         "enabled": true,
         "scopes": [
-          "[variables('sqlDatabaseId')]"
+          "[variables('cosmosAccountResourceId')]"
         ],
         "evaluationFrequency": "PT5M",
         "windowSize": "PT5M",
@@ -307,17 +307,31 @@
           "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
           "allOf": [
             {
-              "name": "Deadlocks",
-              "metricName": "deadlock",
-              "metricNamespace": "Microsoft.Sql/servers/databases",
+              "name": "Throttled Requests",
+              "metricName": "TotalRequests",
+              "metricNamespace": "Microsoft.DocumentDB/databaseAccounts",
+              "dimensions": [
+                {
+                  "name": "StatusCode",
+                  "operator": "Include",
+                  "values": ["429"]
+                }
+              ],
               "operator": "GreaterThan",
               "threshold": 0,
-              "timeAggregation": "Total",
+              "timeAggregation": "Count",
               "criterionType": "StaticThresholdCriterion"
             }
           ]
         },
         "actions": [
+          {
+            "actionGroupId": "[resourceId('Microsoft.Insights/actionGroups', parameters('actionGroupName'))]"
+          }
+        ]
+      },
+      "tags": "[parameters('tags')]"
+    },
           {
             "actionGroupId": "[resourceId('Microsoft.Insights/actionGroups', parameters('actionGroupName'))]"
           }

@@ -12,7 +12,7 @@ This document summarizes the implementation of validation and testing features f
 
 **Features**:
 - 12 exported functions for comprehensive resource validation
-- Support for all Azure resource types (VNet, Key Vault, Storage, SQL, App Service, Functions)
+- Support for all Azure resource types (VNet, Key Vault, Storage, Cosmos DB, App Service, Functions)
 - Deployment status tracking
 - Output collection and export
 - Validation summary reporting
@@ -24,7 +24,7 @@ This document summarizes the implementation of validation and testing features f
 - `Test-VirtualNetworkExists` - Validate virtual networks
 - `Test-KeyVaultExists` - Validate Key Vaults
 - `Test-StorageAccountExists` - Validate storage accounts
-- `Test-SqlServerExists` - Validate SQL Servers
+- `Test-CosmosDBAccountExists` - Validate Cosmos DB Accounts
 - `Test-AppServiceExists` - Validate App Services
 - `Test-FunctionAppExists` - Validate Function Apps
 - `Test-DeploymentResources` - Comprehensive validation for all resources

@@ -11,13 +11,13 @@
     "appServiceName": {
       "value": "kbudget-dev-app"
     },
-    "sqlServerId": {
-      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-dev-rg/providers/Microsoft.Sql/servers/kbudget-dev-sql"
+    "cosmosAccountId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-dev-rg/providers/Microsoft.DocumentDB/databaseAccounts/kbudget-dev-cosmos"
     },
-    "sqlServerName": {
-      "value": "kbudget-dev-sql"
+    "cosmosAccountName": {
+      "value": "kbudget-dev-cosmos"
     },
-    "sqlDatabaseName": {
+    "cosmosDatabaseName": {
       "value": "kbudget-dev-db"
     },
     "storageAccountId": {
