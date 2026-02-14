@@ -269,7 +269,7 @@ The test notification will:
 To manually test that alerts are working:
 
 1. **App Service CPU**: Generate load on the application using a load testing tool
-2. **SQL Database DTU**: Run intensive queries against the database
+2. **Cosmos DB RU Consumption**: Provision sufficient RU/s and increase if throttling
 3. **Storage Availability**: Temporarily restrict storage access (testing only!)
 4. **Function Errors**: Deploy a function that intentionally throws exceptions
 

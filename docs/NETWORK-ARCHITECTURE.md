@@ -143,8 +143,8 @@ The KBudget GPT application uses a multi-tier network architecture with dedicate
 │  ├─ CIDR: 10.x.2.0/24                                                  │
 │  ├─ Total IPs: 256                                                     │
 │  ├─ Usable IPs: 251                                                    │
-│  ├─ Purpose: SQL Database, data tier                                   │
-│  └─ Security: db-nsg (restricted access)                               │
+│  ├─ Purpose: Cosmos DB, data tier                                      │
+│  └─ Security: cosmos-nsg (restricted access)                          │
 │                                                                        │
 │  Functions Subnet                                                      │
 │  ├─ CIDR: 10.x.3.0/24                                                  │
@@ -198,8 +198,8 @@ The KBudget GPT application uses a multi-tier network architecture with dedicate
 ┌─────────────────────────────────┐
 │  Database Subnet (10.x.2.0/24)  │
 │  ┌───────────────────────────┐  │
-│  │   Azure SQL Database      │  │
-│  │   (Private Endpoint)      │  │
+│  │   Cosmos DB           │  │
+│  │   (Private Endpoint)  │  │
 │  └───────────┬───────────────┘  │
 └──────────────┼──────────────────┘
                │
@@ -253,7 +253,7 @@ Application Subnet (10.x.1.0/24)
         │                        │
         ▼                        ▼
 ┌───────────────┐        ┌───────────────┐
-│ SQL Database  │        │ Storage       │
+│ Cosmos DB     │        │ Storage       │
 │ Service       │        │ Account       │
 │ Endpoint      │        │ Service       │
 │               │        │ Endpoint      │
@@ -336,7 +336,7 @@ Layer 4: Data Tier
                   ▼
 Layer 5: Data Encryption
 ┌─────────────────────────────────────────┐
-│ SQL Database                            │
+│ Cosmos DB                               │
 │ - TDE (Transparent Data Encryption)     │
 │ - Column-level encryption               │
 │ - Always Encrypted                      │
