@@ -57,7 +57,37 @@ $objectId = (Get-AzADServicePrincipal -ApplicationId "<app-id>").Id
 
 Edit `parameters.{env}.json` and replace `{user-or-sp-object-id}` with your actual object ID.
 
-### Deploy
+### Deploy with Network Restrictions (Recommended for Production)
+
+```powershell
+# Get subnet IDs for allowed access
+$vnet = Get-AzVirtualNetwork -ResourceGroupName "kbudget-prod-rg" -Name "kbudget-prod-vnet"
+$appSubnet = Get-AzVirtualNetworkSubnetConfig -VirtualNetwork $vnet -Name "app-subnet"
+$funcSubnet = Get-AzVirtualNetworkSubnetConfig -VirtualNetwork $vnet -Name "func-subnet"
+
+# Create subnet ID objects (format required by template)
+$allowedSubnets = @(
+    @{ id = $appSubnet.Id },
+    @{ id = $funcSubnet.Id }
+)
+
+# Create IP address objects (for admin access)
+$allowedIPs = @(
+    @{ value = "1.2.3.4" }  # Replace with your admin IP
+)
+
+# Deploy with network restrictions
+New-AzResourceGroupDeployment `
+    -Name "keyvault-deployment" `
+    -ResourceGroupName "kbudget-prod-rg" `
+    -TemplateFile "key-vault.json" `
+    -TemplateParameterFile "parameters.prod.json" `
+    -allowedSubnetIds $allowedSubnets `
+    -allowedIpAddresses $allowedIPs `
+    -networkAclsDefaultAction "Deny"
+```
+
+### Deploy without Network Restrictions (Development Only)
 
 ```powershell
 New-AzResourceGroupDeployment `

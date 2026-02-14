@@ -306,8 +306,15 @@ Get-AzDnsRecordSet -ResourceGroupName "kbudget-prod-rg" -ZoneName "kbudget.examp
 # Windows
 ipconfig /flushdns
 
-# Linux/Mac
+# macOS
 sudo dscacheutil -flushcache
+sudo killall -HUP mDNSResponder
+
+# Linux (systemd-resolved)
+sudo systemd-resolve --flush-caches
+
+# Linux (nscd)
+sudo /etc/init.d/nscd restart
 ```
 
 ### Zone Transfer Failed

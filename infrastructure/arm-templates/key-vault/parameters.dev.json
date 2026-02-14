@@ -14,6 +14,9 @@
     "enablePurgeProtection": {
       "value": false
     },
+    "networkAclsDefaultAction": {
+      "value": "Allow"
+    },
     "tags": {
       "value": {
         "Environment": "Development",
