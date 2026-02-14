@@ -2,14 +2,23 @@
 
 This directory contains ARM templates for deploying Azure Application Gateway v2 with integrated Web Application Firewall (WAF) to provide secure, scalable, and highly available application delivery.
 
+## ⚠️ Important: SSL/TLS Configuration
+
+**Note**: The initial template deploys Application Gateway with HTTP listeners only (no SSL certificates). For production use:
+1. Deploy the template as-is first
+2. Add SSL certificates (see [Adding SSL Certificate](#adding-ssl-certificate) section)
+3. Update the HTTPS listener to use protocol "Https" instead of "Http"
+
+This approach allows initial deployment without requiring SSL certificates upfront.
+
 ## Overview
 
 The Application Gateway provides:
 - **Layer 7 load balancing** - HTTP/HTTPS traffic distribution
 - **Web Application Firewall (WAF)** - Protection against web vulnerabilities and attacks
-- **SSL/TLS termination** - Centralized SSL certificate management
+- **SSL/TLS termination** - Centralized SSL certificate management (requires post-deployment configuration)
 - **Auto-scaling** - Automatic scaling based on traffic patterns
-- **HTTP to HTTPS redirect** - Automatic redirect for secure connections
+- **HTTP to HTTPS redirect** - Automatic redirect for secure connections (after SSL certificate is added)
 - **Health probes** - Continuous monitoring of backend health
 
 ## Resources Created

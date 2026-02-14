@@ -142,10 +142,12 @@ Service endpoints provide secure, direct connectivity to Azure services over the
 **Key Features**:
 - **WAF Mode**: Detection (dev) / Prevention (staging, production)
 - **Rule Set**: OWASP 3.2 Core Rule Set
-- **SSL/TLS**: TLS 1.2 minimum with strong cipher suites
+- **SSL/TLS**: TLS 1.2 minimum with strong cipher suites (requires SSL certificate configuration post-deployment)
 - **Auto-scaling**: 1-3 instances (dev), 2-10 instances (prod)
-- **HTTP to HTTPS**: Automatic redirect
+- **HTTP to HTTPS**: Automatic redirect (enabled after SSL certificate is added)
 - **Health Probes**: Continuous backend monitoring
+
+**Note**: The initial template deploys with HTTP listeners only. For production, add SSL certificates and update the HTTPS listener configuration.
 
 **WAF Protection Against**:
 - SQL Injection

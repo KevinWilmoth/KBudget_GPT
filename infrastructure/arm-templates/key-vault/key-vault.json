@@ -109,14 +109,14 @@
       "type": "array",
       "defaultValue": [],
       "metadata": {
-        "description": "Array of subnet resource IDs allowed to access Key Vault"
+        "description": "Array of objects with 'id' property containing subnet resource IDs. Example: [{'id': '/subscriptions/.../subnets/app-subnet'}]"
       }
     },
     "allowedIpAddresses": {
       "type": "array",
       "defaultValue": [],
       "metadata": {
-        "description": "Array of IP addresses or CIDR ranges allowed to access Key Vault"
+        "description": "Array of objects with 'value' property containing IP addresses or CIDR ranges. Example: [{'value': '1.2.3.4'}]"
       }
     },
     "tags": {
@@ -183,8 +183,8 @@
         "networkAcls": {
           "bypass": "AzureServices",
           "defaultAction": "[parameters('networkAclsDefaultAction')]",
-          "virtualNetworkRules": "[if(greater(length(parameters('allowedSubnetIds')), 0), map(parameters('allowedSubnetIds'), lambda('subnetId', createObject('id', lambdaVariables('subnetId')))), createArray())]",
-          "ipRules": "[if(greater(length(parameters('allowedIpAddresses')), 0), map(parameters('allowedIpAddresses'), lambda('ipAddress', createObject('value', lambdaVariables('ipAddress')))), createArray())]"
+          "virtualNetworkRules": "[parameters('allowedSubnetIds')]",
+          "ipRules": "[parameters('allowedIpAddresses')]"
         },
         "publicNetworkAccess": "Enabled"
       },
