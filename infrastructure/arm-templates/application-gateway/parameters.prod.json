@@ -1,0 +1,52 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "applicationGatewayName": {
+      "value": "kbudget-prod-appgw"
+    },
+    "virtualNetworkName": {
+      "value": "kbudget-prod-vnet"
+    },
+    "subnetName": {
+      "value": "frontend-subnet"
+    },
+    "publicIpName": {
+      "value": "kbudget-prod-appgw-pip"
+    },
+    "skuName": {
+      "value": "WAF_v2"
+    },
+    "skuTier": {
+      "value": "WAF_v2"
+    },
+    "capacity": {
+      "value": 2
+    },
+    "backendAppServiceFqdn": {
+      "value": "kbudget-prod-app.azurewebsites.net"
+    },
+    "backendAppServiceHostName": {
+      "value": "kbudget-prod-app.azurewebsites.net"
+    },
+    "wafMode": {
+      "value": "Prevention"
+    },
+    "wafRuleSetType": {
+      "value": "OWASP"
+    },
+    "wafRuleSetVersion": {
+      "value": "3.2"
+    },
+    "enableHttp2": {
+      "value": true
+    },
+    "tags": {
+      "value": {
+        "Environment": "Production",
+        "Project": "KBudget GPT",
+        "ManagedBy": "ARM Templates"
+      }
+    }
+  }
+}

@@ -13,6 +13,7 @@ The `Deploy-AzureResources.ps1` script automates the deployment of the complete 
 - **SQL Database**: Azure SQL Server and Database for application data
 - **App Service**: Web application hosting with App Service Plan
 - **Azure Functions**: Serverless compute for background tasks
+- **Application Gateway with WAF**: Load balancer with Web Application Firewall for security
 - **Log Analytics Workspace**: Centralized logging and monitoring
 - **Diagnostic Settings**: Log and metric collection from all resources
 - **Monitoring Alerts**: Proactive alerts for critical resource metrics
@@ -105,6 +106,7 @@ Available resource types:
 - `sql` - SQL Database
 - `appservice` - App Service
 - `functions` - Azure Functions
+- `appgateway` - Application Gateway with WAF
 - `monitoring` - Log Analytics, Diagnostic Settings, and Alerts
 
 #### Custom Location

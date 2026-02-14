@@ -521,11 +521,103 @@ Recommended monitoring for VNet:
 
 This network architecture provides:
 
-✅ **Security**: Multi-layer defense with NSGs, service endpoints, and network segmentation  
+✅ **Security**: Multi-layer defense with NSGs, WAF, service endpoints, and network segmentation  
 ✅ **Scalability**: 251 usable IPs per subnet, room for 64K+ total IPs  
 ✅ **Performance**: Service endpoints for optimized Azure service access  
 ✅ **Isolation**: Dedicated subnets for each application tier  
+✅ **Protection**: Application Gateway WAF defends against OWASP Top 10 vulnerabilities  
 ✅ **Flexibility**: Environment-specific configurations  
 ✅ **Cost Efficiency**: Free VNet and NSGs, optional DDoS Standard for production  
 
 For deployment instructions, see the [README](../../../infrastructure/arm-templates/virtual-network/README.md) in the virtual-network directory.
+
+## Application Gateway with Web Application Firewall (WAF)
+
+### Overview
+
+Azure Application Gateway with WAF provides a Layer 7 load balancer and web application firewall that protects the KBudget GPT application from common web vulnerabilities and attacks.
+
+### Architecture Components
+
+```
+                    Internet
+                       │
+                       │ HTTPS/HTTP
+                       │
+                       ▼
+            ┌──────────────────────┐
+            │   Public IP Address   │
+            │  (Standard SKU)       │
+            └──────────┬────────────┘
+                       │
+                       ▼
+         ┌─────────────────────────────┐
+         │  Application Gateway (WAF)  │
+         │  Frontend Subnet (10.x.4.0/24)│
+         ├─────────────────────────────┤
+         │  - HTTPS Listener (443)     │
+         │  - HTTP Listener (80)       │
+         │  - SSL Termination          │
+         │  - WAF Policy (OWASP 3.2)   │
+         │  - Health Probes            │
+         └──────────┬──────────────────┘
+                    │
+                    │ Internal Traffic
+                    │ (Re-encrypted HTTPS)
+                    │
+                    ▼
+         ┌──────────────────────────┐
+         │   Backend Pool           │
+         │   App Service (HTTPS)    │
+         │   kbudget-{env}-app      │
+         └──────────────────────────┘
+```
+
+### WAF Protection Features
+
+**OWASP Core Rule Set 3.2** protects against:
+
+1. **SQL Injection (SQLi)** - Rule Group 942xxx
+   - Prevents database query manipulation
+   - Blocks common SQL injection patterns
+   
+2. **Cross-Site Scripting (XSS)** - Rule Group 941xxx
+   - Prevents JavaScript injection
+   - Blocks malicious script tags
+   
+3. **Remote Code Execution (RCE)** - Rule Group 932xxx
+   - Prevents command injection
+   - Blocks system command attempts
+   
+4. **Path Traversal** - Rule Group 930xxx
+   - Prevents directory traversal attacks
+   - Blocks file system access attempts
+   
+5. **Protocol Attacks** - Rule Group 920xxx
+   - Enforces valid HTTP protocol
+   - Prevents request smuggling
+
+### Deployment
+
+Deploy Application Gateway with WAF:
+
+```powershell
+# Deploy standalone
+cd infrastructure/arm-templates/application-gateway
+.\Deploy-ApplicationGateway.ps1 -Environment dev
+
+# Deploy as part of full infrastructure
+cd infrastructure/arm-templates/main-deployment
+.\Deploy-AzureResources.ps1 -Environment dev -ResourceTypes @("appgateway")
+
+# Test WAF protection
+cd infrastructure/arm-templates/application-gateway
+.\Test-WAF.ps1 -ApplicationGatewayUrl "https://kbudget-dev-appgw.eastus.cloudapp.azure.com"
+```
+
+### Additional Resources
+
+- [Application Gateway Documentation](../infrastructure/arm-templates/application-gateway/README.md)
+- [WAF Configuration Guide](../infrastructure/arm-templates/application-gateway/WAF-CONFIGURATION-GUIDE.md)
+- [Integration Guide](../infrastructure/arm-templates/application-gateway/INTEGRATION-GUIDE.md)
+- [Quick Reference](../infrastructure/arm-templates/application-gateway/QUICK-REFERENCE.md)

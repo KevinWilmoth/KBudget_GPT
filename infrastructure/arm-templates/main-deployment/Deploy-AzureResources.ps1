@@ -386,6 +386,37 @@ function Deploy-AzureFunctions {
     }
 }
 
+function Deploy-ApplicationGateway {
+    Write-Log "Deploying Application Gateway with WAF..." "INFO"
+    
+    $templatePath = Join-Path $ScriptDir "..\application-gateway\application-gateway.json"
+    $parametersPath = Join-Path $ScriptDir "..\application-gateway\parameters.$Environment.json"
+    
+    try {
+        if ($WhatIf) {
+            Write-Log "WhatIf: Would deploy Application Gateway with WAF" "INFO"
+            return
+        }
+        
+        $deployment = New-AzResourceGroupDeployment `
+            -Name "appgw-deployment-$Timestamp" `
+            -ResourceGroupName $ResourceGroupName `
+            -TemplateFile $templatePath `
+            -TemplateParameterFile $parametersPath `
+            -Verbose
+        
+        Write-Log "Application Gateway with WAF deployed successfully" "SUCCESS"
+        Write-Log "Public IP: $($deployment.Outputs.publicIpAddress.Value)" "INFO"
+        Write-Log "Public FQDN: $($deployment.Outputs.publicIpFqdn.Value)" "INFO"
+        
+        return $deployment
+    }
+    catch {
+        Write-Log "Failed to deploy Application Gateway: $_" "ERROR"
+        throw
+    }
+}
+
 function Deploy-LogAnalytics {
     Write-Log "Deploying Log Analytics Workspace..." "INFO"
     
@@ -677,6 +708,10 @@ try {
     
     if ($deployAll -or $ResourceTypes -contains "functions") {
         $deployments["Functions"] = Deploy-AzureFunctions
+    }
+    
+    if ($deployAll -or $ResourceTypes -contains "appgateway") {
+        $deployments["ApplicationGateway"] = Deploy-ApplicationGateway
     }
     
     # Deploy monitoring resources (Log Analytics, Diagnostic Settings, Alerts)
