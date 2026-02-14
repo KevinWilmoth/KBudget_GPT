@@ -114,53 +114,53 @@ This document provides detailed information about Azure Monitor alert rules, thr
 
 ---
 
-### SQL Database Alerts
+### Cosmos DB Alerts
 
-#### 4. High DTU Consumption Alert
+#### 4. High RU Consumption Alert
 
-**Alert Name:** `{sqlDatabaseName}-high-dtu`
+**Alert Name:** `{cosmosDbAccountName}-high-ru`
 
-**Purpose:** Detect when the SQL Database is consuming high Database Transaction Units (DTUs), indicating resource constraints.
+**Purpose:** Detect when the Cosmos DB is consuming high Request Units (RUs), indicating resource constraints.
 
 **Configuration:**
-- **Metric:** `dtu_consumption_percent`
-- **Metric Namespace:** `Microsoft.Sql/servers/databases`
+- **Metric:** `NormalizedRUConsumption`
+- **Metric Namespace:** `Microsoft.DocumentDB/databaseAccounts`
 - **Threshold:** > 80%
-- **Time Aggregation:** Average
+- **Time Aggregation:** Maximum
 - **Evaluation Frequency:** Every 5 minutes (PT5M)
 - **Window Size:** 5 minutes (PT5M)
 - **Severity:** 2 (Warning)
 - **Operator:** GreaterThan
 
 **When it fires:**
-- The alert fires when the average DTU consumption exceeds 80% over a 5-minute window
+- The alert fires when the maximum normalized RU consumption exceeds 80% over a 5-minute window
 - Evaluated every 5 minutes
 
 **Response Actions:**
-1. Check SQL Database metrics in Azure Portal
-2. Review Query Performance Insights for expensive queries
-3. Identify slow-running or resource-intensive queries
-4. Check for missing indexes or inefficient query plans
-5. Review recent application changes that might increase DB load
-6. Look for long-running transactions or locks
-7. Consider query optimization (add indexes, rewrite queries)
-8. Consider scaling up the database tier if sustained high usage
-9. Implement query caching where appropriate
-10. Archive old data if table sizes are growing significantly
+1. Check Cosmos DB metrics in Azure Portal
+2. Review query performance and identify expensive queries
+3. Check for hot partitions using partition key statistics
+4. Review recent application changes that might increase DB load
+5. Look for inefficient queries or missing indexes
+6. Consider query optimization (use partition keys, add composite indexes)
+7. Consider increasing provisioned RU/s if sustained high usage
+8. Implement query caching where appropriate
+9. Review partition key design for better distribution
+10. Consider using autoscale throughput
 
 **Expected Resolution Time:** 15-45 minutes
 
 ---
 
-#### 5. Database Deadlock Alert
+#### 5. Request Throttling Alert
 
-**Alert Name:** `{sqlDatabaseName}-deadlock`
+**Alert Name:** `{cosmosDbAccountName}-throttling`
 
-**Purpose:** Detect when SQL Database deadlocks occur, indicating transaction conflicts.
+**Purpose:** Detect when Cosmos DB requests are being throttled (429 status codes), indicating insufficient throughput.
 
 **Configuration:**
-- **Metric:** `deadlock`
-- **Metric Namespace:** `Microsoft.Sql/servers/databases`
+- **Metric:** `TotalRequests` (filtered by status code 429)
+- **Metric Namespace:** `Microsoft.DocumentDB/databaseAccounts`
 - **Threshold:** > 0
 - **Time Aggregation:** Total
 - **Evaluation Frequency:** Every 5 minutes (PT5M)
@@ -169,21 +169,21 @@ This document provides detailed information about Azure Monitor alert rules, thr
 - **Operator:** GreaterThan
 
 **When it fires:**
-- The alert fires when any deadlock occurs within a 5-minute window
+- The alert fires when any request throttling occurs within a 5-minute window
 - Evaluated every 5 minutes
-- Higher severity (1) as deadlocks indicate transaction failures
+- Higher severity (1) as throttling indicates request failures
 
 **Response Actions:**
-1. **IMMEDIATE:** Check if deadlocks are causing user-facing errors
-2. Review SQL Database diagnostic logs for deadlock details
-3. Analyze deadlock graph to identify conflicting queries
-4. Review recent application changes in transaction logic
-5. Check transaction isolation levels
-6. Identify long-running transactions
-7. Optimize transaction scope (keep transactions short)
-8. Reorder operations to access resources in consistent order
-9. Implement retry logic in application for deadlock scenarios
-10. Consider application-level locking strategies
+1. **IMMEDIATE:** Check if throttling is causing user-facing errors
+2. Review Cosmos DB diagnostic logs for throttled requests
+3. Check which operations are being throttled
+4. Review partition key distribution for hot partitions
+5. Identify queries or operations consuming excessive RUs
+6. Optimize queries to reduce RU consumption
+7. Implement retry logic with exponential backoff in application
+8. Consider increasing provisioned RU/s temporarily
+9. Enable autoscale if not already enabled
+10. Review and optimize partition key strategy
 
 **Expected Resolution Time:** 15-30 minutes
 
@@ -287,12 +287,12 @@ This document provides detailed information about Azure Monitor alert rules, thr
 **Response Time:** Within 15 minutes  
 **Examples:**
 - HTTP 5xx errors (users experiencing failures)
-- Database deadlocks (transaction failures)
+- Request throttling (insufficient throughput)
 - Storage availability issues
 
 **Current Usage:**
 - App Service HTTP 5xx errors
-- Database deadlocks
+- Cosmos DB request throttling
 - Storage account availability
 
 ---
@@ -302,13 +302,13 @@ This document provides detailed information about Azure Monitor alert rules, thr
 **Response Time:** Within 30 minutes to 1 hour  
 **Examples:**
 - High CPU or memory usage (performance degradation)
-- High DTU consumption (database stressed)
+- High RU consumption (database stressed)
 - Elevated function error rates
 
 **Current Usage:**
 - App Service high CPU
 - App Service high memory
-- SQL Database high DTU
+- Cosmos DB high RU consumption
 - Function App errors
 
 ---
@@ -505,10 +505,10 @@ Use the PowerShell script to send test notifications:
 # Or use Application Insights to simulate errors
 ```
 
-#### Test SQL Database Alerts
+#### Test Cosmos DB Alerts
 ```powershell
-# Run intensive queries to increase DTU
-SELECT * FROM LargeTable ORDER BY RandomColumn
+# Run queries with high RU consumption
+# Use Data Explorer in Azure Portal to execute expensive queries
 ```
 
 ---

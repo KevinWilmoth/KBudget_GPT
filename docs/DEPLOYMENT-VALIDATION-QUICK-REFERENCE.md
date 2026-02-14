@@ -85,7 +85,7 @@ $results.DeploymentDetails | ForEach-Object {
 | `Test-VirtualNetworkExists` | Validate virtual network existence |
 | `Test-KeyVaultExists` | Validate Key Vault existence |
 | `Test-StorageAccountExists` | Validate storage account existence |
-| `Test-SqlServerExists` | Validate SQL Server existence |
+| `Test-CosmosDBAccountExists` | Validate Cosmos DB Account existence |
 | `Test-AppServiceExists` | Validate App Service existence |
 | `Test-FunctionAppExists` | Validate Function App existence |
 | `Test-DeploymentResources` | Comprehensive deployment validation |
@@ -101,7 +101,7 @@ $results.DeploymentDetails | ForEach-Object {
 | Virtual Network | `kbudget-{env}-vnet` | kbudget-dev-vnet |
 | Key Vault | `kbudget-{env}-kv` | kbudget-dev-kv |
 | Storage Account | `kbudget{env}storage` | kbudgetdevstorage |
-| SQL Server | `kbudget-{env}-sql` | kbudget-dev-sql |
+| Cosmos DB Account | `kbudget-{env}-cosmos` | kbudget-dev-cosmos |
 | App Service | `kbudget-{env}-app` | kbudget-dev-app |
 | Function App | `kbudget-{env}-func` | kbudget-dev-func |
 

@@ -6,7 +6,7 @@ This template deploys Azure Monitor metric alerts and action groups for critical
 
 This template creates comprehensive monitoring alerts for:
 - **App Service**: CPU, memory, and HTTP errors
-- **SQL Database**: DTU usage and deadlocks
+- **Cosmos DB**: RU consumption and throttling
 - **Storage Account**: Availability monitoring
 - **Function App**: Execution errors
 
@@ -27,12 +27,12 @@ This template creates comprehensive monitoring alerts for:
 | High Memory | MemoryPercentage | >80% | 2 (Warning) | Memory usage is high |
 | HTTP Errors | Http5xx | >10 errors | 1 (Error) | Server errors detected |
 
-### SQL Database Alerts
+### Cosmos DB Alerts
 
 | Alert | Metric | Threshold | Severity | Description |
 |-------|--------|-----------|----------|-------------|
-| High DTU | dtu_consumption_percent | >80% | 2 (Warning) | Database resources stressed |
-| Deadlock | deadlock | >0 | 1 (Error) | Database deadlocks occurring |
+| High RU Consumption | NormalizedRUConsumption | >80% | 2 (Warning) | Database resources stressed |
+| Request Throttling | TotalRequests (429 status) | >0 | 1 (Error) | Requests being throttled |
 
 ### Storage Account Alerts
 
@@ -63,9 +63,8 @@ This template creates comprehensive monitoring alerts for:
 | `emailAddress` | string | Email for notifications |
 | `appServiceId` | string | Resource ID of App Service |
 | `appServiceName` | string | Name of App Service |
-| `sqlServerId` | string | Resource ID of SQL Server |
-| `sqlServerName` | string | Name of SQL Server |
-| `sqlDatabaseName` | string | Name of SQL Database |
+| `cosmosDbAccountId` | string | Resource ID of Cosmos DB Account |
+| `cosmosDbAccountName` | string | Name of Cosmos DB Account |
 | `storageAccountId` | string | Resource ID of Storage Account |
 | `storageAccountName` | string | Name of Storage Account |
 | `functionAppId` | string | Resource ID of Function App |

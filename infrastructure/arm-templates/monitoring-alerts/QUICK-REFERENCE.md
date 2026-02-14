@@ -38,8 +38,8 @@ cd infrastructure/arm-templates/monitoring-alerts
 | High CPU | App Service | > 80% | Warning | 30 min |
 | High Memory | App Service | > 80% | Warning | 30 min |
 | HTTP 5xx Errors | App Service | > 10 errors/5min | Error | 15 min |
-| High DTU | SQL Database | > 80% | Warning | 30 min |
-| Deadlocks | SQL Database | > 0 | Error | 15 min |
+| High RU Consumption | Cosmos DB | > 80% | Warning | 30 min |
+| Request Throttling | Cosmos DB | > 0 (429 errors) | Error | 15 min |
 | Low Availability | Storage | < 99% | Error | 15 min |
 | Function Errors | Functions | > 5 failures/5min | Warning | 30 min |
 
@@ -54,11 +54,12 @@ cd infrastructure/arm-templates/monitoring-alerts
 - [ ] Review recent deployments
 - [ ] Consider rollback if deployment-related
 
-**Database Deadlocks:**
-- [ ] Check SQL diagnostic logs
-- [ ] Analyze deadlock graph
-- [ ] Review recent code changes
-- [ ] Optimize transaction scope
+**Request Throttling:**
+- [ ] Check Cosmos DB diagnostic logs
+- [ ] Identify throttled operations
+- [ ] Review partition key distribution
+- [ ] Optimize queries to reduce RU consumption
+- [ ] Consider increasing provisioned RU/s
 
 **Storage Availability:**
 - [ ] Check Azure Service Health
@@ -75,9 +76,12 @@ cd infrastructure/arm-templates/monitoring-alerts
 - [ ] Consider scaling if sustained
 - [ ] Investigate code optimization
 
-**High DTU:**
-- [ ] Review Query Performance Insights
+**High RU Consumption:**
+- [ ] Review Cosmos DB metrics
 - [ ] Identify expensive queries
+- [ ] Check for hot partitions
+- [ ] Consider query optimization
+- [ ] Consider increasing RU/s if sustained
 - [ ] Check for missing indexes
 - [ ] Consider database scaling
 

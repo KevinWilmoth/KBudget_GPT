@@ -40,7 +40,7 @@ $rgStatus = Test-ResourceGroupExists -ResourceGroupName "kbudget-dev-rg"
 $vnetStatus = Test-VirtualNetworkExists -ResourceGroupName "kbudget-dev-rg" -VNetName "kbudget-dev-vnet"
 $kvStatus = Test-KeyVaultExists -ResourceGroupName "kbudget-dev-rg" -KeyVaultName "kbudget-dev-kv"
 $storageStatus = Test-StorageAccountExists -ResourceGroupName "kbudget-dev-rg" -StorageAccountName "kbudgetdevstorage"
-$sqlStatus = Test-SqlServerExists -ResourceGroupName "kbudget-dev-rg" -ServerName "kbudget-dev-sql"
+$cosmosStatus = Test-CosmosDBAccountExists -ResourceGroupName "kbudget-dev-rg" -AccountName "kbudget-dev-cosmos"
 $appStatus = Test-AppServiceExists -ResourceGroupName "kbudget-dev-rg" -AppServiceName "kbudget-dev-app"
 $funcStatus = Test-FunctionAppExists -ResourceGroupName "kbudget-dev-rg" -FunctionAppName "kbudget-dev-func"
 ```
@@ -151,8 +151,8 @@ KeyVault: ✓ DEPLOYED
 Storage: ✓ DEPLOYED
   Resource ID: /subscriptions/.../Microsoft.Storage/storageAccounts/kbudgetdevstorage
 
-SqlServer: ✓ DEPLOYED
-  Resource ID: /subscriptions/.../Microsoft.Sql/servers/kbudget-dev-sql
+CosmosDB: ✓ DEPLOYED
+  Resource ID: /subscriptions/.../Microsoft.DocumentDB/databaseAccounts/kbudget-dev-cosmos
 
 AppService: ✓ DEPLOYED
   Resource ID: /subscriptions/.../Microsoft.Web/sites/kbudget-dev-app
@@ -490,7 +490,7 @@ Invoke-Pester -Configuration $config
 # - VNet: kbudget-{env}-vnet
 # - Key Vault: kbudget-{env}-kv
 # - Storage: kbudget{env}storage (no hyphens)
-# - SQL Server: kbudget-{env}-sql
+# - Cosmos DB Account: kbudget-{env}-cosmos
 # - App Service: kbudget-{env}-app
 # - Function App: kbudget-{env}-func
 

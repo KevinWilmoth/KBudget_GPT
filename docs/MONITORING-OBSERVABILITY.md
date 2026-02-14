@@ -16,7 +16,7 @@ The monitoring and observability solution consists of three main components:
 ┌─────────────────────────────────────────────────────────────┐
 │                    Azure Resources                          │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  │
-│  │App Service│  │SQL Database│  │Storage  │  │Functions │  │
+│  │App Service│  │ Cosmos DB │  │Storage  │  │Functions │  │
 │  └────┬─────┘  └─────┬────┘  └────┬─────┘  └────┬─────┘  │
 │       │              │             │             │         │
 │       └──────────────┴─────────────┴─────────────┘         │
@@ -62,7 +62,7 @@ To ensure proper dependencies, deploy in this order:
    - Virtual Network
    - Key Vault
    - Storage Account
-   - SQL Database
+   - Cosmos DB
    - App Service
    - Azure Functions
 
@@ -149,9 +149,9 @@ To ensure proper dependencies, deploy in this order:
 - High memory usage (>80%)
 - HTTP 5xx errors (>10 in 5 min)
 
-#### SQL Database Alerts
-- High DTU consumption (>80%)
-- Database deadlocks (>0)
+#### Cosmos DB Alerts
+- High RU consumption (>80%)
+- Request throttling (429 errors)
 
 #### Storage Account Alerts
 - Low availability (<99%)
@@ -169,11 +169,11 @@ To ensure proper dependencies, deploy in this order:
 - Console output
 - Audit events (180-day retention)
 
-**SQL Database**:
+**Cosmos DB**:
 - Query performance insights
-- Errors and timeouts
-- Deadlocks and blocks
-- Wait statistics
+- Request metrics and latency
+- Throttling events (429)
+- Partition key statistics
 
 **Storage Account**:
 - Read/write/delete operations
@@ -218,9 +218,9 @@ AppServiceAppLogs
 #### Monitor Database Performance
 ```kusto
 AzureDiagnostics
-| where ResourceType == "SERVERS/DATABASES"
-| where Category == "QueryStoreRuntimeStatistics"
-| summarize avg(avg_duration_s) by bin(TimeGenerated, 5m)
+| where ResourceType == "DATABASEACCOUNTS"
+| where Category == "DataPlaneRequests"
+| summarize avg(duration_s) by bin(TimeGenerated, 5m)
 | render timechart
 ```
 
@@ -263,10 +263,10 @@ StorageBlobLogs
 
 ### Database Issues
 
-1. Review SQL Database metrics in portal
-2. Check for slow queries using Query Performance Insights
-3. Investigate deadlocks using diagnostic logs
-4. Optimize queries or add indexes as needed
+1. Review Cosmos DB metrics in portal
+2. Check for throttling using diagnostic logs
+3. Investigate high RU consumption
+4. Optimize queries or increase provisioned RU/s
 5. Consider scaling database if needed
 
 ### Storage Availability Issues

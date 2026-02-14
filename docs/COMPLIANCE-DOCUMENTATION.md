@@ -113,49 +113,46 @@ AppServiceAuditLogs
 | project TimeGenerated, OperationName, Identity, CorrelationId
 ```
 
-### SQL Database
+### Cosmos DB Database
 
 #### Log Categories
 
 | Category | Enabled | Retention | Classification | Purpose |
 |----------|---------|-----------|----------------|---------|
-| **SQLInsights** | ✅ Yes | 90 days | Operational | Query performance insights and optimization |
-| **AutomaticTuning** | ✅ Yes | 90 days | Operational | Automated tuning recommendations |
-| **QueryStoreRuntimeStatistics** | ✅ Yes | 90 days | Performance | Query execution statistics and performance |
-| **QueryStoreWaitStatistics** | ✅ Yes | 90 days | Performance | Query wait time analysis |
-| **Errors** | ✅ Yes | 90 days | Operational | Database error tracking and resolution |
-| **DatabaseWaitStatistics** | ✅ Yes | 90 days | Performance | Database-level wait event analysis |
-| **Timeouts** | ✅ Yes | 90 days | Operational | Query timeout tracking and resolution |
-| **Blocks** | ✅ Yes | 90 days | Operational | Blocking event detection and analysis |
-| **Deadlocks** | ✅ Yes | 90 days | Operational | Deadlock detection and resolution |
+| **DataPlaneRequests** | ✅ Yes | 90 days | Operational | All data plane requests and latency tracking |
+| **MongoRequests** | ✅ Yes | 90 days | Operational | MongoDB API requests (if used) |
+| **QueryRuntimeStatistics** | ✅ Yes | 90 days | Performance | Query execution statistics and performance |
+| **PartitionKeyStatistics** | ✅ Yes | 90 days | Performance | Partition distribution and hot partition detection |
+| **ControlPlaneRequests** | ✅ Yes | 180 days | Security Audit | Account-level operations audit trail |
 
 #### Metrics
 
 | Category | Enabled | Retention | Purpose |
 |----------|---------|-----------|---------|
-| **Basic** | ✅ Yes | 90 days | Basic database performance metrics |
-| **InstanceAndAppAdvanced** | ✅ Yes | 90 days | Advanced performance and resource metrics |
-| **WorkloadManagement** | ✅ Yes | 90 days | Workload management and resource governance |
+| **Requests** | ✅ Yes | 90 days | Request metrics including RU consumption |
+| **PartitionKeyRUConsumption** | ✅ Yes | 90 days | RU consumption per partition key |
+| **QueryRUConsumption** | ✅ Yes | 90 days | RU consumption per query |
 
 #### Sample Queries
 
-**Query Database Errors:**
+**Query Request Metrics:**
 ```kusto
 AzureDiagnostics
-| where ResourceType == "SERVERS/DATABASES"
-| where Category == "Errors"
+| where ResourceType == "DATABASEACCOUNTS"
+| where Category == "DataPlaneRequests"
 | where TimeGenerated > ago(24h)
-| project TimeGenerated, Message, Severity, DatabaseName_s
+| project TimeGenerated, activityId_g, statusCode_s, requestCharge_s
 | order by TimeGenerated desc
 ```
 
-**Query Deadlocks:**
+**Query Throttling Events:**
 ```kusto
 AzureDiagnostics
-| where ResourceType == "SERVERS/DATABASES"
-| where Category == "Deadlocks"
+| where ResourceType == "DATABASEACCOUNTS"
+| where Category == "DataPlaneRequests"
+| where statusCode_s == "429"
 | where TimeGenerated > ago(7d)
-| project TimeGenerated, deadlock_xml_s, DatabaseName_s
+| project TimeGenerated, activityId_g, requestCharge_s
 ```
 
 ### Storage Account
@@ -504,7 +501,7 @@ Compliance Summary:
 
 Resources Reviewed:
 ☑ App Service - Compliant
-☑ SQL Database - Compliant
+☑ Cosmos DB Database - Compliant
 ☑ Storage Account - Compliant
 ☑ Azure Functions - Compliant
 ☑ Key Vault - Compliant

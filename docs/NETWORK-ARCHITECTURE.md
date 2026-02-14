@@ -69,7 +69,7 @@ The KBudget GPT application uses a multi-tier network architecture with dedicate
 │  │  │  │  Service Endpoints:                                          │  │ │ │
 │  │  │  │  • Microsoft.Web                                             │  │ │ │
 │  │  │  │  • Microsoft.Storage                                         │  │ │ │
-│  │  │  │  • Microsoft.Sql                                             │  │ │ │
+│  │  │  │  • Microsoft.AzureCosmosDB                                   │  │ │ │
 │  │  │  │  • Microsoft.KeyVault                                        │  │ │ │
 │  │  │  └──────────────────────────────────────────────────────────────┘  │ │ │
 │  │  │  Workloads: App Service, Web Apps, APIs                            │ │ │
@@ -78,15 +78,15 @@ The KBudget GPT application uses a multi-tier network architecture with dedicate
 │  │  ┌────────────────────────────────────────────────────────────────────┐ │ │
 │  │  │       Database Subnet: 10.x.2.0/24 (256 IPs)                       │ │ │
 │  │  │  ┌──────────────────────────────────────────────────────────────┐  │ │ │
-│  │  │  │  NSG: db-nsg                                                 │  │ │ │
-│  │  │  │  • Allow SQL (1433) ← 10.x.1.0/24 (app-subnet) ONLY          │  │ │ │
+│  │  │  │  NSG: cosmos-nsg                                             │  │ │ │
+│  │  │  │  • Allow HTTPS (443) ← 10.x.1.0/24 (app-subnet) ONLY        │  │ │ │
 │  │  │  │  • Deny all other inbound                                    │  │ │ │
-│  │  │  └──────────────────────────────────────────────────────────────┘  │ │ │
+│  │  │  │  └──────────────────────────────────────────────────────────────┘  │ │ │
 │  │  │  ┌──────────────────────────────────────────────────────────────┐  │ │ │
 │  │  │  │  Service Endpoints:                                          │  │ │ │
-│  │  │  │  • Microsoft.Sql                                             │  │ │ │
+│  │  │  │  • Microsoft.AzureCosmosDB                                   │  │ │ │
 │  │  │  └──────────────────────────────────────────────────────────────┘  │ │ │
-│  │  │  Workloads: SQL Managed Instance, Private Endpoints               │ │ │
+│  │  │  Workloads: Cosmos DB Private Endpoints                            │ │ │
 │  │  └────────────────────────────────────────────────────────────────────┘ │ │
 │  │                                                                          │ │
 │  │  ┌────────────────────────────────────────────────────────────────────┐ │ │
@@ -96,7 +96,7 @@ The KBudget GPT application uses a multi-tier network architecture with dedicate
 │  │  │  │  Service Endpoints:                                          │  │ │ │
 │  │  │  │  • Microsoft.Web                                             │  │ │ │
 │  │  │  │  • Microsoft.Storage                                         │  │ │ │
-│  │  │  │  • Microsoft.Sql                                             │  │ │ │
+│  │  │  │  • Microsoft.AzureCosmosDB                                   │  │ │ │
 │  │  │  │  • Microsoft.KeyVault                                        │  │ │ │
 │  │  │  └──────────────────────────────────────────────────────────────┘  │ │ │
 │  │  │  Workloads: Azure Functions, Background Jobs                       │ │ │
@@ -473,7 +473,7 @@ Step 4: Configure Service Endpoints
         │ Enable endpoints:       │
         │ • Microsoft.Web         │
         │ • Microsoft.Storage     │
-        │ • Microsoft.Sql         │
+        │ • Microsoft.AzureCosmosDB│
         │ • Microsoft.KeyVault    │
         └───────────┬─────────────┘
                     │
