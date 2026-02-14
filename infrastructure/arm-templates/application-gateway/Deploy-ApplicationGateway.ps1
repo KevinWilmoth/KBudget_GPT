@@ -264,15 +264,13 @@ function Deploy-ApplicationGateway {
     $subnetName = $params.parameters.subnetName.value
     $backendFqdn = $params.parameters.backendAppServiceFqdn.value
     
-    # Extract App Service name - handle both azurewebsites.net and custom domains
-    # For azurewebsites.net: extract the name before .azurewebsites.net
-    # For custom domains: try to find matching App Service in resource group
+    # Extract App Service name from FQDN if using azurewebsites.net domain
+    # For custom domains, App Service validation will be skipped
     if ($backendFqdn -match '^([^.]+)\.azurewebsites\.net$') {
         $appServiceName = $matches[1]
     }
     else {
-        # For custom domains, we'll skip the App Service validation
-        # since we can't reliably determine the App Service name
+        # Custom domain - cannot reliably determine App Service name
         $appServiceName = $null
         Write-Log "Backend uses custom domain: $backendFqdn" "INFO"
         Write-Log "Skipping App Service validation (only applicable for *.azurewebsites.net)" "INFO"
