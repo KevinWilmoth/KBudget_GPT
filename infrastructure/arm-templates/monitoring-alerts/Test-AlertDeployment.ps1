@@ -102,9 +102,9 @@ function Test-ParameterFile {
             "emailAddress",
             "appServiceId",
             "appServiceName",
-            "sqlServerId",
-            "sqlServerName",
-            "sqlDatabaseName",
+            "cosmosAccountId",
+            "cosmosAccountName",
+            "cosmosDatabaseName",
             "storageAccountId",
             "storageAccountName",
             "functionAppId",
@@ -291,7 +291,7 @@ $totalTests++
 try {
     $template = Get-Content (Join-Path $ScriptDir "monitoring-alerts.json") -Raw | ConvertFrom-Json
     $alertCount = ($template.resources | Where-Object { $_.type -eq "Microsoft.Insights/metricAlerts" }).Count
-    $expectedCount = 7 # App CPU, App Memory, App HTTP, SQL DTU, SQL Deadlock, Storage Avail, Function Errors
+    $expectedCount = 7 # App CPU, App Memory, App HTTP, Cosmos RU, Cosmos Throttle, Storage Avail, Function Errors
     
     $alertCountValid = $alertCount -eq $expectedCount
     

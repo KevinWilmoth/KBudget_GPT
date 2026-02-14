@@ -3,7 +3,7 @@
 # 
 # Purpose: Deploy alert rules and action groups for critical Azure resources
 # Features:
-#   - Deploy monitoring alerts for App Service, SQL Database, Storage, Functions
+#   - Deploy monitoring alerts for App Service, Cosmos DB, Storage, Functions
 #   - Configure email and webhook notifications
 #   - Test alert configurations with test notifications
 #   - Validate alert deployment
@@ -489,7 +489,7 @@ function Export-AlertDocumentation {
 6. Monitor for resolution
 
 ### Database Issues (Severity 1-2)
-1. Review SQL Database metrics in portal
+1. Review Cosmos DB metrics in portal
 2. Check for slow queries using Query Performance Insights
 3. Investigate deadlocks using diagnostic logs
 4. Optimize queries or add indexes as needed
