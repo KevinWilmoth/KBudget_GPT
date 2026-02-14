@@ -23,22 +23,22 @@
         "description": "Name of the App Service"
       }
     },
-    "sqlServerId": {
+    "cosmosAccountId": {
       "type": "string",
       "metadata": {
-        "description": "Resource ID of the SQL Server"
+        "description": "Resource ID of the Cosmos DB Account"
       }
     },
-    "sqlServerName": {
+    "cosmosAccountName": {
       "type": "string",
       "metadata": {
-        "description": "Name of the SQL Server"
+        "description": "Name of the Cosmos DB Account"
       }
     },
-    "sqlDatabaseName": {
+    "cosmosDatabaseName": {
       "type": "string",
       "metadata": {
-        "description": "Name of the SQL Database"
+        "description": "Name of the Cosmos DB Database"
       }
     },
     "storageAccountId": {
@@ -79,7 +79,7 @@
     }
   },
   "variables": {
-    "sqlDatabaseId": "[concat(parameters('sqlServerId'), '/databases/', parameters('sqlDatabaseName'))]"
+    "cosmosAccountResourceId": "[parameters('cosmosAccountId')]"
   },
   "resources": [
     {
@@ -151,14 +151,14 @@
       }
     },
     {
-      "type": "Microsoft.Sql/servers/databases/providers/diagnosticSettings",
+      "type": "Microsoft.DocumentDB/databaseAccounts/providers/diagnosticSettings",
       "apiVersion": "2021-05-01-preview",
-      "name": "[concat(parameters('sqlServerName'), '/', parameters('sqlDatabaseName'), '/Microsoft.Insights/default')]",
+      "name": "[concat(parameters('cosmosAccountName'), '/Microsoft.Insights/default')]",
       "properties": {
         "workspaceId": "[parameters('workspaceId')]",
         "logs": [
           {
-            "category": "SQLInsights",
+            "category": "DataPlaneRequests",
             "enabled": true,
             "retentionPolicy": {
               "enabled": true,
@@ -166,7 +166,7 @@
             }
           },
           {
-            "category": "AutomaticTuning",
+            "category": "MongoRequests",
             "enabled": true,
             "retentionPolicy": {
               "enabled": true,
@@ -174,7 +174,7 @@
             }
           },
           {
-            "category": "QueryStoreRuntimeStatistics",
+            "category": "QueryRuntimeStatistics",
             "enabled": true,
             "retentionPolicy": {
               "enabled": true,
@@ -182,7 +182,7 @@
             }
           },
           {
-            "category": "QueryStoreWaitStatistics",
+            "category": "PartitionKeyStatistics",
             "enabled": true,
             "retentionPolicy": {
               "enabled": true,
@@ -190,7 +190,7 @@
             }
           },
           {
-            "category": "Errors",
+            "category": "PartitionKeyRUConsumption",
             "enabled": true,
             "retentionPolicy": {
               "enabled": true,
@@ -198,31 +198,7 @@
             }
           },
           {
-            "category": "DatabaseWaitStatistics",
-            "enabled": true,
-            "retentionPolicy": {
-              "enabled": true,
-              "days": 90
-            }
-          },
-          {
-            "category": "Timeouts",
-            "enabled": true,
-            "retentionPolicy": {
-              "enabled": true,
-              "days": 90
-            }
-          },
-          {
-            "category": "Blocks",
-            "enabled": true,
-            "retentionPolicy": {
-              "enabled": true,
-              "days": 90
-            }
-          },
-          {
-            "category": "Deadlocks",
+            "category": "ControlPlaneRequests",
             "enabled": true,
             "retentionPolicy": {
               "enabled": true,
@@ -232,23 +208,7 @@
         ],
         "metrics": [
           {
-            "category": "Basic",
-            "enabled": true,
-            "retentionPolicy": {
-              "enabled": true,
-              "days": 90
-            }
-          },
-          {
-            "category": "InstanceAndAppAdvanced",
-            "enabled": true,
-            "retentionPolicy": {
-              "enabled": true,
-              "days": 90
-            }
-          },
-          {
-            "category": "WorkloadManagement",
+            "category": "Requests",
             "enabled": true,
             "retentionPolicy": {
               "enabled": true,

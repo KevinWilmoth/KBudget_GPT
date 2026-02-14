@@ -23,13 +23,13 @@
     "appServiceName": {
       "value": "kbudget-staging-app"
     },
-    "sqlServerId": {
-      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-staging-rg/providers/Microsoft.Sql/servers/kbudget-staging-sql"
+    "cosmosAccountId": {
+      "value": "/subscriptions/{subscription-id}/resourceGroups/kbudget-staging-rg/providers/Microsoft.DocumentDB/databaseAccounts/kbudget-staging-cosmos"
     },
-    "sqlServerName": {
-      "value": "kbudget-staging-sql"
+    "cosmosAccountName": {
+      "value": "kbudget-staging-cosmos"
     },
-    "sqlDatabaseName": {
+    "cosmosDatabaseName": {
       "value": "kbudget-staging-db"
     },
     "storageAccountId": {
