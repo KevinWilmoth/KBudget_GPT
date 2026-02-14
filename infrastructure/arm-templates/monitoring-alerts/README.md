@@ -63,8 +63,8 @@ This template creates comprehensive monitoring alerts for:
 | `emailAddress` | string | Email for notifications |
 | `appServiceId` | string | Resource ID of App Service |
 | `appServiceName` | string | Name of App Service |
-| `cosmosDbAccountId` | string | Resource ID of Cosmos DB Account |
-| `cosmosDbAccountName` | string | Name of Cosmos DB Account |
+| `cosmosAccountId` | string | Resource ID of Cosmos DB Account |
+| `cosmosAccountName` | string | Name of Cosmos DB Account |
 | `storageAccountId` | string | Resource ID of Storage Account |
 | `storageAccountName` | string | Name of Storage Account |
 | `functionAppId` | string | Resource ID of Function App |
