@@ -1,0 +1,14 @@
+# Logs
+logs/
+*.log
+
+# Reports
+reports/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Backup files
+*.bak
+*~

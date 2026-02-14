@@ -11,6 +11,7 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 - **[PowerShell Deployment Guide](docs/POWERSHELL-DEPLOYMENT-GUIDE.md)** - Comprehensive guide for all PowerShell deployment scripts including prerequisites, usage examples, parameters, troubleshooting, and CI/CD integration
 - **[Deployment Validation and Testing Guide](docs/DEPLOYMENT-VALIDATION-GUIDE.md)** - Complete guide for deployment validation, automated testing, CI/CD pipeline integration, and error handling
 - **[Azure AD Authentication Setup Guide](docs/AAD-AUTHENTICATION-SETUP-GUIDE.md)** - Complete guide for configuring Azure Active Directory authentication including app registration, user management, testing, and troubleshooting
+- **[RBAC Documentation](docs/RBAC-DOCUMENTATION.md)** - Complete guide for Role-Based Access Control implementation, including role assignments, service principal configuration, audit process, and compliance
 - **[Compliance Documentation](docs/COMPLIANCE-DOCUMENTATION.md)** - Comprehensive audit log retention and regulatory compliance documentation with all log categories, retention timelines, and security policies
 - [Azure Infrastructure Overview](docs/azure-infrastructure-overview.md) - Complete guide to the Azure architecture, resources, security, and deployment
 - [Azure Resource Group Naming Conventions](docs/azure-resource-group-naming-conventions.md) - Standard naming conventions for Azure Resource Groups across all environments
@@ -39,6 +40,7 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 │       ├── log-analytics/         # Log Analytics Workspace templates
 │       ├── monitoring-alerts/     # Azure Monitor alerts templates
 │       ├── diagnostic-settings/   # Diagnostic settings templates
+│       ├── rbac/                  # Role-Based Access Control (RBAC) scripts
 │       └── main-deployment/       # Main orchestration scripts
 │           ├── Deploy-AzureResources.ps1
 │           └── README.md
@@ -202,6 +204,11 @@ For DevOps and infrastructure management, please refer to our documentation:
 - [Monitoring Alerts](infrastructure/arm-templates/monitoring-alerts/README.md) - Metric alerts and action groups
 - [Diagnostic Settings](infrastructure/arm-templates/diagnostic-settings/README.md) - Log collection configuration
 
+#### Security and Access Control
+
+- [RBAC](infrastructure/arm-templates/rbac/README.md) - Role-Based Access Control assignment and auditing
+- [Azure AD App Registration](infrastructure/arm-templates/aad-app-registration/README.md) - Azure Active Directory authentication setup
+
 ## Azure Infrastructure
 
 ### Architecture Overview
@@ -254,6 +261,39 @@ New-AzResourceGroupDeployment -ResourceGroupName "kbudget-dev-rg" `
 For complete setup instructions, see:
 - **[Quick Start Guide](infrastructure/arm-templates/aad-app-registration/QUICKSTART.md)** - Get started in 5 minutes
 - **[Azure AD Authentication Setup Guide](docs/AAD-AUTHENTICATION-SETUP-GUIDE.md)** - Complete configuration guide
+
+### Role-Based Access Control (RBAC)
+
+Manage fine-grained access control across Azure resources with automated RBAC assignment and auditing:
+
+- **Role Assignment**: Assign built-in and custom roles to users, groups, and service principals
+- **Least Privilege**: Configure service principals with minimal required permissions
+- **Audit & Compliance**: Generate audit reports and validate role assignments
+- **Multi-Environment**: Separate RBAC configurations for dev, staging, and production
+
+**Quick Start with RBAC:**
+
+```powershell
+# Navigate to RBAC directory
+cd infrastructure/arm-templates/rbac
+
+# Preview RBAC assignments (WhatIf mode)
+.\Assign-RBAC.ps1 -Environment dev -WhatIf
+
+# Assign roles
+.\Assign-RBAC.ps1 -Environment dev
+
+# Audit role assignments
+.\Audit-RBAC.ps1 -Environment dev -DetailedReport
+
+# Test RBAC compliance
+.\Test-RBAC.ps1 -Environment dev -ValidateLeastPrivilege
+```
+
+For complete setup instructions, see:
+- **[RBAC Scripts README](infrastructure/arm-templates/rbac/README.md)** - Complete guide to RBAC scripts and usage
+- **[RBAC Quick Reference](infrastructure/arm-templates/rbac/QUICK-REFERENCE.md)** - Quick reference for common commands
+- **[RBAC Documentation](docs/RBAC-DOCUMENTATION.md)** - Comprehensive RBAC implementation guide
 
 ### Deployment Features
 
