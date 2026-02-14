@@ -10,6 +10,7 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 
 - **[PowerShell Deployment Guide](docs/POWERSHELL-DEPLOYMENT-GUIDE.md)** - Comprehensive guide for all PowerShell deployment scripts including prerequisites, usage examples, parameters, troubleshooting, and CI/CD integration
 - **[Deployment Validation and Testing Guide](docs/DEPLOYMENT-VALIDATION-GUIDE.md)** - Complete guide for deployment validation, automated testing, CI/CD pipeline integration, and error handling
+- **[Networking and Security Configuration Guide](docs/NETWORKING-SECURITY-GUIDE.md)** - Comprehensive guide for Azure networking, Application Gateway with WAF, VNet security, Key Vault network restrictions, and DNS management
 - **[Azure AD Authentication Setup Guide](docs/AAD-AUTHENTICATION-SETUP-GUIDE.md)** - Complete guide for configuring Azure Active Directory authentication including app registration, user management, testing, and troubleshooting
 - **[RBAC Documentation](docs/RBAC-DOCUMENTATION.md)** - Complete guide for Role-Based Access Control implementation, including role assignments, service principal configuration, audit process, and compliance
 - **[Access Review Process](docs/ACCESS-REVIEW-PROCESS.md)** - Comprehensive guide for conducting regular access reviews, ensuring compliance and least privilege access across all Azure resources
@@ -26,6 +27,7 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 ├── docs/                           # Project documentation
 │   ├── AAD-AUTHENTICATION-SETUP-GUIDE.md # Azure AD authentication guide
 │   ├── ACCESS-REVIEW-PROCESS.md   # Access review process guide
+│   ├── NETWORKING-SECURITY-GUIDE.md # Networking and security configuration guide
 │   ├── azure-resource-group-naming-conventions.md
 │   ├── azure-resource-group-best-practices.md
 │   └── MONITORING-OBSERVABILITY.md # Monitoring and observability guide
@@ -37,8 +39,10 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 │       ├── sql-database/          # SQL Database templates
 │       ├── storage-account/       # Storage Account templates
 │       ├── azure-functions/       # Azure Functions templates
-│       ├── key-vault/             # Key Vault templates
-│       ├── virtual-network/       # Virtual Network templates
+│       ├── key-vault/             # Key Vault templates with network security
+│       ├── virtual-network/       # Virtual Network templates with NSGs
+│       ├── application-gateway/   # Application Gateway with WAF templates
+│       ├── dns-zone/              # Azure DNS Zone templates
 │       ├── log-analytics/         # Log Analytics Workspace templates
 │       ├── monitoring-alerts/     # Azure Monitor alerts templates
 │       ├── diagnostic-settings/   # Diagnostic settings templates
@@ -88,8 +92,10 @@ cd infrastructure/arm-templates/main-deployment
 ```
 
 The deployment includes:
-- **Virtual Network**: Network isolation with subnets
-- **Key Vault**: Secure storage for secrets and keys
+- **Virtual Network**: Network isolation with subnets and NSGs
+- **Application Gateway**: Layer 7 load balancer with WAF protection
+- **Key Vault**: Secure storage for secrets and keys with network restrictions
+- **DNS Zone**: Azure-hosted DNS for domain management
 - **Storage Account**: Blob storage for application data
 - **SQL Database**: Azure SQL Server and Database
 - **App Service**: Web application hosting
@@ -197,8 +203,10 @@ For DevOps and infrastructure management, please refer to our documentation:
 - [SQL Database](infrastructure/arm-templates/sql-database/README.md) - Database server and configuration
 - [Storage Account](infrastructure/arm-templates/storage-account/README.md) - Blob storage and file services
 - [Azure Functions](infrastructure/arm-templates/azure-functions/README.md) - Serverless compute
-- [Key Vault](infrastructure/arm-templates/key-vault/README.md) - Secrets and key management
-- [Virtual Network](infrastructure/arm-templates/virtual-network/README.md) - Network isolation and security
+- [Key Vault](infrastructure/arm-templates/key-vault/README.md) - Secrets and key management with network security
+- [Virtual Network](infrastructure/arm-templates/virtual-network/README.md) - Network isolation, subnets, and NSGs
+- [Application Gateway](infrastructure/arm-templates/application-gateway/README.md) - Layer 7 load balancer with WAF
+- [DNS Zone](infrastructure/arm-templates/dns-zone/README.md) - DNS management and endpoint configuration
 - [Resource Groups](infrastructure/arm-templates/resource-groups/README.md) - Resource group deployment
 
 #### Monitoring and Observability
@@ -222,7 +230,9 @@ The KBudget GPT application uses the following Azure resources:
 | Resource | Purpose | Environments |
 |----------|---------|--------------|
 | **Resource Group** | Logical container for resources | dev, staging, prod |
-| **Virtual Network** | Network isolation with subnets | All environments |
+| **Virtual Network** | Network isolation with subnets and NSGs | All environments |
+| **Application Gateway** | Layer 7 load balancer with WAF | All environments |
+| **DNS Zone** | Azure-hosted DNS management | All environments |
 | **Key Vault** | Secure storage for secrets, keys, certificates | All environments |
 | **Storage Account** | Blob storage for application data | All environments |
 | **SQL Database** | Application database (Azure SQL) | All environments |
@@ -231,6 +241,11 @@ The KBudget GPT application uses the following Azure resources:
 
 ### Security Features
 
+✅ **Web Application Firewall (WAF)**: OWASP 3.2 protection against web attacks  
+✅ **Network Segmentation**: Separate subnets for apps, databases, and gateway  
+✅ **Network Security Groups**: Traffic filtering at subnet level  
+✅ **Service Endpoints**: Secure Azure backbone connectivity  
+✅ **Key Vault Network ACLs**: VNet-restricted access to secrets  
 ✅ **Secrets Management**: All passwords and keys stored in Key Vault  
 ✅ **Managed Identities**: App Service and Functions use system-assigned identities  
 ✅ **Network Security**: VNet isolation with NSGs and service endpoints  
