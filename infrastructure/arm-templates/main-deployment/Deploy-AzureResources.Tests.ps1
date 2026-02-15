@@ -67,8 +67,20 @@ Describe "Deploy-AzureResources.ps1 Script Tests" {
             $content | Should -Match 'function Deploy-StorageAccount'
         }
         
-        It "Should contain Deploy-SqlDatabase function" {
-            $content | Should -Match 'function Deploy-SqlDatabase'
+        It "Should contain Deploy-CosmosDatabase function" {
+            $content | Should -Match 'function Deploy-CosmosDatabase'
+        }
+        
+        It "Should contain Deploy-CosmosContainers function" {
+            $content | Should -Match 'function Deploy-CosmosContainers'
+        }
+        
+        It "Should contain Test-CosmosContainerPrerequisites function" {
+            $content | Should -Match 'function Test-CosmosContainerPrerequisites'
+        }
+        
+        It "Should contain Test-CosmosContainers function" {
+            $content | Should -Match 'function Test-CosmosContainers'
         }
         
         It "Should contain Deploy-AppService function" {
@@ -194,10 +206,6 @@ Describe "Deployment-Validation.psm1 Module Tests" {
         
         It "Should export Test-StorageAccountExists function" {
             Get-Command Test-StorageAccountExists -ErrorAction SilentlyContinue | Should -Not -BeNullOrEmpty
-        }
-        
-        It "Should export Test-SqlServerExists function" {
-            Get-Command Test-SqlServerExists -ErrorAction SilentlyContinue | Should -Not -BeNullOrEmpty
         }
         
         It "Should export Test-AppServiceExists function" {
