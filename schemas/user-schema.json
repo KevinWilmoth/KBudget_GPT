@@ -1,0 +1,184 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://kbudget.example.com/schemas/user.json",
+  "title": "User",
+  "description": "User profile schema for the envelope budgeting system",
+  "type": "object",
+  "required": [
+    "id",
+    "userId",
+    "type",
+    "email",
+    "displayName",
+    "currency",
+    "locale",
+    "timezone",
+    "defaultBudgetPeriod",
+    "startOfWeek",
+    "fiscalYearStart",
+    "enableEmailNotifications",
+    "enablePushNotifications",
+    "enableBudgetAlerts",
+    "budgetAlertThreshold",
+    "enableRollover",
+    "createdAt",
+    "createdBy",
+    "updatedAt",
+    "updatedBy",
+    "isActive",
+    "version"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique user identifier (GUID, matches Azure AD user ID)",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "userId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Same as id (for partition key consistency)",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "type": {
+      "type": "string",
+      "const": "user",
+      "description": "Document type discriminator"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "User email address (unique, from Azure AD)",
+      "maxLength": 255
+    },
+    "displayName": {
+      "type": "string",
+      "description": "User's display name",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "firstName": {
+      "type": ["string", "null"],
+      "description": "First name (optional)",
+      "maxLength": 100
+    },
+    "lastName": {
+      "type": ["string", "null"],
+      "description": "Last name (optional)",
+      "maxLength": 100
+    },
+    "profilePictureUrl": {
+      "type": ["string", "null"],
+      "format": "uri",
+      "description": "URL to profile picture stored in Azure Blob Storage (optional)",
+      "maxLength": 2048
+    },
+    "currency": {
+      "type": "string",
+      "description": "Default currency code (ISO 4217)",
+      "pattern": "^[A-Z]{3}$",
+      "default": "USD",
+      "examples": ["USD", "EUR", "GBP", "CAD", "AUD"]
+    },
+    "locale": {
+      "type": "string",
+      "description": "User locale for date/number formatting",
+      "pattern": "^[a-z]{2}-[A-Z]{2}$",
+      "default": "en-US",
+      "examples": ["en-US", "en-GB", "fr-FR", "de-DE", "es-ES"]
+    },
+    "timezone": {
+      "type": "string",
+      "description": "User timezone (IANA timezone identifier)",
+      "default": "America/New_York",
+      "examples": ["America/New_York", "America/Los_Angeles", "Europe/London", "Europe/Paris", "Asia/Tokyo"]
+    },
+    "defaultBudgetPeriod": {
+      "type": "string",
+      "description": "Default budget period type",
+      "enum": ["monthly", "biweekly", "weekly"],
+      "default": "monthly"
+    },
+    "startOfWeek": {
+      "type": "integer",
+      "description": "Day of week for budget periods (0-6, Sunday=0)",
+      "minimum": 0,
+      "maximum": 6,
+      "default": 0
+    },
+    "fiscalYearStart": {
+      "type": "integer",
+      "description": "Month for fiscal year start (1-12, January=1)",
+      "minimum": 1,
+      "maximum": 12,
+      "default": 1
+    },
+    "enableEmailNotifications": {
+      "type": "boolean",
+      "description": "Enable email notifications",
+      "default": true
+    },
+    "enablePushNotifications": {
+      "type": "boolean",
+      "description": "Enable push notifications",
+      "default": false
+    },
+    "enableBudgetAlerts": {
+      "type": "boolean",
+      "description": "Enable budget threshold alerts",
+      "default": true
+    },
+    "budgetAlertThreshold": {
+      "type": "integer",
+      "description": "Percentage threshold for budget alerts (0-100)",
+      "minimum": 0,
+      "maximum": 100,
+      "default": 80
+    },
+    "enableRollover": {
+      "type": "boolean",
+      "description": "Enable envelope balance rollover to next period",
+      "default": true
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the user record was created (ISO 8601)"
+    },
+    "createdBy": {
+      "type": "string",
+      "format": "uuid",
+      "description": "User ID who created the record",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the user record was last updated (ISO 8601)"
+    },
+    "updatedBy": {
+      "type": "string",
+      "format": "uuid",
+      "description": "User ID who last updated the record",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "isActive": {
+      "type": "boolean",
+      "description": "Active status (for soft delete)",
+      "default": true
+    },
+    "lastLoginAt": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Timestamp of last login (ISO 8601)"
+    },
+    "version": {
+      "type": "string",
+      "description": "Schema version number",
+      "pattern": "^\\d+\\.\\d+$",
+      "default": "1.0"
+    }
+  },
+  "additionalProperties": false
+}

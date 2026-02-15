@@ -21,35 +21,52 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 
 ### Project Documentation
 
+#### Data Models
+- **[Data Models Overview](docs/data-models/README.md)** - Overview of all data models for the envelope budgeting system
+- **[User Data Model](docs/data-models/USER-DATA-MODEL.md)** - User profile schema, preferences, settings, and validation rules
+
+#### Infrastructure & Deployment
 - **[Temporary WIP App Quick Start](docs/TEMP-WIP-APP-QUICKSTART.md)** - Quick start guide for deploying the 90s retro "Work in Progress" temporary application to Azure App Service
 - **[PowerShell Deployment Guide](docs/POWERSHELL-DEPLOYMENT-GUIDE.md)** - Comprehensive guide for all PowerShell deployment scripts including prerequisites, usage examples, parameters, troubleshooting, and CI/CD integration
 - **[Deployment Validation and Testing Guide](docs/DEPLOYMENT-VALIDATION-GUIDE.md)** - Complete guide for deployment validation, automated testing, CI/CD pipeline integration, and error handling
 - **[Network Architecture Guide](docs/NETWORK-ARCHITECTURE.md)** - Detailed network architecture diagrams, subnet layout, traffic flows, and security boundaries for the VNet infrastructure
-- **[Azure AD Authentication Setup Guide](docs/AAD-AUTHENTICATION-SETUP-GUIDE.md)** - Complete guide for configuring Azure Active Directory authentication including app registration, user management, testing, and troubleshooting
-- **[RBAC Documentation](docs/RBAC-DOCUMENTATION.md)** - Complete guide for Role-Based Access Control implementation, including role assignments, service principal configuration, audit process, and compliance
-- **[Access Review Process](docs/ACCESS-REVIEW-PROCESS.md)** - Comprehensive guide for conducting regular access reviews, ensuring compliance and least privilege access across all Azure resources
-- **[Compliance Documentation](docs/COMPLIANCE-DOCUMENTATION.md)** - Comprehensive audit log retention and regulatory compliance documentation with all log categories, retention timelines, and security policies
 - [Azure Infrastructure Overview](docs/azure-infrastructure-overview.md) - Complete guide to the Azure architecture, resources, security, and deployment
 - [Azure Resource Group Naming Conventions](docs/azure-resource-group-naming-conventions.md) - Standard naming conventions for Azure Resource Groups across all environments
 - [Azure Resource Group Best Practices](docs/azure-resource-group-best-practices.md) - Comprehensive guide for managing Azure Resource Groups, including resource organization, tagging strategies, and lifecycle management
 - [Monitoring and Observability](docs/MONITORING-OBSERVABILITY.md) - Monitoring and observability implementation guide
+
+#### Security & Compliance
+- **[Azure AD Authentication Setup Guide](docs/AAD-AUTHENTICATION-SETUP-GUIDE.md)** - Complete guide for configuring Azure Active Directory authentication including app registration, user management, testing, and troubleshooting
+- **[RBAC Documentation](docs/RBAC-DOCUMENTATION.md)** - Complete guide for Role-Based Access Control implementation, including role assignments, service principal configuration, audit process, and compliance
+- **[Access Review Process](docs/ACCESS-REVIEW-PROCESS.md)** - Comprehensive guide for conducting regular access reviews, ensuring compliance and least privilege access across all Azure resources
+- **[Compliance Documentation](docs/COMPLIANCE-DOCUMENTATION.md)** - Comprehensive audit log retention and regulatory compliance documentation with all log categories, retention timelines, and security policies
 
 ## Repository Structure
 
 ```
 .
 ├── docs/                           # Project documentation
+│   ├── data-models/               # Data model documentation
+│   │   ├── README.md              # Data models overview
+│   │   └── USER-DATA-MODEL.md     # User entity documentation
 │   ├── AAD-AUTHENTICATION-SETUP-GUIDE.md # Azure AD authentication guide
 │   ├── ACCESS-REVIEW-PROCESS.md   # Access review process guide
 │   ├── TEMP-WIP-APP-QUICKSTART.md # Temporary WIP app deployment guide
 │   ├── azure-resource-group-naming-conventions.md
 │   ├── azure-resource-group-best-practices.md
 │   └── MONITORING-OBSERVABILITY.md # Monitoring and observability guide
+├── schemas/                        # JSON Schema definitions
+│   ├── README.md                  # Schema validation guide
+│   ├── user-schema.json           # User entity JSON Schema
+│   └── user-sample.json           # Sample user document
 ├── temp-app/                       # Temporary WIP application
 │   ├── index.html                 # 90s retro WIP page
 │   ├── server.js                  # Node.js server
 │   ├── Dockerfile                 # Container configuration
 │   └── README.md                  # App documentation
+├── KBudgetApp/                     # Main application
+│   ├── KBudgetApp.csproj          # .NET 8.0 project file
+│   └── Program.cs                 # Application entry point
 ├── infrastructure/                 # Infrastructure as Code
 │   └── arm-templates/             # ARM templates
 │       ├── resource-groups/       # Resource group templates
