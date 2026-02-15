@@ -96,14 +96,44 @@ Deploy only specific resource types:
 
 # Deploy only Key Vault and Cosmos DB
 .\Deploy-AzureResources.ps1 -Environment prod -ResourceTypes @("keyvault", "cosmos")
+
+# Deploy Cosmos DB containers only
+.\Deploy-AzureResources.ps1 -Environment dev -ResourceTypes @("cosmos-containers")
 ```
+
+#### Deploy Cosmos DB Containers
+
+Deploy the envelope-based budgeting containers:
+
+```powershell
+# Deploy all Cosmos DB containers (Users, Budgets, Envelopes, Transactions)
+.\Deploy-AzureResources.ps1 -Environment dev -ResourceTypes @("cosmos-containers")
+
+# Deploy with validation
+.\Deploy-AzureResources.ps1 -Environment dev -ResourceTypes @("cosmos-containers") -WhatIf
+
+# Deploy Cosmos DB and containers together
+.\Deploy-AzureResources.ps1 -Environment dev -ResourceTypes @("cosmos", "cosmos-containers")
+```
+
+**Prerequisites for Container Deployment**:
+- Cosmos DB account must exist
+- Cosmos DB database must exist
+- Deploy Cosmos DB first: `.\Deploy-AzureResources.ps1 -Environment dev -ResourceTypes @("cosmos")`
+
+**Containers Deployed**:
+1. **Users** - User profiles and authentication (partition key: `/id`)
+2. **Budgets** - Budget definitions and settings (partition key: `/id`)
+3. **Envelopes** - Budget envelopes for categories (partition key: `/budgetId`)
+4. **Transactions** - Financial transactions (partition key: `/budgetId`)
 
 Available resource types:
 - `all` (default)
 - `vnet` - Virtual Network
 - `keyvault` - Key Vault
 - `storage` - Storage Account
-- `cosmos` - Cosmos DB
+- `cosmos` - Cosmos DB Account and Database
+- `cosmos-containers` - Cosmos DB Containers (Users, Budgets, Envelopes, Transactions)
 - `appservice` - App Service
 - `functions` - Azure Functions
 - `appgateway` - Application Gateway with WAF
@@ -165,9 +195,15 @@ Resources are deployed in the following order to handle dependencies:
 2. **Virtual Network** (network foundation)
 3. **Key Vault** (secrets storage)
 4. **Storage Account** (required for Functions)
-5. **Cosmos DB** (data tier)
-6. **App Service** (web tier)
-7. **Azure Functions** (serverless tier)
+5. **Cosmos DB Account and Database** (data tier)
+6. **Cosmos DB Containers** (data model):
+   - Users container
+   - Budgets container
+   - Envelopes container
+   - Transactions container
+7. **App Service** (web tier)
+8. **Azure Functions** (serverless tier)
+9. **Monitoring** (Log Analytics, Diagnostic Settings, Alerts)
 
 ## Security Features
 
@@ -229,11 +265,23 @@ Get-AzResource -ResourceGroupName "kbudget-dev-rg" | Format-Table
 Get-AzVirtualNetwork -ResourceGroupName "kbudget-dev-rg"
 Get-AzKeyVault -ResourceGroupName "kbudget-dev-rg"
 Get-AzStorageAccount -ResourceGroupName "kbudget-dev-rg"
-Get-AzSqlServer -ResourceGroupName "kbudget-dev-rg"
+Get-AzCosmosDBAccount -ResourceGroupName "kbudget-dev-rg"
 Get-AzWebApp -ResourceGroupName "kbudget-dev-rg"
+
+# Verify Cosmos DB containers
+Get-AzCosmosDBSqlContainer `
+    -ResourceGroupName "kbudget-dev-rg" `
+    -AccountName "kbudget-dev-cosmos" `
+    -DatabaseName "kbudget-dev-db" | Format-Table
 
 # View deployment history
 Get-AzResourceGroupDeployment -ResourceGroupName "kbudget-dev-rg" | Format-Table
+
+# Check deployment outputs
+$outputFile = ".\outputs\deployment-results_dev_latest.json"
+if (Test-Path $outputFile) {
+    Get-Content $outputFile | ConvertFrom-Json | ConvertTo-Json -Depth 10
+}
 ```
 
 ## Troubleshooting
@@ -257,6 +305,31 @@ Connect-AzAccount
 #### "Resource name already taken"
 - Some resources (Storage, Key Vault) require globally unique names
 - Update parameter files with unique names
+
+#### "Cosmos DB account not found"
+When deploying containers, this error indicates you need to deploy Cosmos DB first:
+```powershell
+# Deploy Cosmos DB account and database first
+.\Deploy-AzureResources.ps1 -Environment dev -ResourceTypes @("cosmos")
+
+# Then deploy containers
+.\Deploy-AzureResources.ps1 -Environment dev -ResourceTypes @("cosmos-containers")
+```
+
+#### "Container already exists"
+The script will skip containers that already exist. This is normal and safe.
+If you need to redeploy:
+```powershell
+# Delete the container first
+Remove-AzCosmosDBSqlContainer `
+    -ResourceGroupName "kbudget-dev-rg" `
+    -AccountName "kbudget-dev-cosmos" `
+    -DatabaseName "kbudget-dev-db" `
+    -Name "users"
+
+# Then redeploy
+.\Deploy-AzureResources.ps1 -Environment dev -ResourceTypes @("cosmos-containers")
+```
 
 #### "Template validation failed"
 Validate individual templates:

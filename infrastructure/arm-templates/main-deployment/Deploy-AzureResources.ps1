@@ -35,6 +35,7 @@ param(
     [string]$Location = "eastus",
 
     [Parameter(Mandatory = $false)]
+    [ValidateSet("all", "vnet", "keyvault", "storage", "cosmos", "cosmos-containers", "appservice", "functions", "appgateway", "monitoring")]
     [string[]]$ResourceTypes = @("all"),
 
     [Parameter(Mandatory = $false)]
@@ -309,6 +310,159 @@ function Deploy-CosmosDatabase {
         Write-Log "Failed to deploy Cosmos Database: $_" "ERROR"
         throw
     }
+}
+
+function Test-CosmosContainerPrerequisites {
+    param(
+        [string]$ResourceGroupName,
+        [string]$CosmosAccountName,
+        [string]$DatabaseName
+    )
+    
+    Write-Log "Validating Cosmos DB prerequisites..." "INFO"
+    
+    # Check if Cosmos DB account exists
+    $cosmosAccount = Get-AzCosmosDBAccount -ResourceGroupName $ResourceGroupName -Name $CosmosAccountName -ErrorAction SilentlyContinue
+    if (-not $cosmosAccount) {
+        throw "Cosmos DB account '$CosmosAccountName' not found in resource group '$ResourceGroupName'"
+    }
+    
+    # Check if database exists
+    $database = Get-AzCosmosDBSqlDatabase -ResourceGroupName $ResourceGroupName -AccountName $CosmosAccountName -Name $DatabaseName -ErrorAction SilentlyContinue
+    if (-not $database) {
+        throw "Cosmos DB database '$DatabaseName' not found in account '$CosmosAccountName'"
+    }
+    
+    Write-Log "✓ Cosmos DB prerequisites validated" "SUCCESS"
+    return $true
+}
+
+function Deploy-CosmosContainers {
+    Write-Log "Deploying Cosmos DB containers..." "INFO"
+    
+    $cosmosDbPath = Join-Path $ScriptDir "..\cosmos-database"
+    $containers = @("users", "budgets", "envelopes", "transactions")
+    $containerDeployments = @{}
+    
+    # Get Cosmos DB account and database names from environment
+    $cosmosAccountName = "kbudget-$Environment-cosmos"
+    $cosmosDatabaseName = "kbudget-$Environment-db"
+    
+    # Validate prerequisites
+    try {
+        Test-CosmosContainerPrerequisites -ResourceGroupName $ResourceGroupName -CosmosAccountName $cosmosAccountName -DatabaseName $cosmosDatabaseName
+    }
+    catch {
+        Write-Log "Cosmos DB prerequisites check failed: $_" "ERROR"
+        Write-Log "Please deploy Cosmos DB account and database first using -ResourceTypes @('cosmos')" "WARNING"
+        throw
+    }
+    
+    foreach ($container in $containers) {
+        $containerTemplatePath = Join-Path $cosmosDbPath "$container-container.json"
+        $containerParamsPath = Join-Path $cosmosDbPath "$container-container.parameters.$Environment.json"
+        
+        if (Test-Path $containerTemplatePath) {
+            Write-Log "  Deploying $container container..." "INFO"
+            
+            try {
+                if ($WhatIf) {
+                    Write-Log "  WhatIf: Would deploy $container container" "INFO"
+                    continue
+                }
+                
+                $containerDeployment = New-AzResourceGroupDeployment `
+                    -Name "$container-container-deployment-$(Get-Date -Format 'yyyyMMddHHmmss')" `
+                    -ResourceGroupName $ResourceGroupName `
+                    -TemplateFile $containerTemplatePath `
+                    -TemplateParameterFile $containerParamsPath `
+                    -ErrorAction Stop
+                
+                Write-Log "  ✓ $container container deployed successfully" "SUCCESS"
+                $containerDeployments[$container] = $containerDeployment
+            }
+            catch {
+                # Check for specific errors
+                if ($_.Exception.Message -like "*already exists*") {
+                    Write-Log "  Container '$container' already exists. Skipping..." "WARNING"
+                    continue
+                }
+                elseif ($_.Exception.Message -like "*quota exceeded*") {
+                    Write-Log "  Cosmos DB quota exceeded. Check account limits." "ERROR"
+                    throw
+                }
+                else {
+                    Write-Log "  Failed to deploy $container container: $_" "ERROR"
+                    throw
+                }
+            }
+        }
+        else {
+            Write-Log "  Template not found: $containerTemplatePath" "WARNING"
+        }
+    }
+    
+    Write-Log "Cosmos DB containers deployment completed" "SUCCESS"
+    return $containerDeployments
+}
+
+function Test-CosmosContainers {
+    param(
+        [string]$ResourceGroupName,
+        [string]$CosmosAccountName,
+        [string]$DatabaseName,
+        [string[]]$ExpectedContainers
+    )
+    
+    Write-Log "Validating Cosmos DB containers..." "INFO"
+    
+    $allValid = $true
+    
+    foreach ($containerName in $ExpectedContainers) {
+        $container = Get-AzCosmosDBSqlContainer `
+            -ResourceGroupName $ResourceGroupName `
+            -AccountName $CosmosAccountName `
+            -DatabaseName $DatabaseName `
+            -Name $containerName `
+            -ErrorAction SilentlyContinue
+        
+        if ($container) {
+            Write-Log "  ✓ Container '$containerName' exists" "SUCCESS"
+            
+            # Validate partition key
+            $partitionKey = $container.Resource.PartitionKey.Paths[0]
+            
+            # Validate partition key based on container name (using optimized strategy from Subtask 13)
+            $expectedPartitionKey = switch ($containerName) {
+                "users" { "/id" }
+                "budgets" { "/id" }
+                "envelopes" { "/budgetId" }
+                "transactions" { "/budgetId" }
+                default { "/userId" }  # fallback for any other containers
+            }
+            
+            if ($partitionKey -eq $expectedPartitionKey) {
+                Write-Log "    ✓ Partition key: $partitionKey" "INFO"
+            }
+            else {
+                Write-Log "    Unexpected partition key: $partitionKey (expected $expectedPartitionKey)" "WARNING"
+                $allValid = $false
+            }
+        }
+        else {
+            Write-Log "  ✗ Container '$containerName' not found" "WARNING"
+            $allValid = $false
+        }
+    }
+    
+    if ($allValid) {
+        Write-Log "✓ All Cosmos DB containers validated successfully" "SUCCESS"
+    }
+    else {
+        Write-Log "Some container validations failed" "WARNING"
+    }
+    
+    return $allValid
 }
 
 function Deploy-AppService {
@@ -605,22 +759,48 @@ function Export-DeploymentResults {
     foreach ($key in $Deployments.Keys) {
         $deployment = $Deployments[$key]
         if ($deployment) {
-            $details = @{
-                DeploymentName = $deployment.DeploymentName
-                ProvisioningState = $deployment.ProvisioningState
-                Timestamp = if ($deployment.Timestamp) { $deployment.Timestamp.ToString('yyyy-MM-dd HH:mm:ss') } else { $null }
-            }
-            
-            # Extract outputs
-            if ($deployment.Outputs) {
-                $outputs = @{}
-                foreach ($outputKey in $deployment.Outputs.Keys) {
-                    $outputs[$outputKey] = $deployment.Outputs[$outputKey].Value
+            # Handle CosmosContainers separately (it's a hashtable of deployments)
+            if ($key -eq "CosmosContainers") {
+                $containerDetails = @{}
+                foreach ($containerName in $deployment.Keys) {
+                    $containerDeployment = $deployment[$containerName]
+                    if ($containerDeployment) {
+                        $containerDetails[$containerName] = @{
+                            DeploymentName = $containerDeployment.DeploymentName
+                            ProvisioningState = $containerDeployment.ProvisioningState
+                            Timestamp = if ($containerDeployment.Timestamp) { $containerDeployment.Timestamp.ToString('yyyy-MM-dd HH:mm:ss') } else { $null }
+                        }
+                        
+                        # Extract outputs
+                        if ($containerDeployment.Outputs) {
+                            $outputs = @{}
+                            foreach ($outputKey in $containerDeployment.Outputs.Keys) {
+                                $outputs[$outputKey] = $containerDeployment.Outputs[$outputKey].Value
+                            }
+                            $containerDetails[$containerName]['Outputs'] = $outputs
+                        }
+                    }
                 }
-                $details['Outputs'] = $outputs
+                $results.DeploymentDetails[$key] = $containerDetails
             }
-            
-            $results.DeploymentDetails[$key] = $details
+            else {
+                $details = @{
+                    DeploymentName = $deployment.DeploymentName
+                    ProvisioningState = $deployment.ProvisioningState
+                    Timestamp = if ($deployment.Timestamp) { $deployment.Timestamp.ToString('yyyy-MM-dd HH:mm:ss') } else { $null }
+                }
+                
+                # Extract outputs
+                if ($deployment.Outputs) {
+                    $outputs = @{}
+                    foreach ($outputKey in $deployment.Outputs.Keys) {
+                        $outputs[$outputKey] = $deployment.Outputs[$outputKey].Value
+                    }
+                    $details['Outputs'] = $outputs
+                }
+                
+                $results.DeploymentDetails[$key] = $details
+            }
         }
     }
     
@@ -685,6 +865,29 @@ try {
     
     if ($deployAll -or $ResourceTypes -contains "cosmos") {
         $deployments["CosmosDatabase"] = Deploy-CosmosDatabase
+    }
+    
+    # Deploy Cosmos DB Containers
+    if ($deployAll -or $ResourceTypes -contains "cosmos-containers") {
+        $containerDeployments = Deploy-CosmosContainers
+        
+        # Store container deployments
+        if ($containerDeployments -and $containerDeployments.Count -gt 0) {
+            $deployments["CosmosContainers"] = $containerDeployments
+            
+            # Validate deployed containers
+            if (-not $WhatIf) {
+                $cosmosAccountName = "kbudget-$Environment-cosmos"
+                $cosmosDatabaseName = "kbudget-$Environment-db"
+                $expectedContainers = @("users", "budgets", "envelopes", "transactions")
+                
+                Test-CosmosContainers `
+                    -ResourceGroupName $ResourceGroupName `
+                    -CosmosAccountName $cosmosAccountName `
+                    -DatabaseName $cosmosDatabaseName `
+                    -ExpectedContainers $expectedContainers
+            }
+        }
     }
     
     if ($deployAll -or $ResourceTypes -contains "appservice") {
