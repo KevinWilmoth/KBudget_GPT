@@ -1,0 +1,133 @@
+name: Deploy Temporary WIP App
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'temp-app/**'
+      - 'infrastructure/arm-templates/temp-wip-app/**'
+      - '.github/workflows/deploy-temp-wip-app.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+env:
+  AZURE_RESOURCE_GROUP: kbudget-${{ github.event.inputs.environment || 'dev' }}-rg
+  APP_NAME: kbudget-wip-${{ github.event.inputs.environment || 'dev' }}
+
+jobs:
+  deploy-infrastructure:
+    name: Deploy Infrastructure
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      webAppName: ${{ steps.deploy.outputs.webAppName }}
+      webAppUrl: ${{ steps.deploy.outputs.webAppUrl }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Ensure Resource Group Exists
+        shell: bash
+        run: |
+          echo "Checking if resource group exists..."
+          if ! az group show --name ${{ env.AZURE_RESOURCE_GROUP }} &>/dev/null; then
+            echo "Creating resource group ${{ env.AZURE_RESOURCE_GROUP }}..."
+            az group create --name ${{ env.AZURE_RESOURCE_GROUP }} --location eastus
+          else
+            echo "Resource group ${{ env.AZURE_RESOURCE_GROUP }} already exists"
+          fi
+      
+      - name: Deploy ARM Template
+        id: deploy
+        uses: azure/arm-deploy@v1
+        with:
+          resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
+          template: ./infrastructure/arm-templates/temp-wip-app/template.json
+          parameters: ./infrastructure/arm-templates/temp-wip-app/parameters.${{ github.event.inputs.environment || 'dev' }}.json
+          deploymentMode: Incremental
+      
+      - name: Display Deployment Info
+        shell: bash
+        run: |
+          echo "✅ Infrastructure deployed successfully!"
+          echo "Web App Name: ${{ steps.deploy.outputs.webAppName }}"
+          echo "Web App URL: ${{ steps.deploy.outputs.webAppUrl }}"
+
+  build-and-deploy-app:
+    name: Build and Deploy Application
+    needs: deploy-infrastructure
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ needs.deploy-infrastructure.outputs.webAppName }}
+          package: ./temp-app
+      
+      - name: Verify Deployment
+        shell: bash
+        run: |
+          echo "⏳ Waiting for app to be ready..."
+          sleep 30
+          
+          URL="${{ needs.deploy-infrastructure.outputs.webAppUrl }}"
+          echo "Testing URL: $URL"
+          
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$URL" || echo "000")
+          
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ Application is responding correctly!"
+            echo "🌐 Visit your app at: $URL"
+          else
+            echo "⚠️ Application returned HTTP $HTTP_CODE"
+            echo "The app may still be starting up. Please check manually at: $URL"
+          fi
+      
+      - name: Deployment Summary
+        shell: bash
+        run: |
+          echo "## 🎉 Deployment Complete!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Deployment Details" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: ${{ github.event.inputs.environment || 'dev' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Resource Group**: ${{ env.AZURE_RESOURCE_GROUP }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Web App**: ${{ needs.deploy-infrastructure.outputs.webAppName }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **URL**: ${{ needs.deploy-infrastructure.outputs.webAppUrl }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🚀 Access Your App" >> $GITHUB_STEP_SUMMARY
+          echo "Visit your 90s retro Work in Progress page at:" >> $GITHUB_STEP_SUMMARY
+          echo "${{ needs.deploy-infrastructure.outputs.webAppUrl }}" >> $GITHUB_STEP_SUMMARY
