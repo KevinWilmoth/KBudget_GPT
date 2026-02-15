@@ -11,7 +11,7 @@ Create ARM template to provision the Cosmos DB Envelopes container with appropri
 
 #### Container Properties
 - **Container Name**: `envelopes`
-- **Partition Key Path**: `/userId`
+- **Partition Key Path**: `/budgetId`
 - **Partition Key Kind**: `Hash`
 - **Default TTL**: Disabled (off/-1)
 - **Unique Keys**: None
@@ -79,7 +79,7 @@ Create the following files in `infrastructure/arm-templates/cosmos-database/`:
 | cosmosAccountName | string | Cosmos DB account name | Required |
 | cosmosDatabaseName | string | Database name | Required |
 | containerName | string | Container name | "envelopes" |
-| partitionKeyPath | string | Partition key path | "/userId" |
+| partitionKeyPath | string | Partition key path | "/budgetId" |
 | throughput | int | Container throughput (if not shared) | null |
 
 ### Deployment Integration
@@ -239,7 +239,7 @@ Test-AzResourceGroupDeployment `
 ## Acceptance Criteria
 - ARM template validates successfully
 - Template deploys without errors to dev environment
-- Envelopes container created with correct partition key (`/userId`)
+- Envelopes container created with correct partition key (`/budgetId`)
 - All three composite indexes applied correctly
 - Excluded paths configured (description, notes not indexed)
 - Container accessible via Azure Portal and SDK
@@ -253,7 +253,7 @@ Test-AzResourceGroupDeployment `
 - [ ] Template syntax validation passes
 - [ ] Deployment to dev environment succeeds
 - [ ] Container visible in Azure Portal
-- [ ] Partition key set to `/userId`
+- [ ] Partition key set to `/budgetId`
 - [ ] Can insert envelope document successfully
 - [ ] Excluded paths (description, notes) are not indexed
 - [ ] Query ordered by sortOrder uses composite index

@@ -11,7 +11,7 @@ Create ARM template to provision the Cosmos DB Users container with appropriate 
 
 #### Container Properties
 - **Container Name**: `users`
-- **Partition Key Path**: `/userId`
+- **Partition Key Path**: `/id`
 - **Partition Key Kind**: `Hash`
 - **Default TTL**: Disabled (off/-1)
 - **Unique Keys**: `/email` (enforce email uniqueness)
@@ -61,7 +61,7 @@ Create the following files in `infrastructure/arm-templates/cosmos-database/`:
 | cosmosAccountName | string | Cosmos DB account name | Required |
 | cosmosDatabaseName | string | Database name | Required |
 | containerName | string | Container name | "users" |
-| partitionKeyPath | string | Partition key path | "/userId" |
+| partitionKeyPath | string | Partition key path | "/id" |
 | throughput | int | Container throughput (if not shared) | null |
 | uniqueKeyPaths | array | Paths for unique key constraints | ["/email"] |
 
@@ -175,7 +175,7 @@ New-AzResourceGroupDeployment `
 ## Acceptance Criteria
 - ARM template validates successfully
 - Template deploys without errors to dev environment
-- Users container created with correct partition key (`/userId`)
+- Users container created with correct partition key (`/id`)
 - Indexing policy applied correctly
 - Unique key constraint on email enforced
 - Container accessible via Azure Portal and SDK
@@ -188,13 +188,13 @@ New-AzResourceGroupDeployment `
 - [ ] Template syntax validation passes
 - [ ] Deployment to dev environment succeeds
 - [ ] Container visible in Azure Portal
-- [ ] Partition key set to `/userId`
+- [ ] Partition key set to `/id`
 - [ ] Can insert user document successfully
 - [ ] Email uniqueness constraint enforced (duplicate email rejected)
 - [ ] Query against composite index performs efficiently
 - [ ] No errors in deployment logs
 - [ ] Container properties match specifications
-- [ ] Can query users by userId efficiently
+- [ ] Can query users by id efficiently (point read)
 
 ## Technical Notes
 - Unique key constraints must be set at container creation time (cannot be added later)

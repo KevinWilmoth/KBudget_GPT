@@ -137,6 +137,14 @@ WHERE b.budgetId = @budgetId
   AND b.type = "budgetAccess"
 ```
 
+**Note:** With optimized partition keys (Subtask 13), Budgets container uses `/id` as partition key, so access checking becomes:
+
+```sql
+SELECT * FROM budgets b 
+WHERE b.id = @budgetId 
+  AND (b.userId = @requestingUserId OR ARRAY_CONTAINS(b.sharedWith, @requestingUserId))
+```
+
 #### Check User Access to Budget
 
 ```sql

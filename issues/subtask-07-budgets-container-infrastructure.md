@@ -11,7 +11,7 @@ Create ARM template to provision the Cosmos DB Budgets container with appropriat
 
 #### Container Properties
 - **Container Name**: `budgets`
-- **Partition Key Path**: `/userId`
+- **Partition Key Path**: `/id`
 - **Partition Key Kind**: `Hash`
 - **Default TTL**: Disabled (off/-1)
 - **Unique Keys**: None
@@ -69,7 +69,7 @@ Create the following files in `infrastructure/arm-templates/cosmos-database/`:
 | cosmosAccountName | string | Cosmos DB account name | Required |
 | cosmosDatabaseName | string | Database name | Required |
 | containerName | string | Container name | "budgets" |
-| partitionKeyPath | string | Partition key path | "/userId" |
+| partitionKeyPath | string | Partition key path | "/id" |
 | throughput | int | Container throughput (if not shared) | null |
 
 ### Deployment Integration
@@ -203,7 +203,7 @@ Test-AzResourceGroupDeployment `
 ## Acceptance Criteria
 - ARM template validates successfully
 - Template deploys without errors to dev environment
-- Budgets container created with correct partition key (`/userId`)
+- Budgets container created with correct partition key (`/id`)
 - All three composite indexes applied correctly
 - Container accessible via Azure Portal and SDK
 - Sample queries execute efficiently (< 10 RUs)
@@ -216,7 +216,7 @@ Test-AzResourceGroupDeployment `
 - [ ] Template syntax validation passes
 - [ ] Deployment to dev environment succeeds
 - [ ] Container visible in Azure Portal
-- [ ] Partition key set to `/userId`
+- [ ] Partition key set to `/id`
 - [ ] Can insert budget document successfully
 - [ ] Query for current budget uses composite index (check metrics)
 - [ ] Query ordered by date uses composite index
