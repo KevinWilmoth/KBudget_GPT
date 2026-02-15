@@ -90,6 +90,64 @@ Archived budget from over 2 years ago.
 - Demonstrates long-term storage
 - Optimizes query performance for active budgets
 
+## Envelope Model Samples
+
+### envelope-groceries-essential.json
+Complete envelope for essential spending category.
+- Category: Essential (Groceries)
+- Active with partial spending
+- Includes rollover tracking
+- Warning threshold configured
+- Demonstrates typical essential envelope
+
+### envelope-entertainment-discretionary.json
+Discretionary spending envelope for entertainment.
+- Category: Discretionary (Entertainment)
+- Optional description with details
+- Active with spending history
+- Last transaction timestamp recorded
+- Standard discretionary envelope
+
+### envelope-emergency-savings.json
+Savings envelope with significant rollover balance.
+- Category: Savings (Emergency Fund)
+- Large rollover amount from previous periods
+- Target goal set ($15,000)
+- No warning threshold (savings accumulation)
+- Demonstrates long-term savings envelope
+
+### envelope-credit-card-debt.json
+Debt payment envelope for credit card payoff.
+- Category: Debt (Credit Card)
+- Fully spent (payment made)
+- Target amount for total payoff
+- No rollover (debt payments don't carry forward)
+- Demonstrates debt reduction envelope
+
+### envelope-paused.json
+Paused envelope demonstrating temporary inactivity.
+- Status: paused
+- Paused timestamp recorded
+- Balance preserved during pause
+- No allocation for current period
+- Demonstrates pausing functionality
+
+### envelope-minimal.json
+Minimal envelope with only required fields.
+- Discretionary miscellaneous category
+- No description or target amount
+- Default settings applied
+- No spending yet
+- Starting point for envelope creation
+
+### envelope-overspend-allowed.json
+Essential envelope with overspend capability.
+- Category: Essential (Medical)
+- Negative balance allowed
+- Maximum overspend limit set
+- Currently in overspent state
+- Demonstrates overspend feature for emergencies
+
 ## Usage
 
 These samples can be used for:
@@ -104,6 +162,7 @@ These samples can be used for:
 All samples conform to their respective data model schemas:
 - User samples: [USER-DATA-MODEL.md](../USER-DATA-MODEL.md)
 - Budget samples: [BUDGET-DATA-MODEL.md](../BUDGET-DATA-MODEL.md)
+- Envelope samples: [ENVELOPE-DATA-MODEL.md](../ENVELOPE-DATA-MODEL.md)
 
 To validate samples against their schemas:
 
@@ -128,6 +187,22 @@ To validate samples against their schemas:
 9. Check totalRemaining = totalIncome - totalAllocated
 10. Verify only one budget per user has isCurrent = true
 
+### Envelope Model Validation
+1. Ensure all required fields are present
+2. Verify budgetId references an existing budget
+3. Confirm categoryType is one of: essential, discretionary, savings, debt
+4. Validate status is one of: active, paused, closed
+5. Check color is valid hex format (#RRGGBB or #RGB)
+6. Confirm currency codes are valid ISO 4217
+7. Validate financial amounts are non-negative
+8. Check currentBalance = allocatedAmount + rolloverAmount - spentAmount
+9. Verify warningThreshold is between 0-100
+10. Confirm name is unique within budget
+11. Verify sortOrder is unique within budget
+12. If isPaused = true, verify pausedAt is set and status = "paused"
+13. If isOverspendAllowed = false, verify currentBalance >= 0
+14. If maxOverspendAmount is set, verify isOverspendAllowed = true
+
 ## Testing
 
 You can import these samples into Cosmos DB for testing:
@@ -146,6 +221,13 @@ az cosmosdb sql container import \
   --database-name KBudgetDB \
   --name Budgets \
   --file budget-complete.json
+
+# Import Envelope samples
+az cosmosdb sql container import \
+  --account-name <account-name> \
+  --database-name KBudgetDB \
+  --name Envelopes \
+  --file envelope-groceries-essential.json
 ```
 
 Or use the Azure Portal Data Explorer to manually insert documents.

@@ -23,11 +23,13 @@ The KBudget application uses Azure Cosmos DB (SQL API) to store data in a docume
    - Rollover configuration
    - Savings goals and spending limits
 
-3. **Envelope Data Model** *(Coming Soon)*
-   - Spending categories
+3. **[Envelope Data Model](./ENVELOPE-DATA-MODEL.md)**
+   - Spending categories (envelopes)
    - Allocation amounts
    - Balance tracking
    - Rollover configuration
+   - Goals and overspend controls
+   - Category types: essential, discretionary, savings, debt
 
 4. **Transaction Data Model** *(Coming Soon)*
    - Income and expense records
@@ -147,6 +149,7 @@ When adding or modifying data models:
 |------|-------|---------|
 | 2026-02-15 | User | Initial schema design and documentation |
 | 2026-02-15 | Budget | Initial schema design and documentation |
+| 2026-02-15 | Envelope | Initial schema design and documentation |
 
 ---
 
