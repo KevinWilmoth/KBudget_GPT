@@ -36,27 +36,34 @@ Based on Subtask 5 architecture:
   ],
   "compositeIndexes": [
     [
-      {"path": "/userId", "order": "ascending"},
       {"path": "/budgetId", "order": "ascending"},
       {"path": "/transactionDate", "order": "descending"}
     ],
     [
-      {"path": "/userId", "order": "ascending"},
+      {"path": "/budgetId", "order": "ascending"},
       {"path": "/envelopeId", "order": "ascending"},
       {"path": "/transactionDate", "order": "descending"}
     ],
     [
-      {"path": "/userId", "order": "ascending"},
+      {"path": "/budgetId", "order": "ascending"},
       {"path": "/transactionType", "order": "ascending"},
       {"path": "/transactionDate", "order": "descending"}
     ],
     [
-      {"path": "/userId", "order": "ascending"},
+      {"path": "/budgetId", "order": "ascending"},
       {"path": "/merchantName", "order": "ascending"}
     ]
   ]
 }
 ```
+
+**Indexing Rationale**:
+- Exclude `description` and `notes` to reduce index size (high write volume)
+- Composite index for chronological transaction listing by budget (most common query)
+- Composite index for envelope transaction history (budget + envelope scoped)
+- Composite index for filtering by transaction type within a budget
+- Composite index for merchant-based queries within a budget
+- **Note**: `/userId` is not needed in composite indexes since partition key is `/budgetId` and all queries are budget-scoped
 
 **Indexing Rationale**:
 - Exclude `description` and `notes` to reduce index size (high write volume)
@@ -164,22 +171,21 @@ Post-deployment validation:
         ],
         "compositeIndexes": [
           [
-            {"path": "/userId", "order": "ascending"},
             {"path": "/budgetId", "order": "ascending"},
             {"path": "/transactionDate", "order": "descending"}
           ],
           [
-            {"path": "/userId", "order": "ascending"},
+            {"path": "/budgetId", "order": "ascending"},
             {"path": "/envelopeId", "order": "ascending"},
             {"path": "/transactionDate", "order": "descending"}
           ],
           [
-            {"path": "/userId", "order": "ascending"},
+            {"path": "/budgetId", "order": "ascending"},
             {"path": "/transactionType", "order": "ascending"},
             {"path": "/transactionDate", "order": "descending"}
           ],
           [
-            {"path": "/userId", "order": "ascending"},
+            {"path": "/budgetId", "order": "ascending"},
             {"path": "/merchantName", "order": "ascending"}
           ]
         ]

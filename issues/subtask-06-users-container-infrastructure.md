@@ -146,7 +146,7 @@ Post-deployment validation:
         ],
         "compositeIndexes": [
           [
-            {"path": "/userId", "order": "ascending"},
+            {"path": "/id", "order": "ascending"},
             {"path": "/email", "order": "ascending"}
           ]
         ]

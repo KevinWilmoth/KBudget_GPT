@@ -34,17 +34,15 @@ Based on Subtask 5 architecture:
   ],
   "compositeIndexes": [
     [
-      {"path": "/userId", "order": "ascending"},
       {"path": "/budgetId", "order": "ascending"},
       {"path": "/sortOrder", "order": "ascending"}
     ],
     [
-      {"path": "/userId", "order": "ascending"},
       {"path": "/budgetId", "order": "ascending"},
       {"path": "/categoryType", "order": "ascending"}
     ],
     [
-      {"path": "/userId", "order": "ascending"},
+      {"path": "/budgetId", "order": "ascending"},
       {"path": "/isRecurring", "order": "ascending"}
     ]
   ]
@@ -53,9 +51,10 @@ Based on Subtask 5 architecture:
 
 **Indexing Rationale**:
 - Exclude `description` and `notes` to reduce index size and write costs
-- Composite index for ordered envelope display (by sortOrder)
-- Composite index for filtering by category type
-- Composite index for finding recurring envelopes (templates)
+- Composite index for ordered envelope display (by sortOrder) - all queries are scoped to budgetId
+- Composite index for filtering by category type within a budget
+- Composite index for finding recurring envelopes within a budget
+- **Note**: `/userId` is not needed in composite indexes since partition key is `/budgetId` and all queries are budget-scoped
 
 #### Throughput Configuration
 - **Development**: Serverless (no throughput configuration)
@@ -150,17 +149,15 @@ Post-deployment validation:
         ],
         "compositeIndexes": [
           [
-            {"path": "/userId", "order": "ascending"},
             {"path": "/budgetId", "order": "ascending"},
             {"path": "/sortOrder", "order": "ascending"}
           ],
           [
-            {"path": "/userId", "order": "ascending"},
             {"path": "/budgetId", "order": "ascending"},
             {"path": "/categoryType", "order": "ascending"}
           ],
           [
-            {"path": "/userId", "order": "ascending"},
+            {"path": "/budgetId", "order": "ascending"},
             {"path": "/isRecurring", "order": "ascending"}
           ]
         ]
