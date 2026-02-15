@@ -2,12 +2,26 @@
 
 A budget management application built with GPT integration.
 
+## 🚀 Quick Start - Temporary WIP App
+
+While the main application is being developed, you can deploy a fun 90s retro-themed "Work in Progress" page to Azure:
+
+```bash
+# Deploy to Azure using GitHub Actions
+# See docs/TEMP-WIP-APP-QUICKSTART.md for complete instructions
+```
+
+**[➡️ Deploy the Temporary WIP App](docs/TEMP-WIP-APP-QUICKSTART.md)** - Get started in 5 minutes!
+
+---
+
 ## Documentation
 
 This repository contains documentation and issue tracking for the KBudget GPT project.
 
 ### Project Documentation
 
+- **[Temporary WIP App Quick Start](docs/TEMP-WIP-APP-QUICKSTART.md)** - Quick start guide for deploying the 90s retro "Work in Progress" temporary application to Azure App Service
 - **[PowerShell Deployment Guide](docs/POWERSHELL-DEPLOYMENT-GUIDE.md)** - Comprehensive guide for all PowerShell deployment scripts including prerequisites, usage examples, parameters, troubleshooting, and CI/CD integration
 - **[Deployment Validation and Testing Guide](docs/DEPLOYMENT-VALIDATION-GUIDE.md)** - Complete guide for deployment validation, automated testing, CI/CD pipeline integration, and error handling
 - **[Network Architecture Guide](docs/NETWORK-ARCHITECTURE.md)** - Detailed network architecture diagrams, subnet layout, traffic flows, and security boundaries for the VNet infrastructure
@@ -27,14 +41,21 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 ├── docs/                           # Project documentation
 │   ├── AAD-AUTHENTICATION-SETUP-GUIDE.md # Azure AD authentication guide
 │   ├── ACCESS-REVIEW-PROCESS.md   # Access review process guide
+│   ├── TEMP-WIP-APP-QUICKSTART.md # Temporary WIP app deployment guide
 │   ├── azure-resource-group-naming-conventions.md
 │   ├── azure-resource-group-best-practices.md
 │   └── MONITORING-OBSERVABILITY.md # Monitoring and observability guide
+├── temp-app/                       # Temporary WIP application
+│   ├── index.html                 # 90s retro WIP page
+│   ├── server.js                  # Node.js server
+│   ├── Dockerfile                 # Container configuration
+│   └── README.md                  # App documentation
 ├── infrastructure/                 # Infrastructure as Code
 │   └── arm-templates/             # ARM templates
 │       ├── resource-groups/       # Resource group templates
 │       ├── aad-app-registration/  # Azure AD app registration scripts
 │       ├── app-service/           # App Service templates
+│       ├── temp-wip-app/          # Temporary WIP app deployment
 │       ├── cosmos-database/       # Cosmos DB templates
 │       ├── storage-account/       # Storage Account templates
 │       ├── azure-functions/       # Azure Functions templates
