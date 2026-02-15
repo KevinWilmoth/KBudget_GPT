@@ -65,13 +65,6 @@ Based on Subtask 5 architecture:
 - Composite index for merchant-based queries within a budget
 - **Note**: `/userId` is not needed in composite indexes since partition key is `/budgetId` and all queries are budget-scoped
 
-**Indexing Rationale**:
-- Exclude `description` and `notes` to reduce index size (high write volume)
-- Composite index for chronological transaction listing by budget (most common query)
-- Composite index for envelope transaction history
-- Composite index for filtering by transaction type
-- Composite index for merchant-based queries
-
 #### Throughput Configuration
 - **Development**: Serverless (no throughput configuration)
 - **Staging**: Share database-level throughput (400 RU/s)
