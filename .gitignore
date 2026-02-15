@@ -38,3 +38,10 @@ node_modules/
 dist/
 build/
 out/
+
+# .NET build artifacts
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
