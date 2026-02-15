@@ -8,17 +8,14 @@
     "cosmosDatabaseName": {
       "value": "kbudget-staging-db"
     },
-    "cosmosContainerName": {
-      "value": "budgets"
-    },
     "consistencyLevel": {
       "value": "Session"
     },
+    "databaseThroughput": {
+      "value": 400
+    },
     "enableServerless": {
       "value": false
-    },
-    "throughput": {
-      "value": 400
     },
     "enableFreeTier": {
       "value": false
@@ -29,16 +26,14 @@
     "enableMultipleWriteLocations": {
       "value": false
     },
-    "partitionKeyPath": {
-      "value": "/id"
-    },
     "tags": {
       "value": {
         "Environment": "Staging",
         "Project": "KBudget-GPT",
         "Owner": "DevOps-Team",
         "CostCenter": "CC-12345",
-        "Application": "KBudget"
+        "Application": "KBudget",
+        "ManagedBy": "ARM-Template"
       }
     }
   }

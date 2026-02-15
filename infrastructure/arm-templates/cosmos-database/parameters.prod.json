@@ -8,17 +8,14 @@
     "cosmosDatabaseName": {
       "value": "kbudget-prod-db"
     },
-    "cosmosContainerName": {
-      "value": "budgets"
-    },
     "consistencyLevel": {
       "value": "Session"
     },
+    "databaseThroughput": {
+      "value": 1000
+    },
     "enableServerless": {
       "value": false
-    },
-    "throughput": {
-      "value": 1000
     },
     "enableFreeTier": {
       "value": false
@@ -29,16 +26,14 @@
     "enableMultipleWriteLocations": {
       "value": false
     },
-    "partitionKeyPath": {
-      "value": "/id"
-    },
     "tags": {
       "value": {
         "Environment": "Production",
         "Project": "KBudget-GPT",
         "Owner": "DevOps-Team",
         "CostCenter": "CC-12345",
-        "Application": "KBudget"
+        "Application": "KBudget",
+        "ManagedBy": "ARM-Template"
       }
     }
   }
