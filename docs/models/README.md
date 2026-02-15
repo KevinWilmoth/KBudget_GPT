@@ -31,10 +31,14 @@ The KBudget application uses Azure Cosmos DB (SQL API) to store data in a docume
    - Goals and overspend controls
    - Category types: essential, discretionary, savings, debt
 
-4. **Transaction Data Model** *(Coming Soon)*
-   - Income and expense records
-   - Transfers between envelopes
-   - Transaction metadata
+4. **[Transaction Data Model](./TRANSACTION-DATA-MODEL.md)**
+   - Income, expense, and transfer records
+   - Transaction metadata and classifications
+   - Receipt and attachment management
+   - Recurring transaction support
+   - Transaction status lifecycle
+   - Payment method tracking
+   - Balance calculation queries
 
 ## Data Model Principles
 
@@ -150,6 +154,7 @@ When adding or modifying data models:
 | 2026-02-15 | User | Initial schema design and documentation |
 | 2026-02-15 | Budget | Initial schema design and documentation |
 | 2026-02-15 | Envelope | Initial schema design and documentation |
+| 2026-02-15 | Transaction | Initial schema design and documentation |
 
 ---
 
