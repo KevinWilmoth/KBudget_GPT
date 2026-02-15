@@ -1,0 +1,175 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "ARM Template for Cosmos DB Transactions Container"
+  },
+  "parameters": {
+    "cosmosAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Cosmos DB Account"
+      }
+    },
+    "cosmosDatabaseName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Cosmos DB Database"
+      }
+    },
+    "containerName": {
+      "type": "string",
+      "defaultValue": "transactions",
+      "metadata": {
+        "description": "Name of the Transactions container"
+      }
+    },
+    "partitionKeyPath": {
+      "type": "string",
+      "defaultValue": "/budgetId",
+      "metadata": {
+        "description": "Partition key path for the container"
+      }
+    },
+    "throughput": {
+      "type": "int",
+      "defaultValue": -1,
+      "metadata": {
+        "description": "Container throughput (RU/s). Set to -1 to use shared database throughput or serverless mode"
+      }
+    },
+    "defaultTtl": {
+      "type": "int",
+      "defaultValue": -1,
+      "metadata": {
+        "description": "Time to live in seconds. Set to -1 to disable (keep forever), or set to 220752000 for 7 years (regulatory compliance)"
+      }
+    },
+    "enableAnalyticalStorage": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Enable analytical storage for future analytics capabilities"
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Tags for the resources"
+      }
+    }
+  },
+  "variables": {
+    "containerResourceId": "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', parameters('cosmosAccountName'), parameters('cosmosDatabaseName'), parameters('containerName'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', parameters('cosmosAccountName'), parameters('cosmosDatabaseName'), parameters('containerName'))]",
+      "dependsOn": [],
+      "properties": {
+        "resource": {
+          "id": "[parameters('containerName')]",
+          "partitionKey": {
+            "paths": [
+              "[parameters('partitionKeyPath')]"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "automatic": true,
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ],
+            "excludedPaths": [
+              {
+                "path": "/\"_etag\"/?"
+              },
+              {
+                "path": "/description/?"
+              },
+              {
+                "path": "/notes/?"
+              }
+            ],
+            "compositeIndexes": [
+              [
+                {
+                  "path": "/budgetId",
+                  "order": "ascending"
+                },
+                {
+                  "path": "/transactionDate",
+                  "order": "descending"
+                }
+              ],
+              [
+                {
+                  "path": "/budgetId",
+                  "order": "ascending"
+                },
+                {
+                  "path": "/envelopeId",
+                  "order": "ascending"
+                },
+                {
+                  "path": "/transactionDate",
+                  "order": "descending"
+                }
+              ],
+              [
+                {
+                  "path": "/budgetId",
+                  "order": "ascending"
+                },
+                {
+                  "path": "/transactionType",
+                  "order": "ascending"
+                },
+                {
+                  "path": "/transactionDate",
+                  "order": "descending"
+                }
+              ],
+              [
+                {
+                  "path": "/budgetId",
+                  "order": "ascending"
+                },
+                {
+                  "path": "/merchantName",
+                  "order": "ascending"
+                }
+              ]
+            ]
+          },
+          "defaultTtl": "[parameters('defaultTtl')]",
+          "analyticalStorageTtl": "[if(parameters('enableAnalyticalStorage'), -1, json('null'))]"
+        },
+        "options": "[if(equals(parameters('throughput'), -1), createObject(), createObject('throughput', parameters('throughput')))]"
+      },
+      "tags": "[parameters('tags')]"
+    }
+  ],
+  "outputs": {
+    "containerResourceId": {
+      "type": "string",
+      "value": "[variables('containerResourceId')]",
+      "metadata": {
+        "description": "Resource ID of the Transactions container"
+      }
+    },
+    "containerName": {
+      "type": "string",
+      "value": "[parameters('containerName')]",
+      "metadata": {
+        "description": "Name of the Transactions container"
+      }
+    }
+  }
+}
