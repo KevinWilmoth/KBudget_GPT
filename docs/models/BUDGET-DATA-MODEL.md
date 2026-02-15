@@ -709,7 +709,7 @@ rolloverAmount = SUM(envelope.currentBalance) from previousBudget
 ## Related Documentation
 
 - [User Data Model](./USER-DATA-MODEL.md)
-- [Envelope Data Model](./ENVELOPE-DATA-MODEL.md) *(Coming Soon)*
+- [Envelope Data Model](./ENVELOPE-DATA-MODEL.md)
 - [Transaction Data Model](./TRANSACTION-DATA-MODEL.md) *(Coming Soon)*
 - [Cosmos Container Architecture](../../issues/subtask-05-cosmos-container-architecture.md)
 - [Azure Infrastructure Overview](../azure-infrastructure-overview.md)
