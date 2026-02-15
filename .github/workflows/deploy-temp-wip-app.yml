@@ -5,7 +5,6 @@ on:
     branches: [main]
     paths:
       - 'temp-app/**'
-      - 'infrastructure/arm-templates/temp-wip-app/**'
       - '.github/workflows/deploy-temp-wip-app.yml'
   workflow_dispatch:
     inputs:
@@ -24,57 +23,8 @@ env:
   APP_NAME: kbudget-wip-${{ github.event.inputs.environment || 'dev' }}
 
 jobs:
-  deploy-infrastructure:
-    name: Deploy Infrastructure
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-    outputs:
-      webAppName: ${{ steps.deploy.outputs.webAppName }}
-      webAppUrl: ${{ steps.deploy.outputs.webAppUrl }}
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      
-      - name: Ensure Resource Group Exists
-        shell: bash
-        run: |
-          echo "Checking if resource group exists..."
-          if ! az group show --name ${{ env.AZURE_RESOURCE_GROUP }} &>/dev/null; then
-            echo "Creating resource group ${{ env.AZURE_RESOURCE_GROUP }}..."
-            az group create --name ${{ env.AZURE_RESOURCE_GROUP }} --location eastus
-          else
-            echo "Resource group ${{ env.AZURE_RESOURCE_GROUP }} already exists"
-          fi
-      
-      - name: Deploy ARM Template
-        id: deploy
-        uses: azure/arm-deploy@v1
-        with:
-          resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
-          template: ./infrastructure/arm-templates/temp-wip-app/template.json
-          parameters: ./infrastructure/arm-templates/temp-wip-app/parameters.${{ github.event.inputs.environment || 'dev' }}.json
-          deploymentMode: Incremental
-      
-      - name: Display Deployment Info
-        shell: bash
-        run: |
-          echo "✅ Infrastructure deployed successfully!"
-          echo "Web App Name: ${{ steps.deploy.outputs.webAppName }}"
-          echo "Web App URL: ${{ steps.deploy.outputs.webAppUrl }}"
-
   build-and-deploy-app:
     name: Build and Deploy Application
-    needs: deploy-infrastructure
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -97,7 +47,7 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ needs.deploy-infrastructure.outputs.webAppName }}
+          app-name: ${{ env.APP_NAME }}
           package: ./temp-app
       
       - name: Verify Deployment
@@ -106,7 +56,7 @@ jobs:
           echo "⏳ Waiting for app to be ready..."
           sleep 30
           
-          URL="${{ needs.deploy-infrastructure.outputs.webAppUrl }}"
+          URL="https://${{ env.APP_NAME }}.azurewebsites.net"
           echo "Testing URL: $URL"
           
           HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$URL" || echo "000")
@@ -127,9 +77,9 @@ jobs:
           echo "### Deployment Details" >> $GITHUB_STEP_SUMMARY
           echo "- **Environment**: ${{ github.event.inputs.environment || 'dev' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Resource Group**: ${{ env.AZURE_RESOURCE_GROUP }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Web App**: ${{ needs.deploy-infrastructure.outputs.webAppName }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **URL**: ${{ needs.deploy-infrastructure.outputs.webAppUrl }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Web App**: ${{ env.APP_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **URL**: https://${{ env.APP_NAME }}.azurewebsites.net" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🚀 Access Your App" >> $GITHUB_STEP_SUMMARY
           echo "Visit your 90s retro Work in Progress page at:" >> $GITHUB_STEP_SUMMARY
-          echo "${{ needs.deploy-infrastructure.outputs.webAppUrl }}" >> $GITHUB_STEP_SUMMARY
+          echo "https://${{ env.APP_NAME }}.azurewebsites.net" >> $GITHUB_STEP_SUMMARY
