@@ -449,14 +449,16 @@ Currently shared with:
 ## Performance Implications
 
 ### Positive
-- Shared budgets in same partition as owner (efficient queries)
+- Shared budgets in same partition as budget (efficient queries using `/id` partition key)
 - No additional containers needed
 - Simple access control (array membership check)
 
 ### Negative
-- "Get all budgets for user" requires checking `sharedWith` arrays (cross-partition)
+- "Get all budgets for user" requires cross-partition query (mitigate with caching)
 - Consider denormalization if performance becomes issue
 - Cache aggressively to minimize queries
+
+**Note:** With the optimized partition key strategy (Subtask 13), Budgets container uses `/id` as partition key, not `/userId`. This means the budget document is in its own partition, making point reads by budgetId extremely efficient (1 RU).
 
 ### Optimization
 - Cache user's budget list (invalidate on share/unshare)

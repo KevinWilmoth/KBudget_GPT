@@ -24,9 +24,11 @@ The partition key is the most critical design decision in Cosmos DB. It affects:
 - Scalability
 - Cross-partition query costs
 
-#### Recommended Partition Keys
+#### Recommended Partition Keys (Initial Strategy)
 
-| Container | Partition Key | Rationale |
+**Note:** This represents the initial partition key analysis. See **Subtask 13: Optimize Partition Key Strategy** for the final optimized approach that uses `/id` for Users/Budgets and `/budgetId` for Envelopes/Transactions to maximize point read performance.
+
+| Container | Initial Partition Key | Rationale |
 |-----------|---------------|-----------|
 | Users | `/userId` | Natural isolation by user; users don't query across users |
 | Budgets | `/userId` | Users query their own budgets; enables efficient user-scoped queries |
@@ -34,10 +36,10 @@ The partition key is the most critical design decision in Cosmos DB. It affects:
 | Transactions | `/userId` | Most queries are user-scoped; best distribution for multi-tenant scenario |
 
 **Key Considerations:**
-- All containers use `userId` as partition key for consistent isolation
+- All containers initially use `userId` as partition key for consistent isolation
 - This enables efficient single-partition queries for user-specific data
 - Supports potential future sharding if a single user's data exceeds partition limits
-- Administrative queries across users will be cross-partition (acceptable tradeoff)
+- **See Subtask 13 for optimized partition key strategy based on point read optimization**
 
 #### Alternative Considered: Composite Partition Keys
 

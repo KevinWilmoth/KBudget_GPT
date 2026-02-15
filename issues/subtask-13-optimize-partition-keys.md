@@ -3,7 +3,9 @@
 **Parent Epic:** [EPIC: Envelope-Based Budgeting Data Model](./EPIC-envelope-budgeting-data-model.md)
 
 ## Description
-Revise the partition key strategy for each Cosmos DB container to optimize for the most common access patterns, particularly point reads. This replaces the uniform `/userId` partition key strategy with container-specific optimizations.
+Revise the partition key strategy for each Cosmos DB container to optimize for the most common access patterns, particularly point reads. This replaces the initial uniform `/userId` partition key strategy from Subtask 5 with container-specific optimizations.
+
+**Note:** This subtask supersedes the partition key strategy defined in Subtask 5. All container infrastructure subtasks (6-9) have been updated to reflect this optimized strategy.
 
 ## Requirements
 

@@ -133,10 +133,20 @@ function Test-CosmosContainers {
             
             # Validate partition key
             $partitionKey = $container.Resource.PartitionKey.Paths[0]
-            if ($partitionKey -eq "/userId") {
+            
+            # Validate partition key based on container name (using optimized strategy from Subtask 13)
+            $expectedPartitionKey = switch ($containerName) {
+                "users" { "/id" }
+                "budgets" { "/id" }
+                "envelopes" { "/budgetId" }
+                "transactions" { "/budgetId" }
+                default { "/userId" }  # fallback for any other containers
+            }
+            
+            if ($partitionKey -eq $expectedPartitionKey) {
                 Write-Host "    ✓ Partition key: $partitionKey" -ForegroundColor Gray
             } else {
-                Write-Warning "    Unexpected partition key: $partitionKey (expected /userId)"
+                Write-Warning "    Unexpected partition key: $partitionKey (expected $expectedPartitionKey)"
             }
         } else {
             Write-Warning "  ✗ Container '$containerName' not found"
