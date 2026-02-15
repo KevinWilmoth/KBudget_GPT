@@ -16,10 +16,12 @@ The KBudget application uses Azure Cosmos DB (SQL API) to store data in a docume
    - Notification configuration
    - Internationalization support
 
-2. **Budget Data Model** *(Coming Soon)*
+2. **[Budget Data Model](./BUDGET-DATA-MODEL.md)**
    - Budget periods and timeframes
    - Income tracking
    - Budget status and lifecycle
+   - Rollover configuration
+   - Savings goals and spending limits
 
 3. **Envelope Data Model** *(Coming Soon)*
    - Spending categories
@@ -80,6 +82,7 @@ All data models follow a consistent structure:
 The data models are implemented as C# classes in the `KBudgetApp/Models` directory:
 
 - `User.cs` - User data model
+- `Budget.cs` - Budget data model
 - Additional models will be added as needed
 
 Each model class includes:
@@ -143,6 +146,7 @@ When adding or modifying data models:
 | Date | Model | Changes |
 |------|-------|---------|
 | 2026-02-15 | User | Initial schema design and documentation |
+| 2026-02-15 | Budget | Initial schema design and documentation |
 
 ---
 
