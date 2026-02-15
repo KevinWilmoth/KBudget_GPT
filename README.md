@@ -34,17 +34,31 @@ This repository contains documentation and issue tracking for the KBudget GPT pr
 - [Azure Resource Group Best Practices](docs/azure-resource-group-best-practices.md) - Comprehensive guide for managing Azure Resource Groups, including resource organization, tagging strategies, and lifecycle management
 - [Monitoring and Observability](docs/MONITORING-OBSERVABILITY.md) - Monitoring and observability implementation guide
 
+### Data Models
+
+- **[Data Models Overview](docs/models/README.md)** - Overview of all data models and design principles for the envelope budgeting system
+- **[User Data Model](docs/models/USER-DATA-MODEL.md)** - User profile, preferences, and settings schema with validation rules and indexing strategy
+
 ## Repository Structure
 
 ```
 .
 ├── docs/                           # Project documentation
+│   ├── models/                     # Data model documentation
+│   │   ├── USER-DATA-MODEL.md     # User schema and validation rules
+│   │   ├── samples/               # Sample JSON documents
+│   │   └── README.md              # Data models overview
 │   ├── AAD-AUTHENTICATION-SETUP-GUIDE.md # Azure AD authentication guide
 │   ├── ACCESS-REVIEW-PROCESS.md   # Access review process guide
 │   ├── TEMP-WIP-APP-QUICKSTART.md # Temporary WIP app deployment guide
 │   ├── azure-resource-group-naming-conventions.md
 │   ├── azure-resource-group-best-practices.md
 │   └── MONITORING-OBSERVABILITY.md # Monitoring and observability guide
+├── KBudgetApp/                     # Main ASP.NET Core application
+│   ├── Models/                     # Data models (C# classes)
+│   │   └── User.cs                # User data model
+│   ├── Program.cs                  # Application entry point
+│   └── KBudgetApp.csproj          # Project file
 ├── temp-app/                       # Temporary WIP application
 │   ├── index.html                 # 90s retro WIP page
 │   ├── server.js                  # Node.js server
