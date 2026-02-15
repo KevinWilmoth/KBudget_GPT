@@ -148,6 +148,64 @@ Essential envelope with overspend capability.
 - Currently in overspent state
 - Demonstrates overspend feature for emergencies
 
+## Transaction Model Samples
+
+### transaction-income-salary.json
+Recurring income transaction for monthly salary.
+- Transaction type: income
+- Recurring monthly payment
+- Directly allocated to envelope
+- Cleared status with confirmation number
+- Demonstrates typical paycheck deposit
+
+### transaction-expense-groceries.json
+Expense transaction for grocery shopping.
+- Transaction type: expense
+- Debit card payment
+- Includes receipt URL
+- Cleared transaction with merchant details
+- Demonstrates typical spending transaction
+
+### transaction-transfer.json
+Transfer transaction between envelopes.
+- Transaction type: transfer
+- Moves funds from dining to savings
+- No merchant information
+- Immediate clearing (internal transfer)
+- Demonstrates budget reallocation
+
+### transaction-pending-expense.json
+Pending expense awaiting clearance.
+- Transaction type: expense
+- Credit card payment
+- Status: pending (not yet cleared)
+- Online purchase with order confirmation
+- Demonstrates uncleared transaction state
+
+### transaction-void.json
+Voided transaction with audit trail.
+- Transaction type: expense
+- Voided after initial clearing
+- Includes void reason and timestamp
+- Preserves original transaction details
+- Demonstrates void workflow for corrections
+
+### transaction-unallocated-income.json
+Income not yet allocated to envelope.
+- Transaction type: income
+- No envelope assignment (envelopeId = null)
+- One-time income (tax refund)
+- Cleared status
+- Demonstrates unallocated income scenario
+
+### transaction-check-payment.json
+Recurring expense paid by check.
+- Transaction type: expense
+- Check payment method with check number
+- Monthly recurring series
+- Cleared after posting delay
+- Demonstrates check-based payments
+
 ## Usage
 
 These samples can be used for:
@@ -163,6 +221,7 @@ All samples conform to their respective data model schemas:
 - User samples: [USER-DATA-MODEL.md](../USER-DATA-MODEL.md)
 - Budget samples: [BUDGET-DATA-MODEL.md](../BUDGET-DATA-MODEL.md)
 - Envelope samples: [ENVELOPE-DATA-MODEL.md](../ENVELOPE-DATA-MODEL.md)
+- Transaction samples: [TRANSACTION-DATA-MODEL.md](../TRANSACTION-DATA-MODEL.md)
 
 To validate samples against their schemas:
 
@@ -203,6 +262,24 @@ To validate samples against their schemas:
 13. If isOverspendAllowed = false, verify currentBalance >= 0
 14. If maxOverspendAmount is set, verify isOverspendAllowed = true
 
+### Transaction Model Validation
+1. Ensure all required fields are present
+2. Verify amount is > 0 with max 2 decimal places
+3. Confirm transactionType is one of: income, expense, transfer
+4. Validate transactionDate is not in the future
+5. Check status is one of: pending, cleared, reconciled, void
+6. Verify budgetId references an existing budget
+7. For income: envelopeId is optional; fromEnvelopeId and toEnvelopeId must be null
+8. For expense: envelopeId is required; fromEnvelopeId and toEnvelopeId must be null
+9. For transfer: both fromEnvelopeId and toEnvelopeId are required and must be different; envelopeId must be null
+10. Confirm currency codes are valid ISO 4217
+11. Validate paymentMethod is one of: cash, debit, credit, check, transfer, other
+12. If isRecurring = true, verify recurringSeriesId and recurringFrequency are set
+13. Verify recurringFrequency is one of: daily, weekly, biweekly, monthly, quarterly, yearly
+14. If isVoid = true, verify voidedAt, voidedBy, and status = "void" are set
+15. If clearedDate is set, verify it is >= postedDate
+16. Confirm ISO 8601 format for all date/datetime fields
+
 ## Testing
 
 You can import these samples into Cosmos DB for testing:
@@ -228,6 +305,13 @@ az cosmosdb sql container import \
   --database-name KBudgetDB \
   --name Envelopes \
   --file envelope-groceries-essential.json
+
+# Import Transaction samples
+az cosmosdb sql container import \
+  --account-name <account-name> \
+  --database-name KBudgetDB \
+  --name Transactions \
+  --file transaction-income-salary.json
 ```
 
 Or use the Azure Portal Data Explorer to manually insert documents.
