@@ -175,19 +175,19 @@ $deploymentOutputs = @{
     containers = @{
         users = @{
             id = "/subscriptions/.../containers/users"
-            partitionKey = "/userId"
+            partitionKey = "/id"
         }
         budgets = @{
             id = "/subscriptions/.../containers/budgets"
-            partitionKey = "/userId"
+            partitionKey = "/id"
         }
         envelopes = @{
             id = "/subscriptions/.../containers/envelopes"
-            partitionKey = "/userId"
+            partitionKey = "/budgetId"
         }
         transactions = @{
             id = "/subscriptions/.../containers/transactions"
-            partitionKey = "/userId"
+            partitionKey = "/budgetId"
         }
     }
 }

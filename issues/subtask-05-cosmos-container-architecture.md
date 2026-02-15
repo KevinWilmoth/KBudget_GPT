@@ -221,12 +221,14 @@ The partition key is the most critical design decision in Cosmos DB. It affects:
 
 ### Container Configuration Summary
 
-| Container | Partition Key | Initial Throughput | Indexing | TTL |
-|-----------|---------------|-------------------|----------|-----|
-| Users | /userId | Shared | Custom composite | Disabled |
-| Budgets | /userId | Shared | Custom composite | Disabled |
-| Envelopes | /userId | Shared | Custom composite | Disabled |
-| Transactions | /userId | Shared | Custom composite | Optional (7 years) |
+**Note:** The partition keys shown below reflect the initial analysis. See **Subtask 13** for the final optimized partition key strategy that uses `/id` for Users/Budgets and `/budgetId` for Envelopes/Transactions.
+
+| Container | Initial Partition Key | Optimized Partition Key (Subtask 13) | Initial Throughput | Indexing | TTL |
+|-----------|---------------|-------------------|----------|-----|-----|
+| Users | /userId | **/id** | Shared | Custom composite | Disabled |
+| Budgets | /userId | **/id** | Shared | Custom composite | Disabled |
+| Envelopes | /userId | **/budgetId** | Shared | Custom composite | Disabled |
+| Transactions | /userId | **/budgetId** | Shared | Custom composite | Optional (7 years) |
 
 ### Time-to-Live (TTL) Strategy
 

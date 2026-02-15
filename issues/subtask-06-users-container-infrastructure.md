@@ -32,12 +32,14 @@ Based on Subtask 5 architecture:
   ],
   "compositeIndexes": [
     [
-      {"path": "/userId", "order": "ascending"},
+      {"path": "/id", "order": "ascending"},
       {"path": "/email", "order": "ascending"}
     ]
   ]
 }
 ```
+
+**Note**: The composite index uses `/id` which is the same as userId (partition key). This enables efficient lookups by email within the user's partition.
 
 #### Throughput Configuration
 - **Development**: Serverless (no throughput configuration)
