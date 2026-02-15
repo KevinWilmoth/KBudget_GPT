@@ -20,7 +20,7 @@ on:
 
 env:
   AZURE_RESOURCE_GROUP: kbudget-${{ github.event.inputs.environment || 'dev' }}-rg
-  APP_NAME: kbudget-wip-${{ github.event.inputs.environment || 'dev' }}
+  APP_NAME: kbudget-${{ github.event.inputs.environment || 'dev' }}-app
 
 jobs:
   build-and-deploy-app:
