@@ -1,0 +1,142 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "ARM Template for Cosmos DB Envelopes Container"
+  },
+  "parameters": {
+    "cosmosAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Cosmos DB Account"
+      }
+    },
+    "cosmosDatabaseName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Cosmos DB Database"
+      }
+    },
+    "containerName": {
+      "type": "string",
+      "defaultValue": "envelopes",
+      "metadata": {
+        "description": "Name of the Envelopes container"
+      }
+    },
+    "partitionKeyPath": {
+      "type": "string",
+      "defaultValue": "/budgetId",
+      "metadata": {
+        "description": "Partition key path for the container"
+      }
+    },
+    "throughput": {
+      "type": "int",
+      "defaultValue": -1,
+      "metadata": {
+        "description": "Container throughput (RU/s). Set to -1 to use shared database throughput or serverless mode"
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Tags for the resources"
+      }
+    }
+  },
+  "variables": {
+    "containerResourceId": "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', parameters('cosmosAccountName'), parameters('cosmosDatabaseName'), parameters('containerName'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', parameters('cosmosAccountName'), parameters('cosmosDatabaseName'), parameters('containerName'))]",
+      "dependsOn": [],
+      "properties": {
+        "resource": {
+          "id": "[parameters('containerName')]",
+          "partitionKey": {
+            "paths": [
+              "[parameters('partitionKeyPath')]"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "automatic": true,
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ],
+            "excludedPaths": [
+              {
+                "path": "/\"_etag\"/?"
+              },
+              {
+                "path": "/description/?"
+              },
+              {
+                "path": "/notes/?"
+              }
+            ],
+            "compositeIndexes": [
+              [
+                {
+                  "path": "/budgetId",
+                  "order": "ascending"
+                },
+                {
+                  "path": "/sortOrder",
+                  "order": "ascending"
+                }
+              ],
+              [
+                {
+                  "path": "/budgetId",
+                  "order": "ascending"
+                },
+                {
+                  "path": "/categoryType",
+                  "order": "ascending"
+                }
+              ],
+              [
+                {
+                  "path": "/budgetId",
+                  "order": "ascending"
+                },
+                {
+                  "path": "/isRecurring",
+                  "order": "ascending"
+                }
+              ]
+            ]
+          },
+          "defaultTtl": -1
+        },
+        "options": "[if(equals(parameters('throughput'), -1), createObject(), createObject('throughput', parameters('throughput')))]"
+      },
+      "tags": "[parameters('tags')]"
+    }
+  ],
+  "outputs": {
+    "containerResourceId": {
+      "type": "string",
+      "value": "[variables('containerResourceId')]",
+      "metadata": {
+        "description": "Resource ID of the Envelopes container"
+      }
+    },
+    "containerName": {
+      "type": "string",
+      "value": "[parameters('containerName')]",
+      "metadata": {
+        "description": "Name of the Envelopes container"
+      }
+    }
+  }
+}
