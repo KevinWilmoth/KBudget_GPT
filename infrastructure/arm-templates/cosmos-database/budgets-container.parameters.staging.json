@@ -1,0 +1,31 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "cosmosAccountName": {
+      "value": "kbudget-staging-cosmos"
+    },
+    "cosmosDatabaseName": {
+      "value": "kbudget-staging-db"
+    },
+    "containerName": {
+      "value": "budgets"
+    },
+    "partitionKeyPath": {
+      "value": "/id"
+    },
+    "throughput": {
+      "value": -1
+    },
+    "tags": {
+      "value": {
+        "Environment": "Staging",
+        "Project": "KBudget-GPT",
+        "Owner": "DevOps-Team",
+        "CostCenter": "CC-12345",
+        "Application": "KBudget",
+        "Container": "Budgets"
+      }
+    }
+  }
+}

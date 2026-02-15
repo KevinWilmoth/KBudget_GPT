@@ -1,0 +1,136 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "ARM Template for Cosmos DB Budgets Container"
+  },
+  "parameters": {
+    "cosmosAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Cosmos DB Account"
+      }
+    },
+    "cosmosDatabaseName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Cosmos DB Database"
+      }
+    },
+    "containerName": {
+      "type": "string",
+      "defaultValue": "budgets",
+      "metadata": {
+        "description": "Name of the Budgets container"
+      }
+    },
+    "partitionKeyPath": {
+      "type": "string",
+      "defaultValue": "/id",
+      "metadata": {
+        "description": "Partition key path for the container"
+      }
+    },
+    "throughput": {
+      "type": "int",
+      "defaultValue": -1,
+      "metadata": {
+        "description": "Container throughput (RU/s). Set to -1 to use shared database throughput or serverless mode"
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Tags for the resources"
+      }
+    }
+  },
+  "variables": {
+    "containerResourceId": "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', parameters('cosmosAccountName'), parameters('cosmosDatabaseName'), parameters('containerName'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', parameters('cosmosAccountName'), parameters('cosmosDatabaseName'), parameters('containerName'))]",
+      "dependsOn": [],
+      "properties": {
+        "resource": {
+          "id": "[parameters('containerName')]",
+          "partitionKey": {
+            "paths": [
+              "[parameters('partitionKeyPath')]"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "automatic": true,
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ],
+            "excludedPaths": [
+              {
+                "path": "/\"_etag\"/?"
+              }
+            ],
+            "compositeIndexes": [
+              [
+                {
+                  "path": "/userId",
+                  "order": "ascending"
+                },
+                {
+                  "path": "/isCurrent",
+                  "order": "ascending"
+                }
+              ],
+              [
+                {
+                  "path": "/userId",
+                  "order": "ascending"
+                },
+                {
+                  "path": "/startDate",
+                  "order": "descending"
+                }
+              ],
+              [
+                {
+                  "path": "/userId",
+                  "order": "ascending"
+                },
+                {
+                  "path": "/fiscalYear",
+                  "order": "descending"
+                }
+              ]
+            ]
+          },
+          "defaultTtl": -1
+        },
+        "options": "[if(equals(parameters('throughput'), -1), createObject(), createObject('throughput', parameters('throughput')))]"
+      },
+      "tags": "[parameters('tags')]"
+    }
+  ],
+  "outputs": {
+    "containerResourceId": {
+      "type": "string",
+      "value": "[variables('containerResourceId')]",
+      "metadata": {
+        "description": "Resource ID of the Budgets container"
+      }
+    },
+    "containerName": {
+      "type": "string",
+      "value": "[parameters('containerName')]",
+      "metadata": {
+        "description": "Name of the Budgets container"
+      }
+    }
+  }
+}
